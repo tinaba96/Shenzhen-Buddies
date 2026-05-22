@@ -586,7 +586,7 @@ export default async function BrowsePage({ searchParams }: Props) {
         {scored.map(({ profile: p, score, rating }) => (
           <li
             key={p.id}
-            className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+            className="group relative rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
           >
             <div className="flex items-start gap-3">
               <Avatar
@@ -596,8 +596,11 @@ export default async function BrowsePage({ searchParams }: Props) {
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
-                  <Link href={`/u/${p.id}`} className="min-w-0 flex-1">
-                    <h2 className="truncate text-lg font-semibold hover:underline">
+                  <Link
+                    href={`/u/${p.id}`}
+                    className="min-w-0 flex-1 after:absolute after:inset-0 after:content-['']"
+                  >
+                    <h2 className="truncate text-lg font-semibold group-hover:underline">
                       {p.display_name}
                     </h2>
                   </Link>
@@ -634,23 +637,15 @@ export default async function BrowsePage({ searchParams }: Props) {
             <Chips label="Languages" items={p.languages} highlight={score.sharedLanguages} />
             <Chips label="Traits" items={p.personality_traits} highlight={score.sharedTraits} />
 
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <Link
-                href={`/u/${p.id}`}
-                className="rounded-md border border-zinc-300 px-3 py-2 text-center text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+            <form action={startConversationWith} className="relative z-10 mt-4">
+              <input type="hidden" name="other_id" value={p.id} />
+              <SubmitButton
+                pendingLabel="Opening…"
+                className="w-full rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
-                View profile
-              </Link>
-              <form action={startConversationWith}>
-                <input type="hidden" name="other_id" value={p.id} />
-                <SubmitButton
-                  pendingLabel="Opening…"
-                  className="w-full rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-                >
-                  Message
-                </SubmitButton>
-              </form>
-            </div>
+                Message
+              </SubmitButton>
+            </form>
           </li>
         ))}
       </ul>
@@ -717,7 +712,7 @@ function AiSuggestedPicks({
         {scored.map(({ profile: p, score, rating }) => (
           <li
             key={p.id}
-            className="flex flex-col rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+            className="group relative flex flex-col rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
           >
             <div className="flex items-start gap-3">
               <Avatar
@@ -728,7 +723,7 @@ function AiSuggestedPicks({
               <div className="min-w-0 flex-1">
                 <Link
                   href={`/u/${p.id}`}
-                  className="block truncate text-sm font-semibold hover:underline"
+                  className="block truncate text-sm font-semibold group-hover:underline after:absolute after:inset-0 after:content-['']"
                 >
                   {p.display_name}
                 </Link>
@@ -746,23 +741,15 @@ function AiSuggestedPicks({
             <p className="mt-3 flex-1 text-sm text-zinc-700 dark:text-zinc-300">
               {describeMatch(score)}
             </p>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <Link
-                href={`/u/${p.id}`}
-                className="rounded-md border border-zinc-300 px-3 py-1.5 text-center text-xs font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+            <form action={startConversationWith} className="relative z-10 mt-4">
+              <input type="hidden" name="other_id" value={p.id} />
+              <SubmitButton
+                pendingLabel="Opening…"
+                className="w-full rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
-                View
-              </Link>
-              <form action={startConversationWith}>
-                <input type="hidden" name="other_id" value={p.id} />
-                <SubmitButton
-                  pendingLabel="Opening…"
-                  className="w-full rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-                >
-                  Message
-                </SubmitButton>
-              </form>
-            </div>
+                Message
+              </SubmitButton>
+            </form>
           </li>
         ))}
       </ul>

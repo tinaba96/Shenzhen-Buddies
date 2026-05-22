@@ -147,13 +147,13 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
         </div>
       </section>
 
-      <div className="mx-auto w-full max-w-3xl px-4 pb-12">
-        {/* Identity row — avatar peeks above the cover banner */}
-        <div className="-mt-14 flex flex-wrap items-end gap-4 sm:-mt-16">
+      <div className="mx-auto w-full max-w-3xl px-4 pb-12 pt-8">
+        {/* Identity row — sits cleanly below the cover banner */}
+        <div className="flex flex-wrap items-center gap-4">
           <Avatar
             src={avatarPublicUrl(profile.avatar_path, profile.updated_at)}
             name={profile.display_name}
-            size={104}
+            size={96}
             className="ring-4 ring-white shadow-lg dark:ring-zinc-900"
           />
           <div className="min-w-0 flex-1 pb-2">
