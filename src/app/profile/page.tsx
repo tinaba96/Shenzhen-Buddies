@@ -72,16 +72,16 @@ export default async function ProfilePage({ searchParams }: Props) {
         </div>
       </section>
 
-      <div className="mx-auto w-full max-w-2xl px-4 pb-16">
-        {/* Identity header — overlaps the cover */}
-        <div className="-mt-14 flex items-end gap-4 sm:-mt-16">
+      <div className="mx-auto w-full max-w-2xl px-4 pb-16 pt-8">
+        {/* Identity header — sits cleanly below the cover banner */}
+        <div className="flex flex-wrap items-center gap-4">
           <Avatar
             src={avatarPublicUrl(profile?.avatar_path, profile?.updated_at)}
             name={profile?.display_name}
-            size={104}
+            size={96}
             className="ring-4 ring-white shadow-lg dark:ring-zinc-900"
           />
-          <div className="min-w-0 flex-1 pb-2">
+          <div className="min-w-0 flex-1">
             <h1 className="truncate text-2xl font-semibold">
               {profile?.display_name || 'Your profile'}
             </h1>
