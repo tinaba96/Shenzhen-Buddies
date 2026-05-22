@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { Avatar } from '@/components/Avatar'
+import { avatarPublicUrl } from '@/lib/avatars'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 type Props = {
@@ -15,6 +17,8 @@ type ProfileRow = {
   hobbies: string[]
   languages: string[]
   personality_traits: string[]
+  avatar_path: string | null
+  updated_at: string
 }
 
 const PAGE_LIMIT = 50
@@ -30,7 +34,7 @@ export default async function BrowsePage({ searchParams }: Props) {
 
   let query = supabase
     .from('profiles')
-    .select('id, role, display_name, bio, city, hobbies, languages, personality_traits')
+    .select('id, role, display_name, bio, city, hobbies, languages, personality_traits, avatar_path, updated_at')
     .neq('id', user.id)
     .eq('visibility', 'public')
     .order('created_at', { ascending: false })
@@ -126,19 +130,28 @@ export default async function BrowsePage({ searchParams }: Props) {
             key={p.id}
             className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
           >
-            <div className="flex items-start justify-between gap-2">
-              <h2 className="text-lg font-semibold">{p.display_name}</h2>
-              <span
-                className={
-                  p.role === 'guide'
-                    ? 'rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                    : 'rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-800 dark:bg-sky-950 dark:text-sky-300'
-                }
-              >
-                {p.role === 'guide' ? 'Guide' : 'Tourist'}
-              </span>
+            <div className="flex items-start gap-3">
+              <Avatar
+                src={avatarPublicUrl(p.avatar_path, p.updated_at)}
+                name={p.display_name}
+                size={48}
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-2">
+                  <h2 className="truncate text-lg font-semibold">{p.display_name}</h2>
+                  <span
+                    className={
+                      p.role === 'guide'
+                        ? 'rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                        : 'rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-800 dark:bg-sky-950 dark:text-sky-300'
+                    }
+                  >
+                    {p.role === 'guide' ? 'Guide' : 'Tourist'}
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-500">{p.city}</p>
+              </div>
             </div>
-            <p className="text-xs text-zinc-500">{p.city}</p>
 
             {p.bio && (
               <p className="mt-2 line-clamp-3 text-sm text-zinc-700 dark:text-zinc-300">

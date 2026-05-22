@@ -4,6 +4,14 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
+const MAX_AVATAR_BYTES = 5 * 1024 * 1024
+const MIME_TO_EXT: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+}
+
 function parseList(input: FormDataEntryValue | null): string[] {
   if (!input) return []
   return String(input)
@@ -32,7 +40,30 @@ export async function saveProfile(formData: FormData) {
     redirect('/profile?error=invalid_visibility')
   }
 
-  const profile = {
+  let uploadedAvatarPath: string | null = null
+  const avatar = formData.get('avatar')
+  if (avatar instanceof File && avatar.size > 0) {
+    if (avatar.size > MAX_AVATAR_BYTES) {
+      redirect('/profile?error=avatar_too_large')
+    }
+    const ext = MIME_TO_EXT[avatar.type]
+    if (!ext) {
+      redirect('/profile?error=avatar_type_unsupported')
+    }
+    const path = `${user.id}/avatar.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(path, avatar, {
+        contentType: avatar.type,
+        upsert: true,
+      })
+    if (uploadError) {
+      redirect(`/profile?error=${encodeURIComponent(uploadError.message)}`)
+    }
+    uploadedAvatarPath = path
+  }
+
+  const profile: Record<string, unknown> = {
     id: user.id,
     role,
     display_name: String(formData.get('display_name') ?? '').trim(),
@@ -42,6 +73,9 @@ export async function saveProfile(formData: FormData) {
     languages: parseList(formData.get('languages')),
     personality_traits: parseList(formData.get('personality_traits')),
     visibility,
+  }
+  if (uploadedAvatarPath) {
+    profile.avatar_path = uploadedAvatarPath
   }
 
   if (!profile.display_name) {

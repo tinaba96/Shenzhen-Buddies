@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { Avatar } from '@/components/Avatar'
 import { SubmitButton } from '@/components/SubmitButton'
+import { avatarPublicUrl } from '@/lib/avatars'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { saveProfile, signOut } from './actions'
 
@@ -18,6 +20,8 @@ type Profile = {
   languages: string[]
   personality_traits: string[]
   visibility: 'public' | 'private'
+  avatar_path: string | null
+  updated_at: string
 }
 
 export default async function ProfilePage({ searchParams }: Props) {
@@ -77,6 +81,26 @@ export default async function ProfilePage({ searchParams }: Props) {
         action={saveProfile}
         className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
       >
+        <div className="flex items-center gap-4">
+          <Avatar
+            src={avatarPublicUrl(profile?.avatar_path, profile?.updated_at)}
+            name={profile?.display_name}
+            size={72}
+          />
+          <label className="block flex-1">
+            <span className="text-sm font-medium">Profile photo</span>
+            <input
+              type="file"
+              name="avatar"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              className="mt-1 block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-900 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-zinc-700 dark:file:bg-white dark:file:text-zinc-900 dark:hover:file:bg-zinc-200"
+            />
+            <span className="mt-1 block text-xs text-zinc-500">
+              JPG, PNG, WebP, or GIF. Max 5 MB.
+            </span>
+          </label>
+        </div>
+
         <fieldset className="space-y-2">
           <legend className="text-sm font-medium">I am a…</legend>
           <div className="flex gap-4">
