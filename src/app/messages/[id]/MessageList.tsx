@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { SubmitButton } from '@/components/SubmitButton'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { sendMessage } from './actions'
@@ -19,23 +20,30 @@ type Props = {
   initialMessages: Message[]
 }
 
+// Module-level cache so React StrictMode's double-mount doesn't create two
+// Supabase clients (each opening its own WebSocket).
+let cachedClient: SupabaseClient | null = null
+function browserClient(): SupabaseClient {
+  if (!cachedClient) cachedClient = createSupabaseBrowserClient()
+  return cachedClient
+}
+
 export function MessageList({ conversationId, currentUserId, initialMessages }: Props) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages)
+  // Realtime-only arrivals; merged with initialMessages on render.
+  const [realtimeMessages, setRealtimeMessages] = useState<Message[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    setMessages((prev) => {
-      const have = new Set(prev.map((m) => m.id))
-      const additions = initialMessages.filter((m) => !have.has(m.id))
-      if (additions.length === 0) return prev
-      return [...prev, ...additions].sort((a, b) =>
-        a.created_at.localeCompare(b.created_at),
-      )
-    })
-  }, [initialMessages])
+  const messages = useMemo(() => {
+    const have = new Set(initialMessages.map((m) => m.id))
+    const additions = realtimeMessages.filter((m) => !have.has(m.id))
+    if (additions.length === 0) return initialMessages
+    return [...initialMessages, ...additions].sort((a, b) =>
+      a.created_at.localeCompare(b.created_at),
+    )
+  }, [initialMessages, realtimeMessages])
 
   useEffect(() => {
-    const supabase = createSupabaseBrowserClient()
+    const supabase = browserClient()
     const channel = supabase
       .channel(`messages:${conversationId}`)
       .on(
@@ -48,7 +56,7 @@ export function MessageList({ conversationId, currentUserId, initialMessages }: 
         },
         (payload) => {
           const msg = payload.new as Message
-          setMessages((prev) => {
+          setRealtimeMessages((prev) => {
             if (prev.some((m) => m.id === msg.id)) return prev
             return [...prev, msg]
           })
@@ -67,6 +75,8 @@ export function MessageList({ conversationId, currentUserId, initialMessages }: 
   }, [messages.length])
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Skip IME composition (Chinese/Japanese candidate commit fires Enter).
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       e.currentTarget.form?.requestSubmit()

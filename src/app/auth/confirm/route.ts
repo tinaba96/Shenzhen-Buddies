@@ -6,7 +6,10 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
-  const next = searchParams.get('next') ?? '/profile'
+  // Only allow same-origin relative paths to defend against open-redirect.
+  const rawNext = searchParams.get('next') ?? '/profile'
+  const safeNext =
+    rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/profile'
 
   if (!token_hash || !type) {
     return NextResponse.redirect(new URL('/login?error=missing_token', request.url))
@@ -21,5 +24,5 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  return NextResponse.redirect(new URL(next, request.url))
+  return NextResponse.redirect(new URL(safeNext, request.url))
 }

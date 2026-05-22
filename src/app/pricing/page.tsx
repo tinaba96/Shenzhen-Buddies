@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 import { SubmitButton } from '@/components/SubmitButton'
 import { isSubscriptionActive, type SubscriptionRow } from '@/lib/stripe'
 import { createSupabaseServerClient } from '@/lib/supabase/server'

@@ -32,8 +32,7 @@ const ACTIVE_STATUSES = new Set([
 export function isSubscriptionActive(row: SubscriptionRow | null | undefined): boolean {
   if (!row) return false
   if (!ACTIVE_STATUSES.has(row.status)) return false
-  if (row.current_period_end) {
-    return new Date(row.current_period_end).getTime() > Date.now()
-  }
-  return true
+  // No period_end → treat as inactive. Safer default than assuming "forever active".
+  if (!row.current_period_end) return false
+  return new Date(row.current_period_end).getTime() > Date.now()
 }

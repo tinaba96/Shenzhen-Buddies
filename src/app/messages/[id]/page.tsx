@@ -55,15 +55,16 @@ export default async function ThreadPage({ params, searchParams }: Props) {
     .eq('id', otherId)
     .maybeSingle<ProfileLite>()
 
+  // Mark read BEFORE fetching messages so we don't lose unread state on a
+  // message that arrives in the window between SELECT and the RPC.
+  await supabase.rpc('mark_conversation_read', { c_id: id })
+
   const { data: messages } = await supabase
     .from('messages')
     .select('id, conversation_id, sender_id, content, created_at')
     .eq('conversation_id', id)
     .order('created_at', { ascending: true })
     .returns<Message[]>()
-
-  // Mark this conversation as read for the current user.
-  await supabase.rpc('mark_conversation_read', { c_id: id })
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-6">

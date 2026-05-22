@@ -58,8 +58,13 @@ export async function POST(request: NextRequest) {
         break
     }
   } catch (err) {
+    // Return 500 so Stripe retries — silent 200 here permanently loses the
+    // subscription row when Supabase has a transient outage.
     console.error('Stripe webhook handler error', err)
-    return NextResponse.json({ received: true, handled: false }, { status: 200 })
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'handler_failed' },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json({ received: true })
