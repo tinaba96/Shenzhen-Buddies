@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
+import { StarRating } from '@/components/StarRating'
 import { SubmitButton } from '@/components/SubmitButton'
 import { avatarPublicUrl } from '@/lib/avatars'
 import { scoreMatch, type MatchScore, type ProfileForMatching } from '@/lib/matching'
@@ -12,9 +13,12 @@ type Props = {
     lang?: string | string[]
     hobby?: string | string[]
     great?: string
+    min_stars?: string
     sort?: string
   }>
 }
+
+type RatingStats = { avg: number; count: number }
 
 type ProfileRow = {
   id: string
@@ -75,6 +79,8 @@ export default async function BrowsePage({ searchParams }: Props) {
   const langs = asArray(sp.lang)
   const hobbies = asArray(sp.hobby)
   const greatOnly = sp.great === '1'
+  const minStarsRaw = Number(sp.min_stars ?? '0')
+  const minStars = Number.isFinite(minStarsRaw) && minStarsRaw > 0 ? minStarsRaw : 0
   const sort = sp.sort
   const supabase = await createSupabaseServerClient()
 
@@ -124,11 +130,36 @@ export default async function BrowsePage({ searchParams }: Props) {
     error = result.error
   }
 
-  const sortByMatch = sort !== 'recent' && !!myProfile
+  // Fetch review aggregates for the candidate profiles so we can display +
+  // optionally filter by minimum rating.
+  const ratings = new Map<string, RatingStats>()
+  if (profiles && profiles.length) {
+    const { data: reviewRows } = await supabase
+      .from('reviews')
+      .select('reviewee_id, stars')
+      .in(
+        'reviewee_id',
+        profiles.map((p) => p.id),
+      )
+      .returns<{ reviewee_id: string; stars: number }[]>()
+    const agg = new Map<string, { sum: number; count: number }>()
+    for (const r of reviewRows ?? []) {
+      const cur = agg.get(r.reviewee_id) ?? { sum: 0, count: 0 }
+      cur.sum += r.stars
+      cur.count += 1
+      agg.set(r.reviewee_id, cur)
+    }
+    for (const [id, { sum, count }] of agg) {
+      ratings.set(id, { avg: sum / count, count })
+    }
+  }
+
   let scored = (profiles ?? []).map((p) => ({
     profile: p,
     score: scoreMatch(myProfile, p),
+    rating: ratings.get(p.id) ?? null,
   }))
+
   if (greatOnly) {
     scored = scored.filter(
       (s) =>
@@ -138,11 +169,28 @@ export default async function BrowsePage({ searchParams }: Props) {
         0,
     )
   }
-  if (sortByMatch) {
+  if (minStars > 0) {
+    scored = scored.filter((s) => (s.rating?.avg ?? 0) >= minStars)
+  }
+
+  const sortByMatch = sort !== 'recent' && sort !== 'rated' && !!myProfile
+  if (sort === 'rated') {
+    scored.sort(
+      (a, b) =>
+        (b.rating?.avg ?? 0) - (a.rating?.avg ?? 0) ||
+        (b.rating?.count ?? 0) - (a.rating?.count ?? 0),
+    )
+  } else if (sortByMatch) {
     scored.sort((a, b) => b.score.total - a.score.total)
   }
 
-  const hasFilters = langs.length > 0 || hobbies.length > 0 || greatOnly || sort === 'recent'
+  const hasFilters =
+    langs.length > 0 ||
+    hobbies.length > 0 ||
+    greatOnly ||
+    minStars > 0 ||
+    sort === 'recent' ||
+    sort === 'rated'
 
   return (
     <main className="flex flex-1 flex-col">
@@ -232,6 +280,40 @@ export default async function BrowsePage({ searchParams }: Props) {
           />
         </div>
 
+        <div>
+          <div className="mb-2 flex items-baseline justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+              Minimum rating
+            </p>
+            <span className="text-xs text-zinc-500">
+              {minStars > 0
+                ? `${minStars}+ stars only`
+                : 'any rating'}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              { v: 0, label: 'Any' },
+              { v: 3, label: '★ 3+' },
+              { v: 4, label: '★ 4+' },
+              { v: 5, label: '★ 5' },
+            ].map((opt) => (
+              <label key={opt.v} className="cursor-pointer select-none">
+                <input
+                  type="radio"
+                  name="min_stars"
+                  value={String(opt.v)}
+                  defaultChecked={minStars === opt.v}
+                  className="peer sr-only"
+                />
+                <span className="inline-block rounded-full border border-zinc-300 px-3 py-1 text-xs transition hover:bg-zinc-50 peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-900 dark:border-zinc-700 dark:hover:bg-zinc-800 dark:peer-checked:bg-amber-950 dark:peer-checked:text-amber-200">
+                  {opt.label}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+
         <div className="flex flex-wrap items-center gap-4 border-t border-zinc-100 pt-4 dark:border-zinc-800">
           <label className="flex cursor-pointer items-center gap-2 text-sm">
             <input
@@ -252,6 +334,7 @@ export default async function BrowsePage({ searchParams }: Props) {
               className="rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
             >
               <option value="match">Best match</option>
+              <option value="rated">Highest rated</option>
               <option value="recent">Most recent</option>
             </select>
           </label>
@@ -304,7 +387,7 @@ export default async function BrowsePage({ searchParams }: Props) {
       )}
 
       <ul className="grid gap-4 sm:grid-cols-2">
-        {scored.map(({ profile: p, score }) => (
+        {scored.map(({ profile: p, score, rating }) => (
           <li
             key={p.id}
             className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
@@ -333,6 +416,14 @@ export default async function BrowsePage({ searchParams }: Props) {
                   </span>
                 </div>
                 <p className="text-xs text-zinc-500">{p.city}</p>
+                {rating && rating.count > 0 && (
+                  <div className="mt-1 flex items-center gap-1 text-xs text-zinc-600 dark:text-zinc-400">
+                    <StarRating value={rating.avg} size={12} />
+                    <span>
+                      {rating.avg.toFixed(1)} · {rating.count}
+                    </span>
+                  </div>
+                )}
                 {myProfile && <MatchBadge score={score} />}
               </div>
             </div>
@@ -405,7 +496,7 @@ function ChipGroup({
 function AiSuggestedPicks({
   scored,
 }: {
-  scored: { profile: ProfileRow; score: MatchScore }[]
+  scored: { profile: ProfileRow; score: MatchScore; rating: RatingStats | null }[]
 }) {
   if (scored.length === 0) return null
   return (
@@ -427,7 +518,7 @@ function AiSuggestedPicks({
       </div>
 
       <ul className="grid gap-4 sm:grid-cols-3">
-        {scored.map(({ profile: p, score }) => (
+        {scored.map(({ profile: p, score, rating }) => (
           <li
             key={p.id}
             className="flex flex-col rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
@@ -448,6 +539,12 @@ function AiSuggestedPicks({
                 <p className="truncate text-xs text-zinc-500">
                   {p.city} · {p.role === 'guide' ? 'Guide' : 'Tourist'}
                 </p>
+                {rating && rating.count > 0 && (
+                  <div className="mt-0.5 flex items-center gap-1 text-[11px] text-zinc-600 dark:text-zinc-400">
+                    <StarRating value={rating.avg} size={11} />
+                    <span>{rating.avg.toFixed(1)}</span>
+                  </div>
+                )}
               </div>
             </div>
             <p className="mt-3 flex-1 text-sm text-zinc-700 dark:text-zinc-300">
