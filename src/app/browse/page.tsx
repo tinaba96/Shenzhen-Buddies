@@ -37,7 +37,11 @@ type ProfileRow = {
   updated_at: string
 }
 
-const PAGE_LIMIT = 50
+// Generous upper bound so post-scoring filters (min_stars, min_reviews,
+// greatOnly) work over a wide enough candidate window. At ~10KB of data per
+// row this is still well under the PostgREST default response cap, and the
+// JS-side filtering is O(n) over the result.
+const PAGE_LIMIT = 200
 
 const LANGUAGE_OPTIONS = [
   'English',
@@ -105,10 +109,15 @@ export default async function BrowsePage({ searchParams }: Props) {
   const withPhoto = sp.with_photo === '1'
   const activeOnly = sp.active === '1'
   const minStarsRaw = Number(sp.min_stars ?? '0')
-  const minStars = Number.isFinite(minStarsRaw) && minStarsRaw > 0 ? minStarsRaw : 0
+  const minStars =
+    Number.isFinite(minStarsRaw) && minStarsRaw > 0
+      ? Math.min(5, Math.floor(minStarsRaw))
+      : 0
   const minReviewsRaw = Number(sp.min_reviews ?? '0')
   const minReviews =
-    Number.isFinite(minReviewsRaw) && minReviewsRaw > 0 ? minReviewsRaw : 0
+    Number.isFinite(minReviewsRaw) && minReviewsRaw > 0
+      ? Math.min(1000, Math.floor(minReviewsRaw))
+      : 0
   const sort = sp.sort
   const supabase = await createSupabaseServerClient()
 
