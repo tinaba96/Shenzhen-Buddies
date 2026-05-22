@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { Avatar } from "@/components/Avatar";
+import { avatarPublicUrl } from "@/lib/avatars";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,7 +32,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-white text-zinc-900 dark:bg-black dark:text-zinc-100">
         <SiteHeader />
         <div className="flex flex-1 flex-col">{children}</div>
         <SiteFooter />
@@ -38,31 +41,106 @@ export default function RootLayout({
   );
 }
 
-function SiteHeader() {
+async function SiteHeader() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let profile: {
+    display_name: string | null;
+    avatar_path: string | null;
+    updated_at: string | null;
+  } | null = null;
+  if (user) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("display_name, avatar_path, updated_at")
+      .eq("id", user.id)
+      .maybeSingle();
+    profile = data;
+  }
+
   return (
-    <header className="sticky top-0 z-20 border-b border-zinc-200/70 bg-white/70 backdrop-blur dark:border-zinc-800/70 dark:bg-black/50">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
+    <header className="sticky top-0 z-30 border-b border-zinc-200/70 bg-white/80 backdrop-blur-md dark:border-zinc-800/70 dark:bg-black/60">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-semibold tracking-tight"
+        >
           <span
             aria-hidden
-            className="inline-block h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-rose-500"
+            className="inline-block h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-rose-500 shadow-sm"
           />
-          <span>Shenzhen Buddies</span>
+          <span className="hidden sm:inline">Shenzhen Buddies</span>
         </Link>
-        <nav className="flex items-center gap-5 text-sm">
+
+        <nav className="hidden flex-1 items-center justify-center gap-6 text-sm md:flex">
           <Link
             href="/explore"
-            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+            className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
           >
             Explore
           </Link>
+          {user && (
+            <Link
+              href="/browse"
+              className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+            >
+              Browse
+            </Link>
+          )}
+          {user && (
+            <Link
+              href="/messages"
+              className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+            >
+              Messages
+            </Link>
+          )}
           <Link
             href="/pricing"
-            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+            className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
           >
             Pricing
           </Link>
         </nav>
+
+        <div className="flex items-center gap-3">
+          {user ? (
+            <Link
+              href="/profile"
+              className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white py-1 pl-1 pr-3 text-sm shadow-sm transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+            >
+              <Avatar
+                src={avatarPublicUrl(
+                  profile?.avatar_path,
+                  profile?.updated_at,
+                )}
+                name={profile?.display_name}
+                size={28}
+              />
+              <span className="hidden max-w-[10ch] truncate sm:inline">
+                {profile?.display_name ?? "Profile"}
+              </span>
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="hidden text-sm text-zinc-600 transition hover:text-zinc-900 sm:inline dark:text-zinc-300 dark:hover:text-white"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                className="rounded-full bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+              >
+                Sign up
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </header>
   );
@@ -71,16 +149,82 @@ function SiteHeader() {
 function SiteFooter() {
   const year = new Date().getFullYear();
   return (
-    <footer className="border-t border-zinc-200 dark:border-zinc-800">
-      <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-zinc-500 sm:flex-row sm:px-6">
-        <p>© {year} Tensai Tech Inc.</p>
-        <div className="flex items-center gap-4">
-          <Link href="/pricing" className="hover:text-zinc-700 dark:hover:text-zinc-300">
-            Pricing
+    <footer className="border-t border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
+        <div>
+          <Link
+            href="/"
+            className="flex items-center gap-2 font-semibold tracking-tight"
+          >
+            <span
+              aria-hidden
+              className="inline-block h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-rose-500"
+            />
+            Shenzhen Buddies
           </Link>
-          <span>Shenzhen Buddies — pilot</span>
+          <p className="mt-3 max-w-xs text-xs text-zinc-500">
+            Match with a local buddy in Shenzhen who shares your interests.
+          </p>
+        </div>
+        <FooterColumn
+          title="Product"
+          links={[
+            { href: "/explore", label: "Explore" },
+            { href: "/browse", label: "Browse buddies" },
+            { href: "/pricing", label: "Pricing" },
+          ]}
+        />
+        <FooterColumn
+          title="Account"
+          links={[
+            { href: "/signup", label: "Sign up" },
+            { href: "/login", label: "Log in" },
+            { href: "/profile", label: "Your profile" },
+          ]}
+        />
+        <FooterColumn
+          title="Company"
+          links={[
+            { href: "/", label: "About" },
+            { href: "/", label: "Contact" },
+            { href: "/", label: "Privacy" },
+          ]}
+        />
+      </div>
+      <div className="border-t border-zinc-200 dark:border-zinc-800">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-zinc-500 sm:flex-row sm:px-6">
+          <p>© {year} Tensai Tech Inc.</p>
+          <p>Pilot release · Shenzhen 深圳</p>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterColumn({
+  title,
+  links,
+}: {
+  title: string;
+  links: { href: string; label: string }[];
+}) {
+  return (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-700 dark:text-zinc-300">
+        {title}
+      </p>
+      <ul className="mt-3 space-y-2 text-sm">
+        {links.map((l) => (
+          <li key={`${title}-${l.label}`}>
+            <Link
+              href={l.href}
+              className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+            >
+              {l.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

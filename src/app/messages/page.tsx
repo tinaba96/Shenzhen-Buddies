@@ -114,13 +114,37 @@ export default async function MessagesIndexPage() {
       </div>
 
       {(convs?.length ?? 0) === 0 ? (
-        <p className="rounded-lg border border-dashed border-zinc-300 px-6 py-12 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-          No conversations yet. Find someone on the{' '}
-          <Link href="/browse" className="underline">
-            Browse
-          </Link>{' '}
-          page and click <strong>Message</strong>.
-        </p>
+        <div className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white p-10 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-40 dark:opacity-20"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle at 30% 20%, rgba(245,158,11,0.25), transparent 50%), radial-gradient(circle at 70% 80%, rgba(244,63,94,0.25), transparent 50%)',
+            }}
+          />
+          <div className="relative">
+            <div className="mx-auto inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-200 to-rose-200 text-zinc-800 shadow-sm dark:from-amber-900/40 dark:to-rose-900/40 dark:text-zinc-100">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7">
+                <path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+            <h2 className="mt-4 text-lg font-semibold">No conversations yet</h2>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+              Find someone on Browse who shares your interests and start the
+              first hello.
+            </p>
+            <Link
+              href="/browse"
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            >
+              Browse buddies
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </div>
       ) : (
         <ul className="divide-y divide-zinc-200 overflow-hidden rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
           {convs!.map((c) => {
