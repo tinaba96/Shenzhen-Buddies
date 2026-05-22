@@ -7,6 +7,7 @@ import { avatarPublicUrl } from '@/lib/avatars'
 import { scoreMatch, type MatchScore, type ProfileForMatching } from '@/lib/matching'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { startConversationWith } from '@/app/messages/actions'
+import { FilterDrawer } from './FilterDrawer'
 
 type Props = {
   searchParams: Promise<{
@@ -237,17 +238,18 @@ export default async function BrowsePage({ searchParams }: Props) {
     scored.sort((a, b) => b.score.total - a.score.total)
   }
 
-  const hasFilters =
-    langs.length > 0 ||
-    hobbies.length > 0 ||
-    traits.length > 0 ||
-    greatOnly ||
-    withPhoto ||
-    activeOnly ||
-    minStars > 0 ||
-    minReviews > 0 ||
-    sort === 'recent' ||
-    sort === 'rated'
+  const activeCount =
+    langs.length +
+    hobbies.length +
+    traits.length +
+    (greatOnly ? 1 : 0) +
+    (withPhoto ? 1 : 0) +
+    (activeOnly ? 1 : 0) +
+    (minStars > 0 ? 1 : 0) +
+    (minReviews > 0 ? 1 : 0) +
+    (sort === 'recent' || sort === 'rated' ? 1 : 0)
+
+  const hasFilters = activeCount > 0
 
   return (
     <main className="flex flex-1 flex-col">
@@ -297,15 +299,14 @@ export default async function BrowsePage({ searchParams }: Props) {
 
       <AiSuggestedPicks scored={scored.filter((s) => s.score.total > 0).slice(0, 3)} />
 
-      <form
-        method="GET"
-        className="mb-6 space-y-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-      >
-        <div>
-          <div className="mb-2 flex items-baseline justify-between gap-2">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-              Languages
-            </p>
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <FilterDrawer activeCount={activeCount}>
+          <form method="GET" className="space-y-5">
+            <div>
+              <div className="mb-2 flex items-baseline justify-between gap-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                  Languages
+                </p>
             <span className="text-xs text-zinc-500">
               {langs.length
                 ? `${langs.length} selected — must speak at least one`
@@ -466,26 +467,36 @@ export default async function BrowsePage({ searchParams }: Props) {
           </label>
         </div>
 
-        <div className="flex items-center gap-3 pt-1">
-          <button
-            type="submit"
-            className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            <div className="sticky bottom-0 -mx-6 -mb-5 flex items-center gap-3 border-t border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900">
+              <button
+                type="submit"
+                className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+              >
+                Apply filters
+              </button>
+              {hasFilters && (
+                <Link
+                  href="/browse"
+                  className="text-sm text-zinc-600 underline dark:text-zinc-400"
+                >
+                  Reset
+                </Link>
+              )}
+            </div>
+          </form>
+        </FilterDrawer>
+        {hasFilters && (
+          <Link
+            href="/browse"
+            className="text-sm text-zinc-600 underline dark:text-zinc-400"
           >
-            Apply filters
-          </button>
-          {hasFilters && (
-            <Link
-              href="/browse"
-              className="text-sm text-zinc-600 underline dark:text-zinc-400"
-            >
-              Clear all
-            </Link>
-          )}
-          <p className="ml-auto text-xs text-zinc-500">
-            {scored.length} {scored.length === 1 ? 'match' : 'matches'}
-          </p>
-        </div>
-      </form>
+            Clear all
+          </Link>
+        )}
+        <p className="ml-auto text-xs text-zinc-500">
+          {scored.length} {scored.length === 1 ? 'match' : 'matches'}
+        </p>
+      </div>
 
       {!myProfile?.role && (
         <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
