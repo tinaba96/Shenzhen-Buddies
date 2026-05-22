@@ -1,11 +1,14 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
+import { SubmitButton } from '@/components/SubmitButton'
 import { avatarPublicUrl } from '@/lib/avatars'
+import { scoreMatch, type MatchScore, type ProfileForMatching } from '@/lib/matching'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { startConversationWith } from '@/app/messages/actions'
 
 type Props = {
-  searchParams: Promise<{ role?: string; city?: string }>
+  searchParams: Promise<{ role?: string; city?: string; sort?: string }>
 }
 
 type ProfileRow = {
@@ -24,7 +27,7 @@ type ProfileRow = {
 const PAGE_LIMIT = 50
 
 export default async function BrowsePage({ searchParams }: Props) {
-  const { role, city } = await searchParams
+  const { role, city, sort } = await searchParams
   const supabase = await createSupabaseServerClient()
 
   const {
@@ -32,12 +35,19 @@ export default async function BrowsePage({ searchParams }: Props) {
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { data: myProfile } = await supabase
+    .from('profiles')
+    .select('role, city, hobbies, languages, personality_traits')
+    .eq('id', user.id)
+    .maybeSingle<ProfileForMatching>()
+
   let query = supabase
     .from('profiles')
-    .select('id, role, display_name, bio, city, hobbies, languages, personality_traits, avatar_path, updated_at')
+    .select(
+      'id, role, display_name, bio, city, hobbies, languages, personality_traits, avatar_path, updated_at',
+    )
     .neq('id', user.id)
     .eq('visibility', 'public')
-    .order('created_at', { ascending: false })
     .limit(PAGE_LIMIT)
 
   if (role === 'guide' || role === 'tourist') {
@@ -47,7 +57,18 @@ export default async function BrowsePage({ searchParams }: Props) {
     query = query.ilike('city', `%${city.trim()}%`)
   }
 
-  const { data: profiles, error } = await query.returns<ProfileRow[]>()
+  const { data: profiles, error } = await query
+    .order('created_at', { ascending: false })
+    .returns<ProfileRow[]>()
+
+  const sortByMatch = sort !== 'recent' && !!myProfile
+  const scored = (profiles ?? []).map((p) => ({
+    profile: p,
+    score: scoreMatch(myProfile, p),
+  }))
+  if (sortByMatch) {
+    scored.sort((a, b) => b.score.total - a.score.total)
+  }
 
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-12">
@@ -55,15 +76,27 @@ export default async function BrowsePage({ searchParams }: Props) {
         <div>
           <h1 className="text-2xl font-semibold">Browse buddies</h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Public profiles in the network.
+            {myProfile
+              ? sortByMatch
+                ? 'Sorted by match score with your profile.'
+                : 'Sorted by most recent.'
+              : 'Fill in your profile to see match scores.'}
           </p>
         </div>
-        <Link
-          href="/profile"
-          className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-        >
-          Your profile
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/messages"
+            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          >
+            Messages
+          </Link>
+          <Link
+            href="/profile"
+            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          >
+            Your profile
+          </Link>
+        </div>
       </div>
 
       <form method="GET" className="mb-6 flex flex-wrap items-end gap-3">
@@ -95,13 +128,27 @@ export default async function BrowsePage({ searchParams }: Props) {
           />
         </label>
 
+        <label className="block">
+          <span className="block text-xs font-medium text-zinc-600 dark:text-zinc-400">
+            Sort
+          </span>
+          <select
+            name="sort"
+            defaultValue={sort ?? 'match'}
+            className="mt-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+          >
+            <option value="match">Best match</option>
+            <option value="recent">Most recent</option>
+          </select>
+        </label>
+
         <button
           type="submit"
           className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           Filter
         </button>
-        {(role || city) && (
+        {(role || city || sort) && (
           <Link
             href="/browse"
             className="text-sm text-zinc-600 underline dark:text-zinc-400"
@@ -117,7 +164,7 @@ export default async function BrowsePage({ searchParams }: Props) {
         </p>
       )}
 
-      {profiles && profiles.length === 0 && (
+      {scored.length === 0 && (
         <p className="rounded-lg border border-dashed border-zinc-300 px-6 py-12 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
           No matching profiles yet. Try a different filter or invite friends to
           sign up.
@@ -125,7 +172,7 @@ export default async function BrowsePage({ searchParams }: Props) {
       )}
 
       <ul className="grid gap-4 sm:grid-cols-2">
-        {profiles?.map((p) => (
+        {scored.map(({ profile: p, score }) => (
           <li
             key={p.id}
             className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
@@ -138,7 +185,11 @@ export default async function BrowsePage({ searchParams }: Props) {
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
-                  <h2 className="truncate text-lg font-semibold">{p.display_name}</h2>
+                  <Link href={`/u/${p.id}`} className="min-w-0 flex-1">
+                    <h2 className="truncate text-lg font-semibold hover:underline">
+                      {p.display_name}
+                    </h2>
+                  </Link>
                   <span
                     className={
                       p.role === 'guide'
@@ -150,6 +201,7 @@ export default async function BrowsePage({ searchParams }: Props) {
                   </span>
                 </div>
                 <p className="text-xs text-zinc-500">{p.city}</p>
+                {myProfile && <MatchBadge score={score} />}
               </div>
             </div>
 
@@ -159,9 +211,27 @@ export default async function BrowsePage({ searchParams }: Props) {
               </p>
             )}
 
-            <Chips label="Hobbies" items={p.hobbies} />
-            <Chips label="Languages" items={p.languages} />
-            <Chips label="Traits" items={p.personality_traits} />
+            <Chips label="Hobbies" items={p.hobbies} highlight={score.sharedHobbies} />
+            <Chips label="Languages" items={p.languages} highlight={score.sharedLanguages} />
+            <Chips label="Traits" items={p.personality_traits} highlight={score.sharedTraits} />
+
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <Link
+                href={`/u/${p.id}`}
+                className="rounded-md border border-zinc-300 px-3 py-2 text-center text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+              >
+                View profile
+              </Link>
+              <form action={startConversationWith}>
+                <input type="hidden" name="other_id" value={p.id} />
+                <SubmitButton
+                  pendingLabel="Opening…"
+                  className="w-full rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  Message
+                </SubmitButton>
+              </form>
+            </div>
           </li>
         ))}
       </ul>
@@ -169,20 +239,53 @@ export default async function BrowsePage({ searchParams }: Props) {
   )
 }
 
-function Chips({ label, items }: { label: string; items: string[] }) {
+function MatchBadge({ score }: { score: MatchScore }) {
+  if (score.total <= 0) return null
+  const shared =
+    score.sharedHobbies.length +
+    score.sharedLanguages.length +
+    score.sharedTraits.length
+  const bits: string[] = []
+  if (shared > 0) bits.push(`${shared} shared`)
+  if (score.sameCity) bits.push('same city')
+  return (
+    <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+      <span aria-hidden>✦</span>
+      {bits.join(' · ') || 'match'}
+    </p>
+  )
+}
+
+function Chips({
+  label,
+  items,
+  highlight,
+}: {
+  label: string
+  items: string[]
+  highlight?: string[]
+}) {
   if (!items || items.length === 0) return null
+  const highlightSet = new Set((highlight ?? []).map((s) => s.trim().toLowerCase()))
   return (
     <div className="mt-3">
       <p className="text-xs font-medium text-zinc-500">{label}</p>
       <div className="mt-1 flex flex-wrap gap-1">
-        {items.slice(0, 8).map((it) => (
-          <span
-            key={it}
-            className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-          >
-            {it}
-          </span>
-        ))}
+        {items.slice(0, 8).map((it) => {
+          const isShared = highlightSet.has(it.trim().toLowerCase())
+          return (
+            <span
+              key={it}
+              className={
+                isShared
+                  ? 'rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                  : 'rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'
+              }
+            >
+              {it}
+            </span>
+          )
+        })}
       </div>
     </div>
   )
