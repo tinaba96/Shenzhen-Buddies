@@ -185,9 +185,9 @@ function SiteFooter() {
         <FooterColumn
           title="Company"
           links={[
-            { href: "/", label: "About" },
-            { href: "/", label: "Contact" },
-            { href: "/", label: "Privacy" },
+            { href: "/about", label: "About" },
+            { href: "/contact", label: "Contact" },
+            { href: "/privacy", label: "Privacy" },
           ]}
         />
       </div>
