@@ -7,10 +7,12 @@ import { avatarPublicUrl } from '@/lib/avatars'
 import { scoreMatch, type MatchScore, type ProfileForMatching } from '@/lib/matching'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { startConversationWith } from '@/app/messages/actions'
+import { applyFilters } from './actions'
 import { FilterDrawer } from './FilterDrawer'
 
 type Props = {
   searchParams: Promise<{
+    q?: string
     lang?: string | string[]
     hobby?: string | string[]
     trait?: string | string[]
@@ -103,6 +105,12 @@ function asArray(input: string | string[] | undefined): string[] {
 
 export default async function BrowsePage({ searchParams }: Props) {
   const sp = await searchParams
+  const rawQ = typeof sp.q === 'string' ? sp.q : ''
+  // Sanitize free-text search: strip PostgREST .or() metacharacters and cap length.
+  const q = rawQ
+    .trim()
+    .replace(/[,()*]/g, ' ')
+    .slice(0, 50)
   const langs = asArray(sp.lang)
   const hobbies = asArray(sp.hobby)
   const traits = asArray(sp.trait)
@@ -154,6 +162,9 @@ export default async function BrowsePage({ searchParams }: Props) {
       .eq('role', oppositeRole)
       .limit(PAGE_LIMIT)
 
+    if (q) {
+      query = query.or(`display_name.ilike.%${q}%,bio.ilike.%${q}%`)
+    }
     if (langs.length > 0) {
       query = query.overlaps('languages', langs)
     }
@@ -242,6 +253,7 @@ export default async function BrowsePage({ searchParams }: Props) {
     langs.length +
     hobbies.length +
     traits.length +
+    (q ? 1 : 0) +
     (greatOnly ? 1 : 0) +
     (withPhoto ? 1 : 0) +
     (activeOnly ? 1 : 0) +
@@ -300,8 +312,49 @@ export default async function BrowsePage({ searchParams }: Props) {
       <AiSuggestedPicks scored={scored.filter((s) => s.score.total > 0).slice(0, 3)} />
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
+        <form
+          method="GET"
+          action="/browse"
+          className="flex flex-1 min-w-[200px] items-center gap-2 rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-sm shadow-sm focus-within:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-zinc-400" aria-hidden>
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            type="search"
+            name="q"
+            defaultValue={q}
+            placeholder="Search names or bios…"
+            className="flex-1 bg-transparent outline-none placeholder:text-zinc-400"
+          />
+          {/* Preserve other filter state across search submits. */}
+          {langs.map((l) => (
+            <input key={`q-lang-${l}`} type="hidden" name="lang" value={l} />
+          ))}
+          {hobbies.map((h) => (
+            <input key={`q-hobby-${h}`} type="hidden" name="hobby" value={h} />
+          ))}
+          {traits.map((t) => (
+            <input key={`q-trait-${t}`} type="hidden" name="trait" value={t} />
+          ))}
+          {greatOnly && <input type="hidden" name="great" value="1" />}
+          {withPhoto && <input type="hidden" name="with_photo" value="1" />}
+          {activeOnly && <input type="hidden" name="active" value="1" />}
+          {minStars > 0 && (
+            <input type="hidden" name="min_stars" value={String(minStars)} />
+          )}
+          {minReviews > 0 && (
+            <input type="hidden" name="min_reviews" value={String(minReviews)} />
+          )}
+          {sort && sort !== 'match' && (
+            <input type="hidden" name="sort" value={sort} />
+          )}
+        </form>
         <FilterDrawer activeCount={activeCount}>
-          <form method="GET" className="space-y-5">
+          <form action={applyFilters} className="space-y-5">
+            {/* Preserve the current search query across filter applies. */}
+            <input type="hidden" name="q" defaultValue={q} />
             <div>
               <div className="mb-2 flex items-baseline justify-between gap-2">
                 <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
@@ -468,12 +521,12 @@ export default async function BrowsePage({ searchParams }: Props) {
         </div>
 
             <div className="sticky bottom-0 -mx-6 -mb-5 flex items-center gap-3 border-t border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900">
-              <button
-                type="submit"
+              <SubmitButton
+                pendingLabel="Applying…"
                 className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
                 Apply filters
-              </button>
+              </SubmitButton>
               {hasFilters && (
                 <Link
                   href="/browse"
