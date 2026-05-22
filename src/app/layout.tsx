@@ -49,6 +49,20 @@ function SiteHeader() {
           />
           <span>Shenzhen Buddies</span>
         </Link>
+        <nav className="flex items-center gap-5 text-sm">
+          <Link
+            href="/explore"
+            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+          >
+            Explore
+          </Link>
+          <Link
+            href="/pricing"
+            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+          >
+            Pricing
+          </Link>
+        </nav>
       </div>
     </header>
   );
