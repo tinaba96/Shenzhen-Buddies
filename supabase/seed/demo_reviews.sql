@@ -25,8 +25,6 @@ declare
   j int;
   tourist_id uuid;
   guide_id uuid;
-  reviewer_id uuid;
-  reviewee_id uuid;
   s int;
   b text;
 
