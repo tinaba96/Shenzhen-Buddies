@@ -223,6 +223,11 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
             >
               Edit profile
             </Link>
+          ) : myProfile?.role && myProfile.role === profile.role ? (
+            <div className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+              Messaging is between tourists and guides. You&apos;re both{' '}
+              {profile.role === 'guide' ? 'guides' : 'tourists'}.
+            </div>
           ) : (
             <form action={startConversationWith}>
               <input type="hidden" name="other_id" value={profile.id} />
@@ -251,7 +256,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
           )}
         </div>
 
-        {!isSelf && (
+        {!isSelf && myProfile?.role && myProfile.role !== profile.role && (
           <form
             action={submitReview}
             className="mb-6 space-y-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"

@@ -8,7 +8,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { startConversationWith } from '@/app/messages/actions'
 
 type Props = {
-  searchParams: Promise<{ role?: string; city?: string; sort?: string }>
+  searchParams: Promise<{ city?: string; sort?: string }>
 }
 
 type ProfileRow = {
@@ -27,7 +27,7 @@ type ProfileRow = {
 const PAGE_LIMIT = 50
 
 export default async function BrowsePage({ searchParams }: Props) {
-  const { role, city, sort } = await searchParams
+  const { city, sort } = await searchParams
   const supabase = await createSupabaseServerClient()
 
   const {
@@ -41,25 +41,37 @@ export default async function BrowsePage({ searchParams }: Props) {
     .eq('id', user.id)
     .maybeSingle<ProfileForMatching>()
 
-  let query = supabase
-    .from('profiles')
-    .select(
-      'id, role, display_name, bio, city, hobbies, languages, personality_traits, avatar_path, updated_at',
-    )
-    .neq('id', user.id)
-    .eq('visibility', 'public')
-    .limit(PAGE_LIMIT)
+  // Tourist ↔ guide matching only. Without a role we have nothing to match against.
+  const oppositeRole: 'guide' | 'tourist' | null =
+    myProfile?.role === 'tourist'
+      ? 'guide'
+      : myProfile?.role === 'guide'
+      ? 'tourist'
+      : null
 
-  if (role === 'guide' || role === 'tourist') {
-    query = query.eq('role', role)
-  }
-  if (city && city.trim()) {
-    query = query.ilike('city', `%${city.trim()}%`)
-  }
+  let profiles: ProfileRow[] | null = null
+  let error: { message: string } | null = null
+  if (oppositeRole) {
+    let query = supabase
+      .from('profiles')
+      .select(
+        'id, role, display_name, bio, city, hobbies, languages, personality_traits, avatar_path, updated_at',
+      )
+      .neq('id', user.id)
+      .eq('visibility', 'public')
+      .eq('role', oppositeRole)
+      .limit(PAGE_LIMIT)
 
-  const { data: profiles, error } = await query
-    .order('created_at', { ascending: false })
-    .returns<ProfileRow[]>()
+    if (city && city.trim()) {
+      query = query.ilike('city', `%${city.trim()}%`)
+    }
+
+    const result = await query
+      .order('created_at', { ascending: false })
+      .returns<ProfileRow[]>()
+    profiles = result.data
+    error = result.error
+  }
 
   const sortByMatch = sort !== 'recent' && !!myProfile
   const scored = (profiles ?? []).map((p) => ({
@@ -90,11 +102,11 @@ export default async function BrowsePage({ searchParams }: Props) {
               Browse buddies
             </h1>
             <p className="mt-2 max-w-xl text-sm text-white/85">
-              {myProfile
-                ? sortByMatch
-                  ? 'Sorted by match score with your profile.'
-                  : 'Sorted by most recent.'
-                : 'Fill in your profile to see match scores.'}
+              {myProfile?.role === 'tourist'
+                ? `Local guides in Shenzhen — ${sortByMatch ? 'sorted by match with your profile' : 'most recent first'}.`
+                : myProfile?.role === 'guide'
+                ? `Tourists looking for a buddy — ${sortByMatch ? 'sorted by match with your profile' : 'most recent first'}.`
+                : 'Pick a role on your profile to see matches.'}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -117,21 +129,6 @@ export default async function BrowsePage({ searchParams }: Props) {
       <div className="mx-auto w-full max-w-4xl px-4 py-10">
 
       <form method="GET" className="mb-6 flex flex-wrap items-end gap-3">
-        <label className="block">
-          <span className="block text-xs font-medium text-zinc-600 dark:text-zinc-400">
-            Role
-          </span>
-          <select
-            name="role"
-            defaultValue={role ?? ''}
-            className="mt-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
-          >
-            <option value="">All</option>
-            <option value="guide">Guides</option>
-            <option value="tourist">Tourists</option>
-          </select>
-        </label>
-
         <label className="block">
           <span className="block text-xs font-medium text-zinc-600 dark:text-zinc-400">
             City
@@ -165,7 +162,7 @@ export default async function BrowsePage({ searchParams }: Props) {
         >
           Filter
         </button>
-        {(role || city || sort) && (
+        {(city || sort) && (
           <Link
             href="/browse"
             className="text-sm text-zinc-600 underline dark:text-zinc-400"
@@ -174,6 +171,18 @@ export default async function BrowsePage({ searchParams }: Props) {
           </Link>
         )}
       </form>
+
+      {!myProfile?.role && (
+        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
+          <p>
+            <strong>Set your role first.</strong> Tourists match with guides
+            and vice versa.{' '}
+            <Link href="/profile" className="font-medium underline">
+              Go to your profile →
+            </Link>
+          </p>
+        </div>
+      )}
 
       {error && (
         <p className="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
