@@ -76,7 +76,7 @@ export default async function BrowsePage({ searchParams }: Props) {
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1542317854-77a89bd9f5c4?w=2000&q=80&auto=format&fit=crop"
+          src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=2000&q=80&auto=format&fit=crop"
           alt="Shenzhen at dusk"
           className="absolute inset-0 h-full w-full object-cover"
         />

@@ -27,7 +27,7 @@ const tiles: Tile[] = [
     blurb:
       "Glass towers, the city's tallest skyline, Lianhuashan park views, and the metro hub that ties it all together. Best at golden hour.",
     photo:
-      'https://images.unsplash.com/photo-1542317854-77a89bd9f5c4?w=1200&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80&auto=format&fit=crop',
     alt: 'Modern city skyline at dusk',
   },
   {
@@ -90,7 +90,7 @@ const moments = [
     alt: 'Cherry blossoms in a city park',
   },
   {
-    src: 'https://images.unsplash.com/photo-1538485399081-7c8978d8a2b3?w=600&q=80&auto=format&fit=crop',
+    src: 'https://images.unsplash.com/photo-1473625247510-8ceb1760943f?w=600&q=80&auto=format&fit=crop',
     alt: 'Bridge over water at twilight',
   },
   {

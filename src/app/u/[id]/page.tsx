@@ -118,7 +118,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
       <section className="relative h-56 overflow-hidden sm:h-72">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1538485399081-7c8978d8a2b3?w=2000&q=80&auto=format&fit=crop"
+          src="https://images.unsplash.com/photo-1473625247510-8ceb1760943f?w=2000&q=80&auto=format&fit=crop"
           alt="Shenzhen skyline"
           className="absolute inset-0 h-full w-full object-cover"
         />
