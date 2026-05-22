@@ -157,6 +157,7 @@ export default async function BrowsePage({ searchParams }: Props) {
       query = query.not('avatar_path', 'is', null)
     }
     if (activeOnly) {
+      // eslint-disable-next-line react-hooks/purity -- request-time clock is intentional in a Server Component
       const thirtyDaysAgo = new Date(
         Date.now() - 30 * 24 * 60 * 60 * 1000,
       ).toISOString()
