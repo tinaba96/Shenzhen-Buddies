@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Avatar } from '@/components/Avatar'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export default async function Home() {
@@ -239,7 +240,7 @@ function Testimonials() {
         'Lin took me to a tea house in Futian I never would have found. We ended up talking for three hours. Felt like meeting a friend, not booking a tour.',
       name: 'Sarah K.',
       role: 'Tourist, visiting from London',
-      tone: 'amber' as const,
+      photo: 'https://i.pravatar.cc/120?img=47',
     },
     {
       stars: 5,
@@ -247,7 +248,7 @@ function Testimonials() {
         'I joined as a guide because I love showing people my city. Met a photographer from Mexico who taught me about light. We are still chatting.',
       name: 'Wei H.',
       role: 'Guide, Shenzhen local',
-      tone: 'rose' as const,
+      photo: 'https://i.pravatar.cc/120?img=12',
     },
     {
       stars: 5,
@@ -255,7 +256,7 @@ function Testimonials() {
         'My Mandarin is awful and I was nervous about the trip. Daniel speaks Italian and took me to the best street food. Game-changer.',
       name: 'Marco R.',
       role: 'Tourist, visiting from Milan',
-      tone: 'amber' as const,
+      photo: 'https://i.pravatar.cc/120?img=33',
     },
   ]
 
@@ -282,20 +283,7 @@ function Testimonials() {
                 &ldquo;{r.quote}&rdquo;
               </blockquote>
               <figcaption className="mt-5 flex items-center gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-                <span
-                  aria-hidden
-                  className={
-                    r.tone === 'amber'
-                      ? 'inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 to-rose-300 text-sm font-semibold text-zinc-800'
-                      : 'inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-rose-300 to-amber-300 text-sm font-semibold text-zinc-800'
-                  }
-                >
-                  {r.name
-                    .split(' ')
-                    .map((s) => s[0])
-                    .join('')
-                    .slice(0, 2)}
-                </span>
+                <Avatar src={r.photo} name={r.name} size={40} />
                 <div>
                   <p className="text-sm font-medium">{r.name}</p>
                   <p className="text-xs text-zinc-500">{r.role}</p>
