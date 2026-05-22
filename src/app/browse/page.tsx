@@ -71,33 +71,50 @@ export default async function BrowsePage({ searchParams }: Props) {
   }
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-12">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Browse buddies</h1>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            {myProfile
-              ? sortByMatch
-                ? 'Sorted by match score with your profile.'
-                : 'Sorted by most recent.'
-              : 'Fill in your profile to see match scores.'}
-          </p>
+    <main className="flex flex-1 flex-col">
+      {/* Hero banner */}
+      <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.unsplash.com/photo-1542317854-77a89bd9f5c4?w=2000&q=80&auto=format&fit=crop"
+          alt="Shenzhen at dusk"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
+        <div className="relative mx-auto flex max-w-5xl flex-col gap-4 px-4 py-12 text-white sm:flex-row sm:items-end sm:justify-between sm:py-16">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-white/70">
+              Discover
+            </p>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight drop-shadow sm:text-4xl">
+              Browse buddies
+            </h1>
+            <p className="mt-2 max-w-xl text-sm text-white/85">
+              {myProfile
+                ? sortByMatch
+                  ? 'Sorted by match score with your profile.'
+                  : 'Sorted by most recent.'
+                : 'Fill in your profile to see match scores.'}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/messages"
+              className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
+            >
+              Messages
+            </Link>
+            <Link
+              href="/profile"
+              className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
+            >
+              Your profile
+            </Link>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/messages"
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-          >
-            Messages
-          </Link>
-          <Link
-            href="/profile"
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-          >
-            Your profile
-          </Link>
-        </div>
-      </div>
+      </section>
+
+      <div className="mx-auto w-full max-w-4xl px-4 py-10">
 
       <form method="GET" className="mb-6 flex flex-wrap items-end gap-3">
         <label className="block">
@@ -235,6 +252,7 @@ export default async function BrowsePage({ searchParams }: Props) {
           </li>
         ))}
       </ul>
+      </div>
     </main>
   )
 }

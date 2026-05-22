@@ -22,29 +22,35 @@ export default async function Home() {
 function Hero({ loggedIn }: { loggedIn: boolean }) {
   return (
     <section className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-white to-rose-50 dark:from-zinc-900 dark:via-black dark:to-zinc-900" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=2000&q=80&auto=format&fit=crop"
+        alt="City skyline at dusk"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/45 to-black/75" />
       <div
-        className="absolute inset-0 opacity-40 dark:opacity-20"
+        className="absolute inset-0 opacity-60 mix-blend-soft-light"
         style={{
           backgroundImage:
-            'radial-gradient(circle at 20% 20%, rgba(245, 158, 11, 0.25), transparent 40%), radial-gradient(circle at 80% 60%, rgba(244, 63, 94, 0.25), transparent 45%)',
+            'radial-gradient(circle at 20% 20%, rgba(245, 158, 11, 0.5), transparent 45%), radial-gradient(circle at 80% 60%, rgba(244, 63, 94, 0.5), transparent 50%)',
         }}
       />
 
-      <div className="relative mx-auto flex max-w-5xl flex-col items-center px-6 py-24 text-center sm:py-32">
-        <p className="inline-flex items-center gap-2 rounded-full border border-zinc-900/10 bg-white/70 px-3 py-1 text-xs font-medium tracking-wide text-zinc-700 backdrop-blur dark:border-white/15 dark:bg-white/5 dark:text-zinc-300">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+      <div className="relative mx-auto flex max-w-5xl flex-col items-center px-6 py-28 text-center text-white sm:py-36">
+        <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium tracking-wide text-white backdrop-blur">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
           Now matching in Shenzhen
         </p>
 
-        <h1 className="mt-6 max-w-3xl text-balance text-5xl font-semibold tracking-tight sm:text-6xl">
+        <h1 className="mt-6 max-w-3xl text-balance text-5xl font-semibold tracking-tight drop-shadow-lg sm:text-7xl">
           See Shenzhen with someone{' '}
-          <span className="bg-gradient-to-r from-amber-600 to-rose-600 bg-clip-text text-transparent dark:from-amber-400 dark:to-rose-400">
+          <span className="bg-gradient-to-r from-amber-300 to-rose-300 bg-clip-text text-transparent">
             who gets you.
           </span>
         </h1>
 
-        <p className="mt-6 max-w-xl text-pretty text-lg text-zinc-600 dark:text-zinc-400">
+        <p className="mt-6 max-w-xl text-pretty text-lg text-white/90 drop-shadow sm:text-xl">
           Skip the tour bus. Get matched with a local who shares your
           interests — language, food, art, sports — and explore the city like
           a friend would.
@@ -55,13 +61,13 @@ function Hero({ loggedIn }: { loggedIn: boolean }) {
             <>
               <Link
                 href="/browse"
-                className="rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                className="rounded-full bg-white px-6 py-3 text-sm font-medium text-zinc-900 shadow-lg shadow-black/20 transition hover:bg-zinc-100"
               >
                 Browse buddies
               </Link>
               <Link
                 href="/profile"
-                className="rounded-full border border-zinc-300 bg-white/80 px-6 py-3 text-sm font-medium text-zinc-900 backdrop-blur transition hover:bg-white dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-white dark:hover:bg-zinc-900"
+                className="rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
               >
                 Your profile
               </Link>
@@ -70,13 +76,13 @@ function Hero({ loggedIn }: { loggedIn: boolean }) {
             <>
               <Link
                 href="/signup?as=tourist"
-                className="rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                className="rounded-full bg-white px-6 py-3 text-sm font-medium text-zinc-900 shadow-lg shadow-black/20 transition hover:bg-zinc-100"
               >
-                Find a local
+                Find a local →
               </Link>
               <Link
                 href="/signup?as=guide"
-                className="rounded-full border border-zinc-300 bg-white/80 px-6 py-3 text-sm font-medium text-zinc-900 backdrop-blur transition hover:bg-white dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-white dark:hover:bg-zinc-900"
+                className="rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
               >
                 Become a guide
               </Link>
@@ -85,17 +91,41 @@ function Hero({ loggedIn }: { loggedIn: boolean }) {
         </div>
 
         {!loggedIn && (
-          <p className="mt-5 text-xs text-zinc-500 dark:text-zinc-500">
+          <p className="mt-6 text-xs text-white/70">
             Free during pilot ·{' '}
-            <Link href="/explore" className="underline hover:text-zinc-700 dark:hover:text-zinc-300">
+            <Link href="/explore" className="underline hover:text-white">
               Explore Shenzhen first
             </Link>{' '}
             ·{' '}
-            <Link href="/login" className="underline hover:text-zinc-700 dark:hover:text-zinc-300">
+            <Link href="/login" className="underline hover:text-white">
               Already have an account?
             </Link>
           </p>
         )}
+
+        {/* Trust strip */}
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs uppercase tracking-wider text-white/60">
+          <span className="flex items-center gap-1.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+              <path d="M9 12l2 2 4-4" />
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+            ID-verified locals
+          </span>
+          <span className="flex items-center gap-1.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+              <path d="m9 11 3 3L22 4" />
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+            </svg>
+            Free 14-day trial
+          </span>
+          <span className="flex items-center gap-1.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+              <path d="M12 2 4 7v6c0 5 4 8 8 9 4-1 8-4 8-9V7z" />
+            </svg>
+            Reviewed by the community
+          </span>
+        </div>
       </div>
     </section>
   )
@@ -104,9 +134,11 @@ function Hero({ loggedIn }: { loggedIn: boolean }) {
 function Audiences() {
   return (
     <section className="border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="mx-auto grid max-w-5xl gap-5 px-6 py-16 md:grid-cols-2">
+      <div className="mx-auto grid max-w-5xl gap-6 px-6 py-20 md:grid-cols-2">
         <AudienceCard
           tone="amber"
+          photo="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&q=80&auto=format&fit=crop"
+          alt="Traveler with a camera on a city street"
           icon={
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
               <path d="M3 7l9-4 9 4" />
@@ -124,6 +156,8 @@ function Audiences() {
         />
         <AudienceCard
           tone="rose"
+          photo="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80&auto=format&fit=crop"
+          alt="Two friends laughing in a café"
           icon={
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
               <path d="M12 21s-7-7-7-12a7 7 0 1 1 14 0c0 5-7 12-7 12z" />
@@ -145,12 +179,16 @@ function Audiences() {
 
 function AudienceCard({
   tone,
+  photo,
+  alt,
   icon,
   title,
   subtitle,
   points,
 }: {
   tone: 'amber' | 'rose'
+  photo: string
+  alt: string
   icon: React.ReactNode
   title: string
   subtitle: string
@@ -160,26 +198,41 @@ function AudienceCard({
     tone === 'amber'
       ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
       : 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+  const gradient =
+    tone === 'amber'
+      ? 'from-amber-500/40 via-amber-400/10'
+      : 'from-rose-500/40 via-rose-400/10'
 
   return (
-    <article className="group rounded-2xl border border-zinc-200 bg-white p-6 transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
-      <div className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${accent}`}>
-        {icon}
+    <article className="group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="relative h-48 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={photo}
+          alt={alt}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+        <div className={`absolute inset-0 bg-gradient-to-t ${gradient} to-transparent`} />
+        <div className={`absolute left-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-xl shadow-lg backdrop-blur ${accent}`}>
+          {icon}
+        </div>
       </div>
-      <p className="mt-4 text-xs font-medium uppercase tracking-wide text-zinc-500">
-        {subtitle}
-      </p>
-      <h3 className="mt-1 text-xl font-semibold">{title}</h3>
-      <ul className="mt-4 space-y-2 text-sm text-zinc-700 dark:text-zinc-300">
-        {points.map((p) => (
-          <li key={p} className="flex items-start gap-2">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600 dark:text-emerald-400">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-            <span>{p}</span>
-          </li>
-        ))}
-      </ul>
+      <div className="p-6">
+        <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+          {subtitle}
+        </p>
+        <h3 className="mt-1 text-2xl font-semibold tracking-tight">{title}</h3>
+        <ul className="mt-4 space-y-2 text-sm text-zinc-700 dark:text-zinc-300">
+          {points.map((p) => (
+            <li key={p} className="flex items-start gap-2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600 dark:text-emerald-400">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>{p}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </article>
   )
 }
@@ -190,22 +243,38 @@ function HowItWorks() {
       n: '01',
       title: 'Create your profile',
       body: 'Tell us your hobbies, languages, and what kind of day you’d like.',
+      photo:
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=900&q=80&auto=format&fit=crop',
+      alt: 'Person smiling at the camera',
     },
     {
       n: '02',
       title: 'Browse buddies',
       body: 'Find locals (or visitors) who share your interests and city.',
+      photo:
+        'https://images.unsplash.com/photo-1517292987719-0369a794ec0f?w=900&q=80&auto=format&fit=crop',
+      alt: 'Holding a phone in the city',
     },
     {
       n: '03',
       title: 'Plan and go',
       body: 'Message, meet, and explore. Leave a review afterward.',
+      photo:
+        'https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?w=900&q=80&auto=format&fit=crop',
+      alt: 'Two people walking through the city',
     },
   ]
 
   return (
-    <section className="border-t border-zinc-200 dark:border-zinc-800">
-      <div className="mx-auto max-w-5xl px-6 py-20">
+    <section className="relative border-t border-zinc-200 dark:border-zinc-800">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-50 dark:opacity-25"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at 10% 10%, rgba(245,158,11,0.15), transparent 50%), radial-gradient(circle at 90% 90%, rgba(244,63,94,0.15), transparent 50%)',
+        }}
+      />
+      <div className="relative mx-auto max-w-5xl px-6 py-24">
         <div className="text-center">
           <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
             How it works
@@ -219,15 +288,26 @@ function HowItWorks() {
           {steps.map((s) => (
             <li
               key={s.n}
-              className="relative rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900"
+              className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
             >
-              <span className="text-sm font-semibold tracking-wider text-zinc-400">
-                {s.n}
-              </span>
-              <h3 className="mt-3 text-lg font-semibold">{s.title}</h3>
-              <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                {s.body}
-              </p>
+              <div className="relative h-40 overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={s.photo}
+                  alt={s.alt}
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                <span className="absolute left-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-sm font-bold tracking-wide text-zinc-900 shadow backdrop-blur">
+                  {s.n}
+                </span>
+              </div>
+              <div className="p-6">
+                <h3 className="text-lg font-semibold">{s.title}</h3>
+                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                  {s.body}
+                </p>
+              </div>
             </li>
           ))}
         </ol>

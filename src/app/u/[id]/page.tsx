@@ -113,29 +113,41 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-12">
-      <div className="mb-6 flex items-center justify-between">
-        <Link
-          href="/browse"
-          className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-        >
-          ← Browse
-        </Link>
-        <div className="flex items-center gap-2">
+    <main className="flex flex-1 flex-col">
+      {/* Cover banner */}
+      <section className="relative h-56 overflow-hidden sm:h-72">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.unsplash.com/photo-1538485399081-7c8978d8a2b3?w=2000&q=80&auto=format&fit=crop"
+          alt="Shenzhen skyline"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-500/20 via-rose-500/15 to-black/50" />
+        <div className="relative mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
           <Link
-            href="/messages"
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+            href="/browse"
+            className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
           >
-            Messages
+            ← Browse
           </Link>
-          <Link
-            href="/profile"
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-          >
-            Your profile
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/messages"
+              className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
+            >
+              Messages
+            </Link>
+            <Link
+              href="/profile"
+              className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
+            >
+              Your profile
+            </Link>
+          </div>
         </div>
-      </div>
+      </section>
+
+      <div className="mx-auto -mt-12 w-full max-w-3xl px-4 pb-12 sm:-mt-16">
 
       {reviewed && (
         <p className="mb-4 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
@@ -342,6 +354,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
           </ul>
         )}
       </section>
+      </div>
     </main>
   )
 }

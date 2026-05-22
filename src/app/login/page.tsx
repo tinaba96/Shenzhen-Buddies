@@ -6,55 +6,88 @@ type Props = {
   searchParams: Promise<{ error?: string }>
 }
 
+const SIDE_PHOTO =
+  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1400&q=80&auto=format&fit=crop'
+
 export default async function LoginPage({ searchParams }: Props) {
   const { error } = await searchParams
 
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-12">
-      <form
-        action={login}
-        className="w-full max-w-sm space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-      >
-        <h1 className="text-2xl font-semibold">Log in</h1>
-
-        <label className="block">
-          <span className="text-sm font-medium">Email</span>
-          <input
-            type="email"
-            name="email"
-            required
-            autoComplete="email"
-            className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
-          />
-        </label>
-
-        <label className="block">
-          <span className="text-sm font-medium">Password</span>
-          <input
-            type="password"
-            name="password"
-            required
-            autoComplete="current-password"
-            className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
-          />
-        </label>
-
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <SubmitButton
-          pendingLabel="Logging in…"
-          className="w-full rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+    <main className="flex flex-1">
+      {/* Form panel */}
+      <div className="flex flex-1 items-center justify-center px-6 py-12 sm:px-12">
+        <form
+          action={login}
+          className="w-full max-w-sm space-y-5 rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
         >
-          Log in
-        </SubmitButton>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+              Welcome back
+            </p>
+            <h1 className="mt-1 text-2xl font-semibold">Log in</h1>
+          </div>
 
-        <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-          No account?{' '}
-          <Link href="/signup" className="font-medium underline">
-            Sign up
-          </Link>
-        </p>
-      </form>
+          <label className="block">
+            <span className="text-sm font-medium">Email</span>
+            <input
+              type="email"
+              name="email"
+              required
+              autoComplete="email"
+              className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-sm font-medium">Password</span>
+            <input
+              type="password"
+              name="password"
+              required
+              autoComplete="current-password"
+              className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
+            />
+          </label>
+
+          {error && <p className="text-sm text-red-600">{error}</p>}
+
+          <SubmitButton
+            pendingLabel="Logging in…"
+            className="w-full rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+          >
+            Log in
+          </SubmitButton>
+
+          <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
+            No account?{' '}
+            <Link href="/signup" className="font-medium underline">
+              Sign up
+            </Link>
+          </p>
+        </form>
+      </div>
+
+      {/* Photo panel */}
+      <aside className="relative hidden lg:flex lg:flex-1">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={SIDE_PHOTO}
+          alt="Shenzhen at night"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/30 via-rose-500/30 to-black/60" />
+        <div className="relative flex items-end p-12">
+          <blockquote className="max-w-md text-white drop-shadow">
+            <p className="text-2xl font-medium leading-snug">
+              &ldquo;Daniel took me to a dumpling place no map app would have
+              found. We&apos;re still texting about food.&rdquo;
+            </p>
+            <p className="mt-4 text-sm text-white/85">
+              — Marco R., visiting from Milan
+            </p>
+          </blockquote>
+        </div>
+      </aside>
     </main>
   )
 }
