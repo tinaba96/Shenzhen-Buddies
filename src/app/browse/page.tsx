@@ -8,7 +8,12 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { startConversationWith } from '@/app/messages/actions'
 
 type Props = {
-  searchParams: Promise<{ city?: string; sort?: string }>
+  searchParams: Promise<{
+    lang?: string | string[]
+    hobby?: string | string[]
+    great?: string
+    sort?: string
+  }>
 }
 
 type ProfileRow = {
@@ -26,8 +31,51 @@ type ProfileRow = {
 
 const PAGE_LIMIT = 50
 
+const LANGUAGE_OPTIONS = [
+  'English',
+  'Mandarin',
+  'Cantonese',
+  'Japanese',
+  'Korean',
+  'Spanish',
+  'French',
+  'German',
+  'Italian',
+  'Portuguese',
+  'Vietnamese',
+] as const
+
+const HOBBY_OPTIONS = [
+  'street food',
+  'dim sum',
+  'coffee',
+  'tea',
+  'hiking',
+  'photography',
+  'art',
+  'design',
+  'architecture',
+  'electronics',
+  'makers',
+  'jazz',
+  'karaoke',
+  'history',
+  'museums',
+  'yoga',
+  'running',
+] as const
+
+function asArray(input: string | string[] | undefined): string[] {
+  if (!input) return []
+  return Array.isArray(input) ? input : [input]
+}
+
 export default async function BrowsePage({ searchParams }: Props) {
-  const { city, sort } = await searchParams
+  const sp = await searchParams
+  const langs = asArray(sp.lang)
+  const hobbies = asArray(sp.hobby)
+  const greatOnly = sp.great === '1'
+  const sort = sp.sort
   const supabase = await createSupabaseServerClient()
 
   const {
@@ -62,8 +110,11 @@ export default async function BrowsePage({ searchParams }: Props) {
       .eq('role', oppositeRole)
       .limit(PAGE_LIMIT)
 
-    if (city && city.trim()) {
-      query = query.ilike('city', `%${city.trim()}%`)
+    if (langs.length > 0) {
+      query = query.overlaps('languages', langs)
+    }
+    if (hobbies.length > 0) {
+      query = query.overlaps('hobbies', hobbies)
     }
 
     const result = await query
@@ -74,13 +125,24 @@ export default async function BrowsePage({ searchParams }: Props) {
   }
 
   const sortByMatch = sort !== 'recent' && !!myProfile
-  const scored = (profiles ?? []).map((p) => ({
+  let scored = (profiles ?? []).map((p) => ({
     profile: p,
     score: scoreMatch(myProfile, p),
   }))
+  if (greatOnly) {
+    scored = scored.filter(
+      (s) =>
+        s.score.sharedHobbies.length +
+          s.score.sharedLanguages.length +
+          s.score.sharedTraits.length >
+        0,
+    )
+  }
   if (sortByMatch) {
     scored.sort((a, b) => b.score.total - a.score.total)
   }
+
+  const hasFilters = langs.length > 0 || hobbies.length > 0 || greatOnly || sort === 'recent'
 
   return (
     <main className="flex flex-1 flex-col">
@@ -130,48 +192,90 @@ export default async function BrowsePage({ searchParams }: Props) {
 
       <AiSuggestedPicks scored={scored.filter((s) => s.score.total > 0).slice(0, 3)} />
 
-      <form method="GET" className="mb-6 flex flex-wrap items-end gap-3">
-        <label className="block">
-          <span className="block text-xs font-medium text-zinc-600 dark:text-zinc-400">
-            City
-          </span>
-          <input
-            type="text"
-            name="city"
-            defaultValue={city ?? ''}
-            placeholder="Shenzhen"
-            className="mt-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+      <form
+        method="GET"
+        className="mb-6 space-y-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+      >
+        <div>
+          <div className="mb-2 flex items-baseline justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+              Languages
+            </p>
+            <span className="text-xs text-zinc-500">
+              {langs.length
+                ? `${langs.length} selected — must speak at least one`
+                : 'any language'}
+            </span>
+          </div>
+          <ChipGroup
+            name="lang"
+            options={LANGUAGE_OPTIONS}
+            selected={langs}
           />
-        </label>
+        </div>
 
-        <label className="block">
-          <span className="block text-xs font-medium text-zinc-600 dark:text-zinc-400">
-            Sort
-          </span>
-          <select
-            name="sort"
-            defaultValue={sort ?? 'match'}
-            className="mt-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
-          >
-            <option value="match">Best match</option>
-            <option value="recent">Most recent</option>
-          </select>
-        </label>
+        <div>
+          <div className="mb-2 flex items-baseline justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+              Hobbies
+            </p>
+            <span className="text-xs text-zinc-500">
+              {hobbies.length
+                ? `${hobbies.length} selected — must enjoy at least one`
+                : 'any hobby'}
+            </span>
+          </div>
+          <ChipGroup
+            name="hobby"
+            options={HOBBY_OPTIONS}
+            selected={hobbies}
+          />
+        </div>
 
-        <button
-          type="submit"
-          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-        >
-          Filter
-        </button>
-        {(city || sort) && (
-          <Link
-            href="/browse"
-            className="text-sm text-zinc-600 underline dark:text-zinc-400"
+        <div className="flex flex-wrap items-center gap-4 border-t border-zinc-100 pt-4 dark:border-zinc-800">
+          <label className="flex cursor-pointer items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="great"
+              value="1"
+              defaultChecked={greatOnly}
+              className="h-4 w-4 rounded border-zinc-300 text-zinc-900 dark:border-zinc-700"
+            />
+            <span>Only great matches (shared interests)</span>
+          </label>
+
+          <label className="ml-auto flex items-center gap-2 text-sm">
+            <span className="text-zinc-500">Sort</span>
+            <select
+              name="sort"
+              defaultValue={sort ?? 'match'}
+              className="rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            >
+              <option value="match">Best match</option>
+              <option value="recent">Most recent</option>
+            </select>
+          </label>
+        </div>
+
+        <div className="flex items-center gap-3 pt-1">
+          <button
+            type="submit"
+            className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
-            Clear
-          </Link>
-        )}
+            Apply filters
+          </button>
+          {hasFilters && (
+            <Link
+              href="/browse"
+              className="text-sm text-zinc-600 underline dark:text-zinc-400"
+            >
+              Clear all
+            </Link>
+          )}
+          <p className="ml-auto text-xs text-zinc-500">
+            {scored.length} {scored.length === 1 ? 'match' : 'matches'}
+          </p>
+        </div>
       </form>
 
       {!myProfile?.role && (
@@ -265,6 +369,36 @@ export default async function BrowsePage({ searchParams }: Props) {
       </ul>
       </div>
     </main>
+  )
+}
+
+function ChipGroup({
+  name,
+  options,
+  selected,
+}: {
+  name: string
+  options: readonly string[]
+  selected: string[]
+}) {
+  const set = new Set(selected.map((s) => s.toLowerCase()))
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {options.map((opt) => (
+        <label key={opt} className="cursor-pointer select-none">
+          <input
+            type="checkbox"
+            name={name}
+            value={opt}
+            defaultChecked={set.has(opt.toLowerCase())}
+            className="peer sr-only"
+          />
+          <span className="inline-block rounded-full border border-zinc-300 px-3 py-1 text-xs transition hover:bg-zinc-50 peer-checked:border-zinc-900 peer-checked:bg-zinc-900 peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-amber-400 dark:border-zinc-700 dark:hover:bg-zinc-800 dark:peer-checked:border-white dark:peer-checked:bg-white dark:peer-checked:text-zinc-900">
+            {opt}
+          </span>
+        </label>
+      ))}
+    </div>
   )
 }
 
