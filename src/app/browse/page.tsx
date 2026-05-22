@@ -9,6 +9,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { startConversationWith } from '@/app/messages/actions'
 import { applyFilters } from './actions'
 import { FilterDrawer } from './FilterDrawer'
+import { SearchSubmit } from './SearchSubmit'
 
 type Props = {
   searchParams: Promise<{
@@ -313,26 +314,16 @@ export default async function BrowsePage({ searchParams }: Props) {
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <form
-          method="GET"
-          action="/browse"
+          action={applyFilters}
           className="flex flex-1 min-w-[200px] items-center gap-1 rounded-full border border-zinc-300 bg-white pl-1 pr-3 text-sm shadow-sm focus-within:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900"
         >
-          <button
-            type="submit"
-            aria-label="Search"
-            className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-white"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden>
-              <circle cx="11" cy="11" r="7" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-          </button>
+          <SearchSubmit />
           <input
             type="search"
             name="q"
             defaultValue={q}
             placeholder="Search names or bios…"
-            className="flex-1 bg-transparent py-1.5 outline-none placeholder:text-zinc-400"
+            className="flex-1 bg-transparent py-1.5 outline-none placeholder:text-zinc-400 disabled:opacity-70"
           />
           {/* Preserve other filter state across search submits. */}
           {langs.map((l) => (
