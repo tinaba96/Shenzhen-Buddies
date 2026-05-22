@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { SubmitButton } from '@/components/SubmitButton'
 import { signup } from './actions'
 
 type Props = {
@@ -46,12 +47,12 @@ export default async function SignupPage({ searchParams }: Props) {
           </p>
         )}
 
-        <button
-          type="submit"
+        <SubmitButton
+          pendingLabel="Signing up…"
           className="w-full rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           Sign up
-        </button>
+        </SubmitButton>
 
         <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
           Already have an account?{' '}

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { SubmitButton } from '@/components/SubmitButton'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { saveProfile, signOut } from './actions'
 
@@ -51,12 +52,12 @@ export default async function ProfilePage({ searchParams }: Props) {
             Browse
           </Link>
           <form action={signOut}>
-            <button
-              type="submit"
+            <SubmitButton
+              pendingLabel="Signing out…"
               className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
             >
               Sign out
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </div>
@@ -192,12 +193,12 @@ export default async function ProfilePage({ searchParams }: Props) {
           </div>
         </fieldset>
 
-        <button
-          type="submit"
+        <SubmitButton
+          pendingLabel="Saving…"
           className="w-full rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           {profile ? 'Save changes' : 'Create profile'}
-        </button>
+        </SubmitButton>
       </form>
     </main>
   )
