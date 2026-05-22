@@ -60,7 +60,12 @@ function SiteFooter() {
     <footer className="border-t border-zinc-200 dark:border-zinc-800">
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-zinc-500 sm:flex-row sm:px-6">
         <p>© {year} Tensai Tech Inc.</p>
-        <p>Shenzhen Buddies — pilot</p>
+        <div className="flex items-center gap-4">
+          <Link href="/pricing" className="hover:text-zinc-700 dark:hover:text-zinc-300">
+            Pricing
+          </Link>
+          <span>Shenzhen Buddies — pilot</span>
+        </div>
       </div>
     </footer>
   );

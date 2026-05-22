@@ -8,38 +8,75 @@ the local shows them around.
 > conventions, but anywhere user-facing the product is "Shenzhen Buddies".
 
 **Stack:** Next.js 16 (App Router), TypeScript, Tailwind v4, Supabase
-(Auth + Postgres), deployed on Vercel.
+(Auth + Postgres + Storage + Realtime), Stripe (subscriptions), deployed on
+Vercel.
 
-## MVP slice
+## Features
 
-Auth (email + password) and profile creation/edit. Matching, chat, reviews,
-notifications, and subscriptions come later.
+- Email + password auth (with email-confirm route handler)
+- Profile creation/edit with photo upload (Supabase Storage)
+- Browse other profiles, filtered by role / city, sorted by match score
+- Match scoring: shared languages + hobbies + traits + same-city bonus +
+  complementary-role bonus
+- Profile detail pages at `/u/[id]`
+- 1:1 direct messaging with Supabase Realtime; unread badges per conversation
+- Reviews & ratings (1–5 stars + optional text), only writeable once you and
+  the reviewee have exchanged at least one message; profile reviews appear
+  publicly once the threshold of 3+ reviews is reached
+- Subscriptions via Stripe Checkout with 14-day free trial and a customer
+  portal (`/pricing`)
 
 ## Local setup
 
-1. **Supabase project** — create one (or use an existing one) and copy:
+1. **Supabase project** — create one (or use an existing one) and copy from
+   Settings → API:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
-   - `anon` public API key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `anon` public key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` (server-only secret;
+     used by the Stripe webhook to write rows that bypass RLS)
 
 2. **Environment variables**
    ```bash
    cp .env.local.example .env.local
-   # paste the URL and anon key into .env.local
+   # paste values from Supabase + Stripe into .env.local
    ```
 
-3. **Database schema** — open the Supabase SQL editor and run
-   `supabase/migrations/0001_init.sql`. This creates the `profiles` table and
-   row-level security policies.
+3. **Database schema** — open the Supabase SQL editor and run each migration
+   **in order**:
+   - `supabase/migrations/0001_init.sql` — `profiles` + RLS
+   - `supabase/migrations/0002_avatars.sql` — `avatar_path` column + public
+     `avatars` storage bucket
+   - `supabase/migrations/0003_chat.sql` — `conversations`, `messages`,
+     RLS, `get_or_create_conversation` RPC, Realtime publication
+   - `supabase/migrations/0004_reviews.sql` — `reviews` + RLS (insert
+     requires prior message history)
+   - `supabase/migrations/0005_notifications.sql` — per-user `last_read_at`
+     on conversations + `mark_conversation_read` RPC
+   - `supabase/migrations/0006_subscriptions.sql` — `subscriptions` mirror
+     of Stripe state (only needed if you wire up Stripe)
 
 4. **Auth settings** (Supabase dashboard → Authentication → URL Configuration)
-   - **Site URL:** `http://localhost:3000` (and your Vercel URL once deployed)
-   - **Redirect URLs:** add `http://localhost:3000/auth/confirm` and the
-     production equivalent.
+   - **Site URL:** `http://localhost:3000` (plus your Vercel URL once deployed)
+   - **Redirect URLs:** add `http://localhost:3000/auth/confirm` (plus the
+     production equivalent).
+   - For pilot testing you can turn **off** "Confirm email" under
+     Authentication → Providers → Email. Re-enable before public launch.
 
-   For fast pilot testing you can turn **off** "Confirm email" under
-   Authentication → Providers → Email. Re-enable it before any real launch.
+5. **Stripe** (optional during pilot — leave keys blank and the `/pricing`
+   page shows a friendly placeholder)
+   - Create a Stripe account, switch to **test mode**.
+   - Create a **Product** (e.g. "Shenzhen Buddies Premium") with a recurring
+     **Price** (monthly or yearly). Copy the price ID (`price_...`).
+   - Copy your test secret key (`sk_test_...`).
+   - Configure a webhook endpoint at
+     `<your-site-url>/api/stripe/webhook` listening for
+     `checkout.session.completed`, `customer.subscription.created`,
+     `customer.subscription.updated`, `customer.subscription.deleted`.
+     Copy its signing secret (`whsec_...`).
+   - Paste into `.env.local`: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+     `NEXT_PUBLIC_STRIPE_PRICE_ID`.
 
-5. **Run**
+6. **Run**
    ```bash
    npm run dev
    ```
@@ -48,30 +85,51 @@ notifications, and subscriptions come later.
 ## Deploy to Vercel
 
 1. Push to GitHub, import the repo in Vercel.
-2. Add the two `NEXT_PUBLIC_SUPABASE_*` env vars in the Vercel project
-   settings.
+2. Add env vars in Vercel project settings:
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+   `SUPABASE_SERVICE_ROLE_KEY`, and the three `STRIPE_*` /
+   `NEXT_PUBLIC_STRIPE_PRICE_ID` if you're enabling subscriptions.
 3. Update Supabase Auth → URL Configuration with your Vercel URL.
+4. In Stripe, edit the webhook endpoint to point at your Vercel URL.
 
 ## Code layout
 
 ```
 src/
   app/
-    page.tsx                 landing
-    login/                   email + password login
-    signup/                  email + password signup
-    profile/                 protected: create / edit profile
-    auth/confirm/route.ts    email-confirmation callback
-    layout.tsx               root layout
-  lib/supabase/
-    client.ts                browser client (use in client components)
-    server.ts                server client (server components, actions)
-    proxy.ts                 session-refresh helper for proxy.ts
-  proxy.ts                   runs the session refresh on every request
+    page.tsx                       landing
+    login/                         email + password login
+    signup/                        email + password signup
+    profile/                       protected: create / edit profile
+    browse/                        protected: discover other profiles
+    u/[id]/                        public profile detail + review form
+    messages/                      conversations list
+    messages/[id]/                 thread view (client realtime)
+    pricing/                       subscription page (Stripe Checkout)
+    auth/confirm/route.ts          email-confirmation callback
+    api/stripe/webhook/route.ts    Stripe webhook handler
+    layout.tsx                     root layout (header + footer)
+  components/
+    Avatar.tsx                     image / initials fallback
+    SubmitButton.tsx               useFormStatus pending state
+    StarRating.tsx                 display + input variants
+  lib/
+    avatars.ts                     public-URL helper
+    matching.ts                    score function for browse
+    stripe.ts                      Stripe SDK + entitlement helper
+    supabase/
+      client.ts                    browser client
+      server.ts                    server client (cookies-bound)
+      admin.ts                     service-role client (webhook only)
+      proxy.ts                     session refresh in src/proxy.ts
+  proxy.ts                         runs on every request
 supabase/
-  migrations/0001_init.sql   profiles table + RLS policies
+  migrations/                      run in order in the SQL editor
 ```
 
-> Note: in Next.js 16, middleware was renamed to **proxy**. The file is
+> **Note:** Next.js 16 renamed middleware to **proxy**. The file is
 > `src/proxy.ts`, exporting a `proxy` function. Same purpose as the old
-> middleware.
+> middleware. Production build must use webpack
+> (`"build": "next build --webpack"` in package.json) — the default
+> Turbopack output skips build-traces that Vercel's adapter needs to
+> register serverless functions.
