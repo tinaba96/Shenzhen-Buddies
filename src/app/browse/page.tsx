@@ -128,6 +128,8 @@ export default async function BrowsePage({ searchParams }: Props) {
 
       <div className="mx-auto w-full max-w-4xl px-4 py-10">
 
+      <AiSuggestedPicks scored={scored.filter((s) => s.score.total > 0).slice(0, 3)} />
+
       <form method="GET" className="mb-6 flex flex-wrap items-end gap-3">
         <label className="block">
           <span className="block text-xs font-medium text-zinc-600 dark:text-zinc-400">
@@ -264,6 +266,105 @@ export default async function BrowsePage({ searchParams }: Props) {
       </div>
     </main>
   )
+}
+
+function AiSuggestedPicks({
+  scored,
+}: {
+  scored: { profile: ProfileRow; score: MatchScore }[]
+}) {
+  if (scored.length === 0) return null
+  return (
+    <section className="mb-8 overflow-hidden rounded-2xl border border-amber-200/70 bg-gradient-to-br from-amber-50 via-white to-rose-50 p-6 shadow-sm dark:border-amber-900/30 dark:from-amber-950/30 dark:via-zinc-900 dark:to-rose-950/30">
+      <div className="mb-4 flex items-center gap-3">
+        <span className="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-rose-500 text-white shadow-sm">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden>
+            <path d="M12 2l1.6 4.4 4.4 1.6-4.4 1.6L12 14l-1.6-4.4L6 8l4.4-1.6zM19.5 14l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" />
+          </svg>
+        </span>
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+            AI suggested
+          </p>
+          <p className="text-sm font-semibold">
+            Your best matches in Shenzhen, hand-picked.
+          </p>
+        </div>
+      </div>
+
+      <ul className="grid gap-4 sm:grid-cols-3">
+        {scored.map(({ profile: p, score }) => (
+          <li
+            key={p.id}
+            className="flex flex-col rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+          >
+            <div className="flex items-start gap-3">
+              <Avatar
+                src={avatarPublicUrl(p.avatar_path, p.updated_at)}
+                name={p.display_name}
+                size={56}
+              />
+              <div className="min-w-0 flex-1">
+                <Link
+                  href={`/u/${p.id}`}
+                  className="block truncate text-sm font-semibold hover:underline"
+                >
+                  {p.display_name}
+                </Link>
+                <p className="truncate text-xs text-zinc-500">
+                  {p.city} · {p.role === 'guide' ? 'Guide' : 'Tourist'}
+                </p>
+              </div>
+            </div>
+            <p className="mt-3 flex-1 text-sm text-zinc-700 dark:text-zinc-300">
+              {describeMatch(score)}
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <Link
+                href={`/u/${p.id}`}
+                className="rounded-md border border-zinc-300 px-3 py-1.5 text-center text-xs font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+              >
+                View
+              </Link>
+              <form action={startConversationWith}>
+                <input type="hidden" name="other_id" value={p.id} />
+                <SubmitButton
+                  pendingLabel="Opening…"
+                  className="w-full rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  Message
+                </SubmitButton>
+              </form>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+function describeMatch(score: MatchScore): string {
+  const parts: string[] = []
+  if (score.sharedLanguages.length > 0) {
+    parts.push(`speaks ${formatList(score.sharedLanguages.slice(0, 2))}`)
+  }
+  if (score.sharedHobbies.length > 0) {
+    parts.push(`into ${formatList(score.sharedHobbies.slice(0, 2))}`)
+  }
+  if (score.sharedTraits.length > 0 && parts.length < 2) {
+    parts.push(`feels ${formatList(score.sharedTraits.slice(0, 2))}`)
+  }
+  if (score.sameCity) {
+    parts.push('in your city')
+  }
+  if (parts.length === 0) return 'A solid all-round match.'
+  return 'Why: ' + parts.join(' · ')
+}
+
+function formatList(items: string[]): string {
+  if (items.length === 0) return ''
+  if (items.length === 1) return items[0]
+  return items.join(' & ')
 }
 
 function MatchBadge({ score }: { score: MatchScore }) {
