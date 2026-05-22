@@ -87,6 +87,10 @@ function Hero({ loggedIn }: { loggedIn: boolean }) {
         {!loggedIn && (
           <p className="mt-5 text-xs text-zinc-500 dark:text-zinc-500">
             Free during pilot ·{' '}
+            <Link href="/explore" className="underline hover:text-zinc-700 dark:hover:text-zinc-300">
+              Explore Shenzhen first
+            </Link>{' '}
+            ·{' '}
             <Link href="/login" className="underline hover:text-zinc-700 dark:hover:text-zinc-300">
               Already have an account?
             </Link>
