@@ -147,27 +147,16 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
         </div>
       </section>
 
-      <div className="mx-auto -mt-12 w-full max-w-3xl px-4 pb-12 sm:-mt-16">
-
-      {reviewed && (
-        <p className="mb-4 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-          Review submitted.
-        </p>
-      )}
-      {queryError && (
-        <p className="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
-          {queryError}
-        </p>
-      )}
-
-      <section className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex items-start gap-4">
+      <div className="mx-auto w-full max-w-3xl px-4 pb-12">
+        {/* Identity row — avatar peeks above the cover banner */}
+        <div className="-mt-14 flex flex-wrap items-end gap-4 sm:-mt-16">
           <Avatar
             src={avatarPublicUrl(profile.avatar_path, profile.updated_at)}
             name={profile.display_name}
-            size={96}
+            size={104}
+            className="ring-4 ring-white shadow-lg dark:ring-zinc-900"
           />
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 pb-2">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl font-semibold">{profile.display_name}</h1>
               <span
@@ -191,31 +180,44 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
                 </span>
               </div>
             )}
-            {profile.bio && (
-              <p className="mt-3 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
-                {profile.bio}
-              </p>
-            )}
           </div>
         </div>
 
-        <Chips
-          label="Hobbies"
-          items={profile.hobbies}
-          highlight={score.sharedHobbies}
-        />
-        <Chips
-          label="Languages"
-          items={profile.languages}
-          highlight={score.sharedLanguages}
-        />
-        <Chips
-          label="Personality traits"
-          items={profile.personality_traits}
-          highlight={score.sharedTraits}
-        />
+        {reviewed && (
+          <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+            Review submitted.
+          </p>
+        )}
+        {queryError && (
+          <p className="mt-6 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
+            {queryError}
+          </p>
+        )}
 
-        <div className="mt-6">
+        <section className="mt-6 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          {profile.bio && (
+            <p className="whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
+              {profile.bio}
+            </p>
+          )}
+
+          <Chips
+            label="Hobbies"
+            items={profile.hobbies}
+            highlight={score.sharedHobbies}
+          />
+          <Chips
+            label="Languages"
+            items={profile.languages}
+            highlight={score.sharedLanguages}
+          />
+          <Chips
+            label="Personality traits"
+            items={profile.personality_traits}
+            highlight={score.sharedTraits}
+          />
+
+          <div className="mt-6">
           {isSelf ? (
             <Link
               href="/profile"
