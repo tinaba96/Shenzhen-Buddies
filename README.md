@@ -1,7 +1,11 @@
-# Shenzhen-Buddies
+# Shenzhen Buddies
 
-Peer-to-peer travel buddy matching, starting in Shenzhen. International
-travelers find a local who shares their interests; the local shows them around.
+By **Tensai Tech Inc.** — peer-to-peer travel buddy matching, starting in
+Shenzhen. International travelers find a local who shares their interests;
+the local shows them around.
+
+> Repo slug remains `shenzhen-buddies` (lowercase, hyphenated) for npm/URL
+> conventions, but anywhere user-facing the product is "Shenzhen Buddies".
 
 **Stack:** Next.js 16 (App Router), TypeScript, Tailwind v4, Supabase
 (Auth + Postgres), deployed on Vercel.
