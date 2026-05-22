@@ -12,8 +12,12 @@ type Props = {
   searchParams: Promise<{
     lang?: string | string[]
     hobby?: string | string[]
+    trait?: string | string[]
     great?: string
     min_stars?: string
+    min_reviews?: string
+    with_photo?: string
+    active?: string
     sort?: string
   }>
 }
@@ -49,6 +53,24 @@ const LANGUAGE_OPTIONS = [
   'Vietnamese',
 ] as const
 
+const TRAIT_OPTIONS = [
+  'curious',
+  'outgoing',
+  'patient',
+  'observant',
+  'creative',
+  'thoughtful',
+  'easygoing',
+  'witty',
+  'kind',
+  'warm',
+  'calm',
+  'fun',
+  'adventurous',
+  'direct',
+  'energetic',
+] as const
+
 const HOBBY_OPTIONS = [
   'street food',
   'dim sum',
@@ -78,9 +100,15 @@ export default async function BrowsePage({ searchParams }: Props) {
   const sp = await searchParams
   const langs = asArray(sp.lang)
   const hobbies = asArray(sp.hobby)
+  const traits = asArray(sp.trait)
   const greatOnly = sp.great === '1'
+  const withPhoto = sp.with_photo === '1'
+  const activeOnly = sp.active === '1'
   const minStarsRaw = Number(sp.min_stars ?? '0')
   const minStars = Number.isFinite(minStarsRaw) && minStarsRaw > 0 ? minStarsRaw : 0
+  const minReviewsRaw = Number(sp.min_reviews ?? '0')
+  const minReviews =
+    Number.isFinite(minReviewsRaw) && minReviewsRaw > 0 ? minReviewsRaw : 0
   const sort = sp.sort
   const supabase = await createSupabaseServerClient()
 
@@ -121,6 +149,18 @@ export default async function BrowsePage({ searchParams }: Props) {
     }
     if (hobbies.length > 0) {
       query = query.overlaps('hobbies', hobbies)
+    }
+    if (traits.length > 0) {
+      query = query.overlaps('personality_traits', traits)
+    }
+    if (withPhoto) {
+      query = query.not('avatar_path', 'is', null)
+    }
+    if (activeOnly) {
+      const thirtyDaysAgo = new Date(
+        Date.now() - 30 * 24 * 60 * 60 * 1000,
+      ).toISOString()
+      query = query.gte('updated_at', thirtyDaysAgo)
     }
 
     const result = await query
@@ -172,6 +212,9 @@ export default async function BrowsePage({ searchParams }: Props) {
   if (minStars > 0) {
     scored = scored.filter((s) => (s.rating?.avg ?? 0) >= minStars)
   }
+  if (minReviews > 0) {
+    scored = scored.filter((s) => (s.rating?.count ?? 0) >= minReviews)
+  }
 
   const sortByMatch = sort !== 'recent' && sort !== 'rated' && !!myProfile
   if (sort === 'rated') {
@@ -187,8 +230,12 @@ export default async function BrowsePage({ searchParams }: Props) {
   const hasFilters =
     langs.length > 0 ||
     hobbies.length > 0 ||
+    traits.length > 0 ||
     greatOnly ||
+    withPhoto ||
+    activeOnly ||
     minStars > 0 ||
+    minReviews > 0 ||
     sort === 'recent' ||
     sort === 'rated'
 
@@ -283,6 +330,21 @@ export default async function BrowsePage({ searchParams }: Props) {
         <div>
           <div className="mb-2 flex items-baseline justify-between gap-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+              Personality traits
+            </p>
+            <span className="text-xs text-zinc-500">
+              {traits.length
+                ? `${traits.length} selected — must share at least one vibe`
+                : 'any vibe'}
+            </span>
+          </div>
+          <ChipGroup name="trait" options={TRAIT_OPTIONS} selected={traits} />
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+          <div className="mb-2 flex items-baseline justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
               Minimum rating
             </p>
             <span className="text-xs text-zinc-500">
@@ -312,6 +374,38 @@ export default async function BrowsePage({ searchParams }: Props) {
               </label>
             ))}
           </div>
+          </div>
+
+          <div>
+            <div className="mb-2 flex items-baseline justify-between gap-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                Minimum reviews
+              </p>
+              <span className="text-xs text-zinc-500">
+                {minReviews > 0 ? `${minReviews}+ reviews` : 'any count'}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { v: 0, label: 'Any' },
+                { v: 3, label: '3+ reviews' },
+                { v: 10, label: '10+ reviews' },
+              ].map((opt) => (
+                <label key={opt.v} className="cursor-pointer select-none">
+                  <input
+                    type="radio"
+                    name="min_reviews"
+                    value={String(opt.v)}
+                    defaultChecked={minReviews === opt.v}
+                    className="peer sr-only"
+                  />
+                  <span className="inline-block rounded-full border border-zinc-300 px-3 py-1 text-xs transition hover:bg-zinc-50 peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-900 dark:border-zinc-700 dark:hover:bg-zinc-800 dark:peer-checked:bg-amber-950 dark:peer-checked:text-amber-200">
+                    {opt.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-4 border-t border-zinc-100 pt-4 dark:border-zinc-800">
@@ -323,7 +417,29 @@ export default async function BrowsePage({ searchParams }: Props) {
               defaultChecked={greatOnly}
               className="h-4 w-4 rounded border-zinc-300 text-zinc-900 dark:border-zinc-700"
             />
-            <span>Only great matches (shared interests)</span>
+            <span>Great matches only</span>
+          </label>
+
+          <label className="flex cursor-pointer items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="with_photo"
+              value="1"
+              defaultChecked={withPhoto}
+              className="h-4 w-4 rounded border-zinc-300 text-zinc-900 dark:border-zinc-700"
+            />
+            <span>With photo</span>
+          </label>
+
+          <label className="flex cursor-pointer items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="active"
+              value="1"
+              defaultChecked={activeOnly}
+              className="h-4 w-4 rounded border-zinc-300 text-zinc-900 dark:border-zinc-700"
+            />
+            <span>Active in last 30 days</span>
           </label>
 
           <label className="ml-auto flex items-center gap-2 text-sm">
