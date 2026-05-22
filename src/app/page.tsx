@@ -19,12 +19,20 @@ export default async function Home() {
 
       <div className="mt-8 flex gap-3">
         {user ? (
-          <Link
-            href="/profile"
-            className="rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
-            Go to your profile
-          </Link>
+          <>
+            <Link
+              href="/browse"
+              className="rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            >
+              Browse buddies
+            </Link>
+            <Link
+              href="/profile"
+              className="rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+            >
+              Your profile
+            </Link>
+          </>
         ) : (
           <>
             <Link
