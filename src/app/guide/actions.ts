@@ -179,9 +179,9 @@ export async function requestBooking(formData: FormData) {
 
     const session = await stripe().checkout.sessions.create({
       mode: 'payment',
-      // Card only (Apple/Google Pay still ride on this) — no BNPL like
-      // Klarna/Affirm.
-      payment_method_types: ['card'],
+      // Card (Apple/Google Pay ride on this) + Stripe Link — but no BNPL
+      // like Klarna/Affirm.
+      payment_method_types: ['card', 'link'],
       // Hold expires in 30 min (Stripe minimum), then the day frees up.
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
       customer_email: user.email ?? undefined,
