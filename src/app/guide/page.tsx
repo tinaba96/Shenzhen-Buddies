@@ -53,7 +53,7 @@ const STATUS_STYLES: Record<BookingStatus, { label: string; className: string }>
     className: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
   },
   pending: {
-    label: 'Awaiting confirmation',
+    label: 'Awaiting confirmation (within 3 business days)',
     className:
       'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
   },
@@ -231,8 +231,8 @@ export default async function GuidePage({ searchParams }: Props) {
         {(sp.requested || sp.paid) && (
           <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
             {sp.paid
-              ? "Payment received! Your request is in — we'll email you once it's confirmed. If we can't confirm, you're fully refunded."
-              : "Request sent! We'll email you as soon as it's confirmed."}
+              ? "Payment received! Your request is in — we'll confirm by email within 3 business days. If we can't confirm, you're fully refunded."
+              : "Request sent! We'll confirm by email within 3 business days."}
           </p>
         )}
         {sp.payment_cancelled && (
@@ -374,8 +374,8 @@ export default async function GuidePage({ searchParams }: Props) {
                     </SubmitButton>
                     <p className="text-center text-xs text-zinc-500">
                       You pay {formatMoney(HOURLY_RATE_CENTS)}/hour now to hold
-                      the day. If we can&apos;t confirm, you&apos;re fully
-                      refunded.
+                      the day. We confirm within 3 business days — if we
+                      can&apos;t, you&apos;re fully refunded.
                     </p>
                   </form>
                 </>
