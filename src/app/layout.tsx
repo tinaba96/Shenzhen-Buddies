@@ -178,6 +178,7 @@ function SiteFooter() {
         <FooterColumn
           title="Product"
           links={[
+            { href: "/welcome", label: "Get 10% off" },
             { href: "/explore", label: "Explore" },
             { href: "/browse", label: "Browse buddies" },
             { href: "/pricing", label: "Pricing" },
