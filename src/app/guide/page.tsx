@@ -4,10 +4,14 @@ import { Avatar } from '@/components/Avatar'
 import { SubmitButton } from '@/components/SubmitButton'
 import { avatarPublicUrl } from '@/lib/avatars'
 import {
+  ACTIVE_BOOKING_STATUSES,
+  amountCentsForHours,
   bookableSegments,
   formatDay,
   formatHour,
   formatHourRange,
+  formatMoney,
+  HOURLY_RATE_CENTS,
   MAX_BOOKING_HOURS,
   MIN_BOOKING_HOURS,
   todayInShenzhen,
@@ -22,7 +26,13 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { requestBooking } from './actions'
 
 type Props = {
-  searchParams: Promise<{ day?: string; requested?: string; error?: string }>
+  searchParams: Promise<{
+    day?: string
+    requested?: string
+    paid?: string
+    payment_cancelled?: string
+    error?: string
+  }>
 }
 
 type GuideProfile = {
@@ -38,6 +48,10 @@ type GuideProfile = {
 }
 
 const STATUS_STYLES: Record<BookingStatus, { label: string; className: string }> = {
+  pending_payment: {
+    label: 'Payment incomplete',
+    className: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+  },
   pending: {
     label: 'Awaiting confirmation',
     className:
@@ -108,19 +122,22 @@ export default async function GuidePage({ searchParams }: Props) {
         .order('start_hour')
         .returns<AvailabilityWindow[]>(),
       // Tourists can only read their own bookings through RLS, but the picker
-      // needs to know which days are taken — a pending/approved booking
-      // blocks the whole day. Read with the service-role client and expose
-      // nothing but the day itself.
+      // needs to know which days are taken — any active booking (incl. one
+      // mid-checkout) holds the whole day. Read with the service-role client
+      // and expose nothing but the day itself.
       admin
         .from('bookings')
         .select('day')
         .gte('day', today)
-        .in('status', ['pending', 'approved'])
+        .in('status', ACTIVE_BOOKING_STATUSES)
         .returns<{ day: string }[]>(),
       supabase
         .from('bookings')
-        .select('id, tourist_id, day, start_hour, end_hour, status, note, created_at')
+        .select(
+          'id, tourist_id, day, start_hour, end_hour, status, note, amount_cents, currency, stripe_payment_intent_id, created_at',
+        )
         .eq('tourist_id', user.id)
+        .neq('status', 'pending_payment')
         .order('created_at', { ascending: false })
         .limit(20)
         .returns<BookingRow[]>(),
@@ -211,9 +228,17 @@ export default async function GuidePage({ searchParams }: Props) {
         </div>
 
         {/* Banners */}
-        {sp.requested && (
+        {(sp.requested || sp.paid) && (
           <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-            Request sent! We&apos;ll email you as soon as it&apos;s confirmed.
+            {sp.paid
+              ? "Payment received! Your request is in — we'll email you once it's confirmed. If we can't confirm, you're fully refunded."
+              : "Request sent! We'll email you as soon as it's confirmed."}
+          </p>
+        )}
+        {sp.payment_cancelled && (
+          <p className="mt-6 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+            Payment cancelled — nothing was charged. You can pick a slot and try
+            again.
           </p>
         )}
         {sp.error && (
@@ -238,9 +263,11 @@ export default async function GuidePage({ searchParams }: Props) {
         <section className="mt-8">
           <h2 className="text-xl font-semibold">Book a day together</h2>
           <p className="mt-1 text-sm text-zinc-500">
-            Tours run from {MIN_BOOKING_HOURS} to {MAX_BOOKING_HOURS} hours.
-            Pick a day, a start time, and how long you&apos;d like — we&apos;ll
-            confirm by email.
+            Tours run from {MIN_BOOKING_HOURS} to {MAX_BOOKING_HOURS} hours at{' '}
+            {formatMoney(HOURLY_RATE_CENTS)}/hour (
+            {formatMoney(amountCentsForHours(MIN_BOOKING_HOURS))}–
+            {formatMoney(amountCentsForHours(MAX_BOOKING_HOURS))}). You pay when
+            you book; if we can&apos;t confirm, you&apos;re fully refunded.
           </p>
 
           {!isTourist ? (
@@ -318,7 +345,7 @@ export default async function GuidePage({ searchParams }: Props) {
                             (_, i) => MIN_BOOKING_HOURS + i,
                           ).map((h) => (
                             <option key={h} value={h}>
-                              {h} hours
+                              {h} hours — {formatMoney(amountCentsForHours(h))}
                             </option>
                           ))}
                         </select>
@@ -340,14 +367,15 @@ export default async function GuidePage({ searchParams }: Props) {
                       />
                     </label>
                     <SubmitButton
-                      pendingLabel="Sending request…"
+                      pendingLabel="Going to payment…"
                       className="w-full rounded-full bg-zinc-900 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
                     >
-                      Request this day
+                      Continue to payment
                     </SubmitButton>
                     <p className="text-center text-xs text-zinc-500">
-                      Free to request — you&apos;ll only confirm details after
-                      we approve it.
+                      You pay {formatMoney(HOURLY_RATE_CENTS)}/hour now to hold
+                      the day. If we can&apos;t confirm, you&apos;re fully
+                      refunded.
                     </p>
                   </form>
                 </>
@@ -372,6 +400,13 @@ export default async function GuidePage({ searchParams }: Props) {
                       <p className="text-sm font-medium">
                         {formatDay(b.day)} ·{' '}
                         {formatHourRange(b.start_hour, b.end_hour)}
+                        {b.amount_cents != null && (
+                          <span className="ml-2 font-normal text-zinc-500">
+                            {b.status === 'rejected'
+                              ? `${formatMoney(b.amount_cents, b.currency ?? undefined)} refunded`
+                              : formatMoney(b.amount_cents, b.currency ?? undefined)}
+                          </span>
+                        )}
                       </p>
                       {b.note && (
                         <p className="mt-1 max-w-md truncate text-xs text-zinc-500">

@@ -59,6 +59,8 @@ Vercel.
    - `supabase/migrations/0008_bookings.sql` — `availability_windows` +
      `bookings` for the single-guide beta (one booking per day, enforced by
      an exclusion constraint)
+   - `supabase/migrations/0009_booking_payments.sql` — adds Stripe payment
+     columns + `pending_payment` hold state to `bookings`
 
 4. **Auth settings** (Supabase dashboard → Authentication → URL Configuration)
    - **Site URL:** `http://localhost:3000` (plus your Vercel URL once deployed)
@@ -67,19 +69,24 @@ Vercel.
    - For pilot testing you can turn **off** "Confirm email" under
      Authentication → Providers → Email. Re-enable before public launch.
 
-5. **Stripe** (optional during pilot — leave keys blank and the `/pricing`
-   page shows a friendly placeholder)
+5. **Stripe** — powers premium subscriptions (`/pricing`) **and** one-time
+   booking payments (`/guide`). Leave `STRIPE_SECRET_KEY` blank during pilot to
+   disable both: bookings then skip checkout and go straight to admin review.
    - Create a Stripe account, switch to **test mode**.
-   - Create a **Product** (e.g. "Shenzhen Buddies Premium") with a recurring
-     **Price** (monthly or yearly). Copy the price ID (`price_...`).
+   - (Subscriptions only) Create a **Product** with a recurring **Price** and
+     copy the price ID (`price_...`).
    - Copy your test secret key (`sk_test_...`).
-   - Configure a webhook endpoint at
-     `<your-site-url>/api/stripe/webhook` listening for
-     `checkout.session.completed`, `customer.subscription.created`,
-     `customer.subscription.updated`, `customer.subscription.deleted`.
+   - Configure a webhook endpoint at `<your-site-url>/api/stripe/webhook`
+     listening for:
+     - `checkout.session.completed` — confirms a paid booking / subscription
+     - `checkout.session.expired` — frees the held day if a booking checkout
+       is abandoned
+     - `customer.subscription.created/updated/deleted` — subscription sync
      Copy its signing secret (`whsec_...`).
    - Paste into `.env.local`: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
-     `NEXT_PUBLIC_STRIPE_PRICE_ID`.
+     `NEXT_PUBLIC_STRIPE_PRICE_ID` (price ID only needed for subscriptions).
+   - Booking pricing is a flat CA$10/hour (5–15h), set in `src/lib/booking.ts`
+     (`HOURLY_RATE_CENTS`, `CURRENCY`). Declining a paid booking auto-refunds.
 
 6. **Single-guide beta mode** (optional)
    - Sign the operator's guide up as a normal **guide** account and fill in

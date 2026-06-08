@@ -4,6 +4,7 @@ import {
   formatDay,
   formatHour,
   formatHourRange,
+  formatMoney,
   todayInShenzhen,
   type AvailabilityWindow,
   type BookingRow,
@@ -30,6 +31,8 @@ type TouristLite = {
 }
 
 const STATUS_BADGES: Record<BookingStatus, string> = {
+  pending_payment:
+    'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
   pending:
     'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
   approved:
@@ -60,12 +63,17 @@ export default async function AdminPage({ searchParams }: Props) {
       .returns<AvailabilityWindow[]>(),
     admin
       .from('bookings')
-      .select('id, tourist_id, day, start_hour, end_hour, status, note, created_at')
+      .select(
+        'id, tourist_id, day, start_hour, end_hour, status, note, amount_cents, currency, stripe_payment_intent_id, created_at',
+      )
+      .neq('status', 'pending_payment')
       .order('created_at', { ascending: false })
       .limit(100)
       .returns<BookingRow[]>(),
   ])
 
+  // Unpaid holds ('pending_payment') are filtered out in SQL — admins only act
+  // on paid bookings. 'pending' here means paid & awaiting review.
   const bookingList = bookings ?? []
   const pending = bookingList.filter((b) => b.status === 'pending')
   const resolved = bookingList.filter((b) => b.status !== 'pending')
@@ -143,10 +151,19 @@ export default async function AdminPage({ searchParams }: Props) {
                         {formatDay(b.day)} ·{' '}
                         {formatHourRange(b.start_hour, b.end_hour)} (
                         {b.end_hour - b.start_hour}h)
+                        {b.amount_cents != null && (
+                          <span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                            {formatMoney(b.amount_cents, b.currency ?? undefined)}{' '}
+                            paid
+                          </span>
+                        )}
                       </p>
                       <p className="mt-1 text-xs text-zinc-500">
                         {tourist?.display_name ?? 'Unknown tourist'}
                         {email && <> · {email}</>}
+                      </p>
+                      <p className="mt-1 text-xs text-zinc-400">
+                        Declining refunds the tourist automatically.
                       </p>
                       {b.note && (
                         <p className="mt-2 whitespace-pre-wrap rounded-md bg-zinc-50 px-3 py-2 text-xs text-zinc-700 dark:bg-zinc-950 dark:text-zinc-300">

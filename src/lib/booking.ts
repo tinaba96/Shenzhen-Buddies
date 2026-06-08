@@ -4,6 +4,22 @@
 export const MIN_BOOKING_HOURS = 5
 export const MAX_BOOKING_HOURS = 15
 
+// Pricing: a flat CA$10/hour, charged once at booking time.
+export const HOURLY_RATE_CENTS = 1000
+export const CURRENCY = 'cad'
+
+export function amountCentsForHours(hours: number): number {
+  return hours * HOURLY_RATE_CENTS
+}
+
+// 5000 -> "CA$50.00"
+export function formatMoney(cents: number, currency: string = CURRENCY): string {
+  return new Intl.NumberFormat('en-CA', {
+    style: 'currency',
+    currency: currency.toUpperCase(),
+  }).format(cents / 100)
+}
+
 export type AvailabilityWindow = {
   id: string
   day: string // YYYY-MM-DD
@@ -11,7 +27,19 @@ export type AvailabilityWindow = {
   end_hour: number
 }
 
-export type BookingStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
+export type BookingStatus =
+  | 'pending_payment'
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'cancelled'
+
+// Statuses that hold the day (block other tourists from booking it).
+export const ACTIVE_BOOKING_STATUSES: BookingStatus[] = [
+  'pending_payment',
+  'pending',
+  'approved',
+]
 
 export type BookingRow = {
   id: string
@@ -21,6 +49,9 @@ export type BookingRow = {
   end_hour: number
   status: BookingStatus
   note: string | null
+  amount_cents: number | null
+  currency: string | null
+  stripe_payment_intent_id: string | null
   created_at: string
 }
 
