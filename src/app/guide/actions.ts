@@ -182,6 +182,10 @@ export async function requestBooking(formData: FormData) {
       // Card (Apple/Google Pay ride on this) + Stripe Link — but no BNPL
       // like Klarna/Affirm.
       payment_method_types: ['card', 'link'],
+      // Show a promo-code field. Codes are created in the Stripe dashboard
+      // (10/30/50/70/100% off); only people who know one can apply it, and
+      // Stripe validates redemption/limits/expiry server-side.
+      allow_promotion_codes: true,
       // Hold expires in 30 min (Stripe minimum), then the day frees up.
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
       customer_email: user.email ?? undefined,

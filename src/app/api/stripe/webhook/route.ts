@@ -104,9 +104,16 @@ async function markBookingPaid(session: Stripe.Checkout.Session) {
       : (session.payment_intent?.id ?? null)
 
   const admin = createSupabaseAdminClient()
+  // Record what was actually charged after any promo code (amount_total is
+  // already net of discounts; 0 for a 100%-off / free code).
   const { data: booking } = await admin
     .from('bookings')
-    .update({ status: 'pending', stripe_payment_intent_id: paymentIntentId })
+    .update({
+      status: 'pending',
+      stripe_payment_intent_id: paymentIntentId,
+      amount_cents: session.amount_total ?? undefined,
+      currency: session.currency ?? undefined,
+    })
     .eq('id', bookingId)
     .eq('status', 'pending_payment')
     .select('id, tourist_id, day, start_hour, end_hour, note, amount_cents, currency')
