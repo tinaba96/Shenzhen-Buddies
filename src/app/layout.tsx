@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { Avatar } from "@/components/Avatar";
 import { avatarPublicUrl } from "@/lib/avatars";
+import { isAdminEmail, isSingleGuideMode } from "@/lib/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import "./globals.css";
 
@@ -84,10 +85,10 @@ async function SiteHeader() {
           </Link>
           {user && (
             <Link
-              href="/browse"
+              href={isSingleGuideMode() ? "/guide" : "/browse"}
               className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
             >
-              Browse
+              {isSingleGuideMode() ? "Book a guide" : "Browse"}
             </Link>
           )}
           {user && (
@@ -104,6 +105,14 @@ async function SiteHeader() {
           >
             Pricing
           </Link>
+          {user && isAdminEmail(user.email) && (
+            <Link
+              href="/admin"
+              className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+            >
+              Admin
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center gap-3">

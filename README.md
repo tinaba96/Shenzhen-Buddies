@@ -54,6 +54,11 @@ Vercel.
      on conversations + `mark_conversation_read` RPC
    - `supabase/migrations/0006_subscriptions.sql` — `subscriptions` mirror
      of Stripe state (only needed if you wire up Stripe)
+   - `supabase/migrations/0007_match_role_constraint.sql` — guide↔tourist
+     constraint on conversations
+   - `supabase/migrations/0008_bookings.sql` — `availability_windows` +
+     `bookings` for the single-guide beta (one booking per day, enforced by
+     an exclusion constraint)
 
 4. **Auth settings** (Supabase dashboard → Authentication → URL Configuration)
    - **Site URL:** `http://localhost:3000` (plus your Vercel URL once deployed)
@@ -76,7 +81,21 @@ Vercel.
    - Paste into `.env.local`: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
      `NEXT_PUBLIC_STRIPE_PRICE_ID`.
 
-6. **Run**
+6. **Single-guide beta mode** (optional)
+   - Sign the operator's guide up as a normal **guide** account and fill in
+     their profile.
+   - Set `OFFICIAL_GUIDE_ID` to that account's auth user id (Supabase
+     dashboard → Authentication → Users). While it is set, `/browse`
+     redirects to `/guide`, where tourists book that guide (5–15 hour slots)
+     instead of matching. Unset it to restore the matching experience.
+   - Set `ADMIN_EMAILS` (comma-separated) — those accounts get an **Admin**
+     nav link to `/admin` to publish availability and approve/decline
+     requests.
+   - Set `RESEND_API_KEY` + `EMAIL_FROM` for booking emails (new request →
+     admins; approve/decline → tourist). Leave blank locally and emails are
+     logged to the server console instead.
+
+7. **Run**
    ```bash
    npm run dev
    ```
@@ -88,7 +107,9 @@ Vercel.
 2. Add env vars in Vercel project settings:
    `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
    `SUPABASE_SERVICE_ROLE_KEY`, and the three `STRIPE_*` /
-   `NEXT_PUBLIC_STRIPE_PRICE_ID` if you're enabling subscriptions.
+   `NEXT_PUBLIC_STRIPE_PRICE_ID` if you're enabling subscriptions. For the
+   single-guide beta also add `OFFICIAL_GUIDE_ID`, `ADMIN_EMAILS`,
+   `RESEND_API_KEY`, and `EMAIL_FROM`.
 3. Update Supabase Auth → URL Configuration with your Vercel URL.
 4. In Stripe, edit the webhook endpoint to point at your Vercel URL.
 

@@ -4,6 +4,7 @@ import { Avatar } from '@/components/Avatar'
 import { StarRating } from '@/components/StarRating'
 import { SubmitButton } from '@/components/SubmitButton'
 import { avatarPublicUrl } from '@/lib/avatars'
+import { isSingleGuideMode } from '@/lib/config'
 import { scoreMatch, type MatchScore, type ProfileForMatching } from '@/lib/matching'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { startConversationWith } from '@/app/messages/actions'
@@ -105,6 +106,10 @@ function asArray(input: string | string[] | undefined): string[] {
 }
 
 export default async function BrowsePage({ searchParams }: Props) {
+  // Beta: while a single operator-managed guide is configured, the matching
+  // experience is hidden (not removed) and tourists book via /guide instead.
+  if (isSingleGuideMode()) redirect('/guide')
+
   const sp = await searchParams
   const rawQ = typeof sp.q === 'string' ? sp.q : ''
   // Sanitize free-text search: strip PostgREST .or() metacharacters and cap length.
@@ -179,8 +184,8 @@ export default async function BrowsePage({ searchParams }: Props) {
       query = query.not('avatar_path', 'is', null)
     }
     if (activeOnly) {
-      // eslint-disable-next-line react-hooks/purity -- request-time clock is intentional in a Server Component
       const thirtyDaysAgo = new Date(
+        // eslint-disable-next-line react-hooks/purity -- request-time clock is intentional in a Server Component
         Date.now() - 30 * 24 * 60 * 60 * 1000,
       ).toISOString()
       query = query.gte('updated_at', thirtyDaysAgo)
