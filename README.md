@@ -91,9 +91,13 @@ Vercel.
    - Set `ADMIN_EMAILS` (comma-separated) — those accounts get an **Admin**
      nav link to `/admin` to publish availability and approve/decline
      requests.
-   - Set `RESEND_API_KEY` + `EMAIL_FROM` for booking emails (new request →
-     admins; approve/decline → tourist). Leave blank locally and emails are
-     logged to the server console instead.
+   - Set `GMAIL_USER` + `GMAIL_APP_PASSWORD` (+ optional `EMAIL_FROM`) for
+     booking emails (new request → admins; approve/decline → tourist). On the
+     Gmail account, turn on 2-Step Verification and generate an **App
+     password** (Google Account → Security → App passwords); paste it into
+     `GMAIL_APP_PASSWORD`. Gmail sends the mail itself, so the `@gmail.com`
+     From reaches inboxes without owning a domain. Leave blank locally and
+     emails are logged to the server console instead.
 
 7. **Run**
    ```bash
@@ -109,7 +113,7 @@ Vercel.
    `SUPABASE_SERVICE_ROLE_KEY`, and the three `STRIPE_*` /
    `NEXT_PUBLIC_STRIPE_PRICE_ID` if you're enabling subscriptions. For the
    single-guide beta also add `OFFICIAL_GUIDE_ID`, `ADMIN_EMAILS`,
-   `RESEND_API_KEY`, and `EMAIL_FROM`.
+   `GMAIL_USER`, `GMAIL_APP_PASSWORD`, and `EMAIL_FROM`.
 3. Update Supabase Auth → URL Configuration with your Vercel URL.
 4. In Stripe, edit the webhook endpoint to point at your Vercel URL.
 

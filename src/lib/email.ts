@@ -1,6 +1,13 @@
-// Minimal transactional email via Resend's REST API — no SDK dependency.
-// When RESEND_API_KEY is missing (e.g. local dev) emails are logged instead
-// of sent, so the booking flow keeps working end to end.
+// Transactional email via Gmail SMTP (nodemailer). Sending uses a Gmail
+// "App password" — independent of who logs into the shared inbox, and works
+// without 2FA at send time. Because Gmail itself is the sending server, the
+// @gmail.com From address passes SPF/DKIM/DMARC, so mail actually lands in
+// the inbox without owning a domain.
+//
+// When GMAIL_USER / GMAIL_APP_PASSWORD are missing (e.g. local dev) emails
+// are logged instead of sent, so the booking flow keeps working end to end.
+
+import nodemailer from 'nodemailer'
 
 type SendEmailInput = {
   to: string | string[]
@@ -8,35 +15,43 @@ type SendEmailInput = {
   text: string
 }
 
+// Accepts either "Name <addr@x.com>" or a bare address; falls back to the
+// authenticated Gmail user so the From always matches the sending account.
+function resolveFrom(user: string): string {
+  const configured = process.env.EMAIL_FROM?.trim()
+  if (!configured) return user
+  // Gmail rewrites the envelope sender to the authed user anyway, but a
+  // display name like "Shenzhen Buddies <user@gmail.com>" is preserved.
+  return configured
+}
+
 export async function sendEmail({ to, subject, text }: SendEmailInput) {
   const recipients = (Array.isArray(to) ? to : [to]).filter(Boolean)
   if (recipients.length === 0) return
 
-  const apiKey = process.env.RESEND_API_KEY
-  const from =
-    process.env.EMAIL_FROM ?? 'Shenzhen Buddies <onboarding@resend.dev>'
+  const user = process.env.GMAIL_USER
+  const pass = process.env.GMAIL_APP_PASSWORD
 
-  if (!apiKey) {
+  if (!user || !pass) {
     console.log(
-      `[email skipped — RESEND_API_KEY not set] to=${recipients.join(', ')} subject="${subject}"\n${text}`,
+      `[email skipped — GMAIL_USER/GMAIL_APP_PASSWORD not set] to=${recipients.join(', ')} subject="${subject}"\n${text}`,
     )
     return
   }
 
   try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ from, to: recipients, subject, text }),
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user, pass },
     })
-    if (!res.ok) {
-      // Email failures must never break the booking flow — log and move on.
-      console.error(`Email send failed (${res.status}): ${await res.text()}`)
-    }
+    await transporter.sendMail({
+      from: resolveFrom(user),
+      to: recipients,
+      subject,
+      text,
+    })
   } catch (err) {
+    // Email failures must never break the booking flow — log and move on.
     console.error('Email send failed:', err)
   }
 }
