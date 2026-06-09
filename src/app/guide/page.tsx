@@ -9,6 +9,7 @@ import {
   amountCentsForHours,
   bookableSegments,
   formatDay,
+  formatHour,
   formatHourRange,
   formatMoney,
   HOURLY_RATE_CENTS,
@@ -24,7 +25,11 @@ import {
 import { isSingleGuideMode, officialGuideId } from '@/lib/config'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { requestBooking } from './actions'
+import {
+  addGuideAvailability,
+  deleteGuideAvailability,
+  requestBooking,
+} from './actions'
 
 type Props = {
   searchParams: Promise<{
@@ -32,6 +37,8 @@ type Props = {
     requested?: string
     paid?: string
     payment_cancelled?: string
+    avail_saved?: string
+    avail_deleted?: string
     error?: string
   }>
 }
@@ -204,6 +211,7 @@ export default async function GuidePage({ searchParams }: Props) {
   })
 
   const isTourist = myProfile?.role === 'tourist'
+  const isOfficialGuide = user.id === guideId
 
   return (
     <main className="flex flex-1 flex-col">
@@ -266,6 +274,11 @@ export default async function GuidePage({ searchParams }: Props) {
             again.
           </p>
         )}
+        {(sp.avail_saved || sp.avail_deleted) && (
+          <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+            {sp.avail_saved ? 'Availability added.' : 'Availability removed.'}
+          </p>
+        )}
         {sp.error && (
           <p className="mt-6 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
             {sp.error}
@@ -284,7 +297,8 @@ export default async function GuidePage({ searchParams }: Props) {
           <Chips label="Personality traits" items={guide.personality_traits} />
         </section>
 
-        {/* Booking */}
+        {/* Booking (tourists) */}
+        {!isOfficialGuide && (
         <section className="mt-8">
           <h2 className="text-xl font-semibold">Book a day together</h2>
           <p className="mt-1 text-sm text-zinc-500">
@@ -380,6 +394,12 @@ export default async function GuidePage({ searchParams }: Props) {
             </div>
           )}
         </section>
+        )}
+
+        {/* Availability management (official guide) */}
+        {isOfficialGuide && (
+          <GuideAvailability windows={windows ?? []} today={today} />
+        )}
 
         {/* My bookings */}
         {(myBookings?.length ?? 0) > 0 && (
@@ -424,6 +444,104 @@ export default async function GuidePage({ searchParams }: Props) {
         )}
       </div>
     </main>
+  )
+}
+
+// Availability manager shown to the official guide on their own /guide page.
+function GuideAvailability({
+  windows,
+  today,
+}: {
+  windows: AvailabilityWindow[]
+  today: string
+}) {
+  return (
+    <section className="mt-8">
+      <h2 className="text-xl font-semibold">Your availability</h2>
+      <p className="mt-1 text-sm text-zinc-500">
+        Add the days and hours you can guide. Tourists can book any{' '}
+        {MIN_BOOKING_HOURS}–{MAX_BOOKING_HOURS} hour slot inside a window.
+      </p>
+
+      <form
+        action={addGuideAvailability}
+        className="mt-3 flex flex-wrap items-end gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+      >
+        <label className="block">
+          <span className="text-xs font-medium text-zinc-500">Day</span>
+          <input
+            type="date"
+            name="day"
+            required
+            min={today}
+            className="mt-1 block rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+          />
+        </label>
+        <label className="block">
+          <span className="text-xs font-medium text-zinc-500">From</span>
+          <select
+            name="start_hour"
+            defaultValue={9}
+            className="mt-1 block rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+          >
+            {Array.from({ length: 24 }, (_, h) => (
+              <option key={h} value={h}>
+                {formatHour(h)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block">
+          <span className="text-xs font-medium text-zinc-500">Until</span>
+          <select
+            name="end_hour"
+            defaultValue={22}
+            className="mt-1 block rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+          >
+            {Array.from({ length: 24 }, (_, i) => i + 1).map((h) => (
+              <option key={h} value={h}>
+                {formatHour(h)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <SubmitButton
+          pendingLabel="Adding…"
+          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+        >
+          Add window
+        </SubmitButton>
+      </form>
+
+      {windows.length === 0 ? (
+        <p className="mt-3 rounded-lg border border-dashed border-zinc-300 px-6 py-8 text-center text-sm text-zinc-500 dark:border-zinc-700">
+          No upcoming availability yet — tourists can&apos;t book until you add a
+          window.
+        </p>
+      ) : (
+        <ul className="mt-3 space-y-2">
+          {windows.map((w) => (
+            <li
+              key={w.id}
+              className="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+            >
+              <span>
+                {formatDay(w.day)} · {formatHourRange(w.start_hour, w.end_hour)}
+              </span>
+              <form action={deleteGuideAvailability}>
+                <input type="hidden" name="id" value={w.id} />
+                <SubmitButton
+                  pendingLabel="Removing…"
+                  className="text-xs text-zinc-500 underline underline-offset-2 hover:text-red-600"
+                >
+                  Remove
+                </SubmitButton>
+              </form>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   )
 }
 

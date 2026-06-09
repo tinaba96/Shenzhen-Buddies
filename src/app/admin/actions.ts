@@ -3,14 +3,10 @@
 import { revalidatePath } from 'next/cache'
 import { notFound, redirect } from 'next/navigation'
 import {
-  ACTIVE_BOOKING_STATUSES,
-  formatDay,
-  formatHourRange,
-  formatMoney,
-  HOLD_EXPIRY_MINUTES,
-  todayInShenzhen,
-  type BookingRow,
-} from '@/lib/booking'
+  createAvailabilityWindow,
+  removeAvailabilityWindow,
+} from '@/lib/availability'
+import { formatDay, formatHourRange, formatMoney, type BookingRow } from '@/lib/booking'
 import { isAdminEmail, officialGuideId, siteUrl } from '@/lib/config'
 import { sendEmail } from '@/lib/email'
 import { stripe } from '@/lib/stripe'
@@ -33,75 +29,20 @@ function fail(message: string): never {
 
 export async function addAvailability(formData: FormData) {
   await requireAdmin()
-
-  const day = String(formData.get('day') ?? '')
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) fail('Pick a valid day.')
-  if (day < todayInShenzhen()) fail('That day has already passed.')
-
-  const startHour = Number(formData.get('start_hour'))
-  const endHour = Number(formData.get('end_hour'))
-  if (!Number.isInteger(startHour) || startHour < 0 || startHour > 23) {
-    fail('Pick a valid start hour.')
-  }
-  if (!Number.isInteger(endHour) || endHour < 1 || endHour > 24) {
-    fail('Pick a valid end hour.')
-  }
-  if (endHour <= startHour) fail('End must be after start.')
-
-  const admin = createSupabaseAdminClient()
-  const { error } = await admin
-    .from('availability_windows')
-    .insert({ day, start_hour: startHour, end_hour: endHour })
-  if (error) {
-    if (error.code === '23P01') {
-      fail('That window overlaps an existing one on the same day.')
-    }
-    fail(error.message)
-  }
-
+  const error = await createAvailabilityWindow(
+    String(formData.get('day') ?? ''),
+    Number(formData.get('start_hour')),
+    Number(formData.get('end_hour')),
+  )
+  if (error) fail(error)
   revalidatePath('/admin')
   redirect('/admin?saved=1')
 }
 
 export async function deleteAvailability(formData: FormData) {
   await requireAdmin()
-
-  const id = String(formData.get('id') ?? '')
-  if (!id) fail('Missing window id.')
-
-  const admin = createSupabaseAdminClient()
-  const { data: window } = await admin
-    .from('availability_windows')
-    .select('id, day, start_hour, end_hour')
-    .eq('id', id)
-    .maybeSingle<{ id: string; day: string; start_hour: number; end_hour: number }>()
-  if (!window) fail('Window not found.')
-
-  // Free abandoned holds on this day first so a dead checkout doesn't block
-  // removing the window.
-  const staleCutoffIso = new Date(
-    Date.now() - HOLD_EXPIRY_MINUTES * 60_000,
-  ).toISOString()
-  await admin
-    .from('bookings')
-    .update({ status: 'cancelled' })
-    .eq('day', window.day)
-    .eq('status', 'pending_payment')
-    .lt('created_at', staleCutoffIso)
-
-  // Don't pull a window out from under live requests — resolve those first.
-  // (Any active booking, incl. a fresh mid-checkout hold, holds its whole day.)
-  const { count } = await admin
-    .from('bookings')
-    .select('id', { count: 'exact', head: true })
-    .eq('day', window.day)
-    .in('status', ACTIVE_BOOKING_STATUSES)
-  if ((count ?? 0) > 0) {
-    fail('That day has a pending or confirmed booking — handle it first.')
-  }
-
-  await admin.from('availability_windows').delete().eq('id', id)
-
+  const error = await removeAvailabilityWindow(String(formData.get('id') ?? ''))
+  if (error) fail(error)
   revalidatePath('/admin')
   redirect('/admin?deleted=1')
 }

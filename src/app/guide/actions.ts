@@ -1,7 +1,11 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import {
+  createAvailabilityWindow,
+  removeAvailabilityWindow,
+} from '@/lib/availability'
 import {
   ACTIVE_BOOKING_STATUSES,
   amountCentsForHours,
@@ -17,11 +21,54 @@ import {
   todayInShenzhen,
   type AvailabilityWindow,
 } from '@/lib/booking'
-import { adminEmails, isSingleGuideMode, officialGuideId, siteUrl } from '@/lib/config'
+import {
+  adminEmails,
+  isAdminEmail,
+  isSingleGuideMode,
+  officialGuideId,
+  siteUrl,
+} from '@/lib/config'
 import { sendEmail } from '@/lib/email'
 import { stripe } from '@/lib/stripe'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+
+// The official guide manages their own availability from /guide. Operators
+// (admins) can do it too, here or from /admin.
+async function requireGuideOrAdmin() {
+  const supabase = await createSupabaseServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+  const isGuide = officialGuideId() !== null && user.id === officialGuideId()
+  if (!isGuide && !isAdminEmail(user.email)) notFound()
+  return user
+}
+
+function availFail(message: string): never {
+  redirect(`/guide?error=${encodeURIComponent(message)}`)
+}
+
+export async function addGuideAvailability(formData: FormData) {
+  await requireGuideOrAdmin()
+  const error = await createAvailabilityWindow(
+    String(formData.get('day') ?? ''),
+    Number(formData.get('start_hour')),
+    Number(formData.get('end_hour')),
+  )
+  if (error) availFail(error)
+  revalidatePath('/guide')
+  redirect('/guide?avail_saved=1')
+}
+
+export async function deleteGuideAvailability(formData: FormData) {
+  await requireGuideOrAdmin()
+  const error = await removeAvailabilityWindow(String(formData.get('id') ?? ''))
+  if (error) availFail(error)
+  revalidatePath('/guide')
+  redirect('/guide?avail_deleted=1')
+}
 
 function fail(message: string, day?: string): never {
   const dayParam = day ? `&day=${encodeURIComponent(day)}` : ''
