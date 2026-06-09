@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { Avatar } from "@/components/Avatar";
+import { MobileMenu } from "@/components/MobileMenu";
 import { avatarPublicUrl } from "@/lib/avatars";
 import { isAdminEmail, isSingleGuideMode } from "@/lib/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -61,6 +62,31 @@ async function SiteHeader() {
       .maybeSingle();
     profile = data;
   }
+
+  // Same destinations as the desktop nav, reused by the mobile menu so
+  // nothing on the PC header is missing on small screens.
+  const navLinks = [
+    { href: "/explore", label: "Explore" },
+    ...(user
+      ? [
+          {
+            href: isSingleGuideMode() ? "/guide" : "/browse",
+            label: isSingleGuideMode() ? "Book a guide" : "Browse",
+          },
+          { href: "/messages", label: "Messages" },
+        ]
+      : []),
+    { href: "/pricing", label: "Pricing" },
+    ...(user && isAdminEmail(user.email)
+      ? [{ href: "/admin", label: "Admin" }]
+      : []),
+  ];
+  const accountLinks = user
+    ? [{ href: "/profile", label: profile?.display_name || "Your profile" }]
+    : [
+        { href: "/login", label: "Log in" },
+        { href: "/signup", label: "Sign up" },
+      ];
 
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-200/70 bg-white/80 backdrop-blur-md dark:border-zinc-800/70 dark:bg-black/60">
@@ -149,6 +175,7 @@ async function SiteHeader() {
               </Link>
             </>
           )}
+          <MobileMenu links={navLinks} account={accountLinks} />
         </div>
       </div>
     </header>
