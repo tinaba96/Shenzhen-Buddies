@@ -223,7 +223,7 @@ export async function requestBooking(formData: FormData) {
         metadata: { booking_id: booking.id, user_id: user.id },
       },
       success_url: `${siteUrl()}/guide?paid=1`,
-      cancel_url: `${siteUrl()}/guide?day=${day}&payment_cancelled=1`,
+      cancel_url: `${siteUrl()}/guide/cancel?day=${day}`,
     })
     if (!session.url) throw new Error('Stripe did not return a checkout URL')
 
