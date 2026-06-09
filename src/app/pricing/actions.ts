@@ -2,6 +2,7 @@
 
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { DEFAULT_SITE_URL } from '@/lib/config'
 import { stripe } from '@/lib/stripe'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
@@ -13,7 +14,7 @@ async function siteOrigin(): Promise<string> {
   return (
     fromHost ??
     process.env.NEXT_PUBLIC_SITE_URL ??
-    'http://localhost:3000'
+    DEFAULT_SITE_URL
   )
 }
 

@@ -25,9 +25,12 @@ export function isAdminEmail(email: string | null | undefined): boolean {
   return adminEmails().includes(email.toLowerCase())
 }
 
+// Canonical production URL — used as the fallback so emails and redirect
+// links never point at localhost, even if NEXT_PUBLIC_SITE_URL is unset.
+export const DEFAULT_SITE_URL = 'https://shenzhen-buddies.vercel.app'
+
 export function siteUrl(): string {
   return (
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ||
-    'http://localhost:3000'
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || DEFAULT_SITE_URL
   )
 }
