@@ -8,10 +8,16 @@ export const MAX_BOOKING_HOURS = 8
 export const HOURLY_RATE_CENTS = 1000
 export const CURRENCY = 'cad'
 
-// A 'pending_payment' hold older than this is treated as abandoned (Stripe
-// Checkout sessions expire at 30 min). It no longer blocks the day, so the
-// picker self-heals even if the checkout.session.expired webhook is missed.
-export const HOLD_EXPIRY_MINUTES = 30
+// The Stripe Checkout session lifetime (Stripe's minimum). After this the
+// session expires and the tourist can no longer pay on it.
+export const CHECKOUT_EXPIRY_MINUTES = 30
+
+// When the app treats a 'pending_payment' hold as abandoned and stops letting
+// it block the day. Set a few minutes BEYOND the checkout expiry so that by
+// the time we free a day, the original payer's session is already expired —
+// they can't complete payment, so freeing it for others can't double-book.
+// This also self-heals if the checkout.session.expired webhook is missed.
+export const HOLD_EXPIRY_MINUTES = 35
 
 export function isHoldExpired(
   status: BookingStatus,
