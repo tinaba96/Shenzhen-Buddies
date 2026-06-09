@@ -8,7 +8,7 @@ const PROMO = 'WELCOME10'
 export const metadata: Metadata = {
   title: 'Get 10% off your Shenzhen day — Shenzhen Buddies',
   description:
-    'Book a local guide in Shenzhen for a full day out. Use code WELCOME10 for 10% off your first booking. CA$10/hour, 5–15 hours, fully refunded if we can’t confirm.',
+    'Book a local guide in Shenzhen for a day out. Use code WELCOME10 for 10% off your first booking. CA$10/hour, 4–8 hours, fully refunded if we can’t confirm.',
 }
 
 const HERO_PHOTO =
@@ -114,7 +114,7 @@ function Hero() {
 
         <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs uppercase tracking-wider text-white/60">
           <TrustItem>CA$10 / hour</TrustItem>
-          <TrustItem>5–15 hour days</TrustItem>
+          <TrustItem>4–8 hour days</TrustItem>
           <TrustItem>Fully refunded if not confirmed</TrustItem>
         </div>
       </div>
@@ -152,7 +152,7 @@ function DealStrip() {
               </span>
             </h2>
             <p className="mt-4 max-w-md text-zinc-600 dark:text-zinc-400">
-              Every booking is a flat CA$10 an hour — pick anywhere from 5 to 15
+              Every booking is a flat CA$10 an hour — pick anywhere from 4 to 8
               hours. Add <span className="font-semibold text-zinc-900 dark:text-zinc-100">{PROMO}</span> at
               checkout and 10% comes straight off. If we can’t confirm your day,
               you’re refunded in full.
@@ -185,7 +185,7 @@ function DealStrip() {
             </p>
             <dl className="mt-6 space-y-2 border-t border-zinc-200/70 pt-4 text-sm dark:border-zinc-700/70">
               <Row label="Hourly rate" value="CA$10" />
-              <Row label="Day length" value="5–15 hours" />
+              <Row label="Day length" value="4–8 hours" />
               <Row label="Welcome discount" value="−10%" highlight />
               <Row label="Payment" value="Card · Apple Pay · Link" />
             </dl>
@@ -228,7 +228,7 @@ function HowItWorks() {
     {
       n: '01',
       title: 'Pick your day',
-      body: 'Choose an open date and how many hours you want — 5 to 15.',
+      body: 'Choose an open date and how many hours you want — 4 to 8.',
     },
     {
       n: '02',
@@ -456,7 +456,7 @@ function Faq() {
     },
     {
       q: 'How long is a day?',
-      a: 'Anywhere from 5 to 15 hours, your choice. It’s a flat CA$10 per hour before the discount.',
+      a: 'Anywhere from 4 to 8 hours, your choice. It’s a flat CA$10 per hour before the discount.',
     },
     {
       q: 'When will I know it’s confirmed?',

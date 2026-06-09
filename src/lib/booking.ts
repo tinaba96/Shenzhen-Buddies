@@ -1,8 +1,8 @@
 // Shared types and pure helpers for the beta booking flow.
 // All hours are whole-hour wall-clock times in Shenzhen (0–24).
 
-export const MIN_BOOKING_HOURS = 5
-export const MAX_BOOKING_HOURS = 15
+export const MIN_BOOKING_HOURS = 4
+export const MAX_BOOKING_HOURS = 8
 
 // Pricing: a flat CA$10/hour, charged once at booking time.
 export const HOURLY_RATE_CENTS = 1000
