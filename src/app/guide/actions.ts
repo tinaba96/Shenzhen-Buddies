@@ -10,6 +10,7 @@ import {
   fitsInSegments,
   formatDay,
   formatHourRange,
+  HOLD_EXPIRY_MINUTES,
   MAX_BOOKING_HOURS,
   MIN_BOOKING_HOURS,
   todayInShenzhen,
@@ -75,8 +76,21 @@ export async function requestBooking(formData: FormData) {
 
   const admin = createSupabaseAdminClient()
 
-  // Drop this tourist's own abandoned hold for the day (if they bailed out of
-  // a previous checkout) so they can retry without tripping the day lock.
+  // Free abandoned holds on this day — anyone's checkout that expired (incl.
+  // ones the Stripe expiry webhook missed) — so a dead hold can't lock the
+  // day forever or trip the exclusion constraint on insert.
+  const staleCutoffIso = new Date(
+    Date.now() - HOLD_EXPIRY_MINUTES * 60_000,
+  ).toISOString()
+  await admin
+    .from('bookings')
+    .update({ status: 'cancelled' })
+    .eq('day', day)
+    .eq('status', 'pending_payment')
+    .lt('created_at', staleCutoffIso)
+
+  // Drop this tourist's own current hold for the day (if they bailed out of a
+  // previous checkout) so they can retry without tripping the day lock.
   await admin
     .from('bookings')
     .delete()

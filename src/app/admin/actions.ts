@@ -7,6 +7,7 @@ import {
   formatDay,
   formatHourRange,
   formatMoney,
+  HOLD_EXPIRY_MINUTES,
   todayInShenzhen,
   type BookingRow,
 } from '@/lib/booking'
@@ -76,8 +77,20 @@ export async function deleteAvailability(formData: FormData) {
     .maybeSingle<{ id: string; day: string; start_hour: number; end_hour: number }>()
   if (!window) fail('Window not found.')
 
+  // Free abandoned holds on this day first so a dead checkout doesn't block
+  // removing the window.
+  const staleCutoffIso = new Date(
+    Date.now() - HOLD_EXPIRY_MINUTES * 60_000,
+  ).toISOString()
+  await admin
+    .from('bookings')
+    .update({ status: 'cancelled' })
+    .eq('day', window.day)
+    .eq('status', 'pending_payment')
+    .lt('created_at', staleCutoffIso)
+
   // Don't pull a window out from under live requests — resolve those first.
-  // (Any active booking, incl. one mid-checkout, holds its whole day.)
+  // (Any active booking, incl. a fresh mid-checkout hold, holds its whole day.)
   const { count } = await admin
     .from('bookings')
     .select('id', { count: 'exact', head: true })

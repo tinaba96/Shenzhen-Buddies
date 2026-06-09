@@ -12,6 +12,7 @@ import {
   formatHourRange,
   formatMoney,
   HOURLY_RATE_CENTS,
+  isHoldExpired,
   MAX_BOOKING_HOURS,
   MIN_BOOKING_HOURS,
   todayInShenzhen,
@@ -127,10 +128,10 @@ export default async function GuidePage({ searchParams }: Props) {
       // and expose nothing but the day itself.
       admin
         .from('bookings')
-        .select('day')
+        .select('day, status, created_at')
         .gte('day', today)
         .in('status', ACTIVE_BOOKING_STATUSES)
-        .returns<{ day: string }[]>(),
+        .returns<{ day: string; status: BookingStatus; created_at: string }[]>(),
       supabase
         .from('bookings')
         .select(
@@ -143,9 +144,20 @@ export default async function GuidePage({ searchParams }: Props) {
         .returns<BookingRow[]>(),
     ])
 
-  const bookedDays = new Set((activeBookings ?? []).map((b) => b.day))
+  // A day is taken by a confirmed/awaiting booking or a *fresh* hold. An
+  // abandoned hold (older than 30 min) no longer blocks it, so the picker
+  // self-heals even if Stripe's checkout.session.expired webhook is missed.
+  // eslint-disable-next-line react-hooks/purity -- request-time clock for hold expiry
+  const nowMs = Date.now()
+  const bookedDays = new Set(
+    (activeBookings ?? [])
+      .filter(
+        (b) => !isHoldExpired(b.status, new Date(b.created_at).getTime(), nowMs),
+      )
+      .map((b) => b.day),
+  )
 
-  // Days that are not taken yet and have at least one bookable (≥5h) window.
+  // Days that are not taken yet and have at least one bookable (≥4h) window.
   const dayOptions: { day: string; segments: FreeSegment[] }[] = []
   const windowsByDay = new Map<string, AvailabilityWindow[]>()
   for (const w of windows ?? []) {

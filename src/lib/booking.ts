@@ -8,6 +8,22 @@ export const MAX_BOOKING_HOURS = 8
 export const HOURLY_RATE_CENTS = 1000
 export const CURRENCY = 'cad'
 
+// A 'pending_payment' hold older than this is treated as abandoned (Stripe
+// Checkout sessions expire at 30 min). It no longer blocks the day, so the
+// picker self-heals even if the checkout.session.expired webhook is missed.
+export const HOLD_EXPIRY_MINUTES = 30
+
+export function isHoldExpired(
+  status: BookingStatus,
+  createdAtMs: number,
+  nowMs: number,
+): boolean {
+  return (
+    status === 'pending_payment' &&
+    nowMs - createdAtMs > HOLD_EXPIRY_MINUTES * 60_000
+  )
+}
+
 export function amountCentsForHours(hours: number): number {
   return hours * HOURLY_RATE_CENTS
 }
