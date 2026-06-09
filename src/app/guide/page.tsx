@@ -128,10 +128,17 @@ export default async function GuidePage({ searchParams }: Props) {
       // and expose nothing but the day itself.
       admin
         .from('bookings')
-        .select('day, status, created_at')
+        .select('day, status, created_at, tourist_id')
         .gte('day', today)
         .in('status', ACTIVE_BOOKING_STATUSES)
-        .returns<{ day: string; status: BookingStatus; created_at: string }[]>(),
+        .returns<
+          {
+            day: string
+            status: BookingStatus
+            created_at: string
+            tourist_id: string
+          }[]
+        >(),
       supabase
         .from('bookings')
         .select(
@@ -151,8 +158,14 @@ export default async function GuidePage({ searchParams }: Props) {
   const nowMs = Date.now()
   const bookedDays = new Set(
     (activeBookings ?? [])
+      // Abandoned holds (older than 30 min) no longer block the day.
       .filter(
         (b) => !isHoldExpired(b.status, new Date(b.created_at).getTime(), nowMs),
+      )
+      // Your own in-progress hold shouldn't hide the day from you — you can
+      // reclaim it (requestBooking drops it first). It still blocks others.
+      .filter(
+        (b) => !(b.status === 'pending_payment' && b.tourist_id === user.id),
       )
       .map((b) => b.day),
   )
