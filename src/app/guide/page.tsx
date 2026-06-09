@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
+import { BookingFields } from '@/components/BookingFields'
 import { SubmitButton } from '@/components/SubmitButton'
 import { avatarPublicUrl } from '@/lib/avatars'
 import {
@@ -8,7 +9,6 @@ import {
   amountCentsForHours,
   bookableSegments,
   formatDay,
-  formatHour,
   formatHourRange,
   formatMoney,
   HOURLY_RATE_CENTS,
@@ -318,39 +318,11 @@ export default async function GuidePage({ searchParams }: Props) {
 
                   <form action={requestBooking} className="mt-4 space-y-4">
                     <input type="hidden" name="day" value={selectedDay.day} />
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <label className="block">
-                        <span className="text-sm font-medium">Start time</span>
-                        <select
-                          name="start_hour"
-                          required
-                          className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
-                        >
-                          {startOptions.map((o) => (
-                            <option key={o.hour} value={o.hour}>
-                              {formatHour(o.hour)} (up to {o.maxDuration}h)
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label className="block">
-                        <span className="text-sm font-medium">Duration</span>
-                        <select
-                          name="duration"
-                          required
-                          className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
-                        >
-                          {Array.from(
-                            { length: MAX_BOOKING_HOURS - MIN_BOOKING_HOURS + 1 },
-                            (_, i) => MIN_BOOKING_HOURS + i,
-                          ).map((h) => (
-                            <option key={h} value={h}>
-                              {h} hours — {formatMoney(amountCentsForHours(h))}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    </div>
+                    <BookingFields
+                      startOptions={startOptions}
+                      minHours={MIN_BOOKING_HOURS}
+                      maxHours={MAX_BOOKING_HOURS}
+                    />
                     <label className="block">
                       <span className="text-sm font-medium">
                         Anything {guide.display_name} should know?
