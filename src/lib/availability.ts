@@ -5,6 +5,7 @@
 import {
   ACTIVE_BOOKING_STATUSES,
   HOLD_EXPIRY_MINUTES,
+  MIN_BOOKING_HOURS,
   todayInShenzhen,
 } from '@/lib/booking'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
@@ -23,6 +24,9 @@ export async function createAvailabilityWindow(
     return 'Pick a valid end hour.'
   }
   if (endHour <= startHour) return 'End must be after start.'
+  if (endHour - startHour < MIN_BOOKING_HOURS) {
+    return `A window must be at least ${MIN_BOOKING_HOURS} hours long — the shortest booking is ${MIN_BOOKING_HOURS} hours, so shorter windows can never be booked.`
+  }
 
   const admin = createSupabaseAdminClient()
   const { error } = await admin
