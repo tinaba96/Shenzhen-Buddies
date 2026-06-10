@@ -27,7 +27,9 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import {
   addGuideAvailability,
+  approveGuideBooking,
   deleteGuideAvailability,
+  rejectGuideBooking,
   requestBooking,
 } from './actions'
 
@@ -39,6 +41,8 @@ type Props = {
     payment_cancelled?: string
     avail_saved?: string
     avail_deleted?: string
+    approved?: string
+    declined?: string
     error?: string
   }>
 }
@@ -302,6 +306,13 @@ export default async function GuidePage({ searchParams }: Props) {
             {sp.avail_saved ? 'Availability added.' : 'Availability removed.'}
           </p>
         )}
+        {(sp.approved || sp.declined) && (
+          <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+            {sp.approved
+              ? 'Booking confirmed — the tourist has been emailed.'
+              : 'Booking declined — the tourist was refunded and the day is free again.'}
+          </p>
+        )}
         {sp.error && (
           <p className="mt-6 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
             {sp.error}
@@ -517,15 +528,32 @@ function GuideBookings({
                     {b.note && ` · “${b.note}”`}
                   </p>
                 </div>
-                <span
-                  className={
-                    confirmed
-                      ? 'rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                      : 'rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300'
-                  }
-                >
-                  {confirmed ? 'Confirmed' : 'Awaiting confirmation'}
-                </span>
+                {confirmed ? (
+                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    Confirmed
+                  </span>
+                ) : (
+                  <div className="flex shrink-0 gap-2">
+                    <form action={approveGuideBooking}>
+                      <input type="hidden" name="id" value={b.id} />
+                      <SubmitButton
+                        pendingLabel="Approving…"
+                        className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500"
+                      >
+                        Approve
+                      </SubmitButton>
+                    </form>
+                    <form action={rejectGuideBooking}>
+                      <input type="hidden" name="id" value={b.id} />
+                      <SubmitButton
+                        pendingLabel="Declining…"
+                        className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                      >
+                        Decline
+                      </SubmitButton>
+                    </form>
+                  </div>
+                )}
               </li>
             )
           })}

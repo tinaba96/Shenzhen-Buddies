@@ -6,6 +6,7 @@ import {
   createAvailabilityWindow,
   removeAvailabilityWindow,
 } from '@/lib/availability'
+import { resolveBookingById } from '@/lib/bookings'
 import {
   ACTIVE_BOOKING_STATUSES,
   amountCentsForHours,
@@ -69,6 +70,30 @@ export async function deleteGuideAvailability(formData: FormData) {
   if (error) availFail(error)
   revalidatePath('/guide')
   redirect('/guide?avail_deleted=1')
+}
+
+export async function approveGuideBooking(formData: FormData) {
+  await requireGuideOrAdmin()
+  const error = await resolveBookingById(
+    String(formData.get('id') ?? ''),
+    'approved',
+  )
+  if (error) availFail(error)
+  revalidatePath('/guide')
+  revalidatePath('/admin')
+  redirect('/guide?approved=1')
+}
+
+export async function rejectGuideBooking(formData: FormData) {
+  await requireGuideOrAdmin()
+  const error = await resolveBookingById(
+    String(formData.get('id') ?? ''),
+    'rejected',
+  )
+  if (error) availFail(error)
+  revalidatePath('/guide')
+  revalidatePath('/admin')
+  redirect('/guide?declined=1')
 }
 
 function fail(message: string, day?: string): never {
