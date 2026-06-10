@@ -29,6 +29,7 @@ import {
   siteUrl,
 } from '@/lib/config'
 import { sendEmail } from '@/lib/email'
+import { notifyGuide } from '@/lib/notify'
 import { stripe } from '@/lib/stripe'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -220,6 +221,19 @@ export async function requestBooking(formData: FormData) {
         `Approve or decline it here: ${siteUrl()}/admin`,
       ].join('\n'),
     })
+    await notifyGuide(
+      `New booking request — ${formatDay(day)}, ${formatHourRange(startHour, endHour)}`,
+      [
+        'A new booking request just came in for you.',
+        '',
+        `Day: ${formatDay(day)}`,
+        `Time: ${formatHourRange(startHour, endHour)} (${duration} hours)`,
+        note ? `Note: ${note}` : 'Note: —',
+        '',
+        "We'll let you know once it's confirmed.",
+        `See your bookings: ${siteUrl()}/guide`,
+      ].join('\n'),
+    )
     revalidatePath('/guide')
     redirect('/guide?requested=1')
   }

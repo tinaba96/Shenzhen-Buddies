@@ -213,6 +213,29 @@ export default async function GuidePage({ searchParams }: Props) {
   const isTourist = myProfile?.role === 'tourist'
   const isOfficialGuide = user.id === guideId
 
+  // The guide's own schedule: upcoming awaiting/confirmed bookings.
+  let guideBookings: GuideBookingRow[] = []
+  const guideTouristNames = new Map<string, string>()
+  if (isOfficialGuide) {
+    const { data } = await admin
+      .from('bookings')
+      .select('id, tourist_id, day, start_hour, end_hour, status, note')
+      .gte('day', today)
+      .in('status', ['pending', 'approved'])
+      .order('day')
+      .returns<GuideBookingRow[]>()
+    guideBookings = data ?? []
+    const ids = Array.from(new Set(guideBookings.map((b) => b.tourist_id)))
+    if (ids.length) {
+      const { data: profs } = await admin
+        .from('profiles')
+        .select('id, display_name')
+        .in('id', ids)
+        .returns<{ id: string; display_name: string }[]>()
+      for (const p of profs ?? []) guideTouristNames.set(p.id, p.display_name)
+    }
+  }
+
   return (
     <main className="flex flex-1 flex-col">
       {/* Cover banner */}
@@ -396,9 +419,12 @@ export default async function GuidePage({ searchParams }: Props) {
         </section>
         )}
 
-        {/* Availability management (official guide) */}
+        {/* Guide's own schedule + availability management */}
         {isOfficialGuide && (
-          <GuideAvailability windows={windows ?? []} today={today} />
+          <>
+            <GuideBookings bookings={guideBookings} names={guideTouristNames} />
+            <GuideAvailability windows={windows ?? []} today={today} />
+          </>
         )}
 
         {/* My bookings */}
@@ -444,6 +470,68 @@ export default async function GuidePage({ searchParams }: Props) {
         )}
       </div>
     </main>
+  )
+}
+
+type GuideBookingRow = {
+  id: string
+  tourist_id: string
+  day: string
+  start_hour: number
+  end_hour: number
+  status: BookingStatus
+  note: string | null
+}
+
+// The guide's upcoming schedule (awaiting + confirmed bookings).
+function GuideBookings({
+  bookings,
+  names,
+}: {
+  bookings: GuideBookingRow[]
+  names: Map<string, string>
+}) {
+  return (
+    <section className="mt-8">
+      <h2 className="text-xl font-semibold">Your bookings</h2>
+      {bookings.length === 0 ? (
+        <p className="mt-3 rounded-lg border border-dashed border-zinc-300 px-6 py-8 text-center text-sm text-zinc-500 dark:border-zinc-700">
+          No upcoming bookings yet.
+        </p>
+      ) : (
+        <ul className="mt-3 space-y-3">
+          {bookings.map((b) => {
+            const confirmed = b.status === 'approved'
+            return (
+              <li
+                key={b.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">
+                    {formatDay(b.day)} ·{' '}
+                    {formatHourRange(b.start_hour, b.end_hour)}
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {names.get(b.tourist_id) ?? 'Tourist'}
+                    {b.note && ` · “${b.note}”`}
+                  </p>
+                </div>
+                <span
+                  className={
+                    confirmed
+                      ? 'rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                      : 'rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                  }
+                >
+                  {confirmed ? 'Confirmed' : 'Awaiting confirmation'}
+                </span>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </section>
   )
 }
 

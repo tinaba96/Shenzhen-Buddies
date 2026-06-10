@@ -3,6 +3,7 @@ import type Stripe from 'stripe'
 import { formatDay, formatHourRange, formatMoney } from '@/lib/booking'
 import { adminEmails, siteUrl } from '@/lib/config'
 import { sendEmail } from '@/lib/email'
+import { notifyGuide } from '@/lib/notify'
 import { stripe } from '@/lib/stripe'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 
@@ -159,6 +160,22 @@ async function markBookingPaid(session: Stripe.Checkout.Session) {
       `Approve or decline it here: ${siteUrl()}/admin`,
     ].join('\n'),
   })
+
+  // Keep the guide in the loop on their own bookings (informational; the
+  // operator does the approving).
+  await notifyGuide(
+    `New booking request — ${formatDay(booking.day)}, ${formatHourRange(booking.start_hour, booking.end_hour)}`,
+    [
+      'A new booking request just came in for you.',
+      '',
+      `Day: ${formatDay(booking.day)}`,
+      `Time: ${formatHourRange(booking.start_hour, booking.end_hour)} (${booking.end_hour - booking.start_hour} hours)`,
+      booking.note ? `Note: ${booking.note}` : 'Note: —',
+      '',
+      "We'll let you know once it's confirmed.",
+      `See your bookings: ${siteUrl()}/guide`,
+    ].join('\n'),
+  )
 }
 
 async function upsertSubscription(userId: string, sub: Stripe.Subscription) {

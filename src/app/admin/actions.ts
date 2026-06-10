@@ -9,6 +9,7 @@ import {
 import { formatDay, formatHourRange, formatMoney, type BookingRow } from '@/lib/booking'
 import { isAdminEmail, officialGuideId, siteUrl } from '@/lib/config'
 import { sendEmail } from '@/lib/email'
+import { notifyGuide } from '@/lib/notify'
 import { stripe } from '@/lib/stripe'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -146,6 +147,31 @@ async function resolveBooking(
         ].join('\n'),
       })
     }
+  }
+
+  // Keep the guide informed about their own bookings (links to /guide).
+  if (nextStatus === 'approved') {
+    await notifyGuide(
+      `Booking confirmed — ${when}`,
+      [
+        'A booking on your calendar is now confirmed.',
+        '',
+        `When: ${when}`,
+        booking.note ? `Note: ${booking.note}` : 'Note: —',
+        '',
+        `See your bookings: ${siteUrl()}/guide`,
+      ].join('\n'),
+    )
+  } else {
+    await notifyGuide(
+      `Booking declined — ${when}`,
+      [
+        `The booking request for ${when} was declined and the tourist refunded.`,
+        'Your day is free again.',
+        '',
+        `See your bookings: ${siteUrl()}/guide`,
+      ].join('\n'),
+    )
   }
 
   revalidatePath('/admin')
