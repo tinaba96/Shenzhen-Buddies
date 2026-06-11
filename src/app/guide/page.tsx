@@ -424,6 +424,30 @@ export default async function GuidePage({ searchParams }: Props) {
                         className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
                       />
                     </label>
+                    {/* Cancellation policy, visible before paying */}
+                    <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+                      <p className="font-medium text-zinc-700 dark:text-zinc-300">
+                        Cancellation policy
+                      </p>
+                      <ul className="mt-1 space-y-0.5">
+                        <li>
+                          • Before we confirm: <strong>full refund</strong>,
+                          anytime
+                        </li>
+                        <li>
+                          • 72h+ before the tour: <strong>full refund</strong>
+                        </li>
+                        <li>• 72–24h before: 70% refund (30% fee)</li>
+                        <li>• Under 24h before: no refund</li>
+                      </ul>
+                      <Link
+                        href="/cancellation"
+                        className="mt-1 inline-block underline underline-offset-2 hover:text-zinc-800 dark:hover:text-zinc-200"
+                      >
+                        Read the full policy
+                      </Link>
+                    </div>
+
                     <SubmitButton
                       pendingLabel="Going to payment…"
                       className="w-full rounded-full bg-zinc-900 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
