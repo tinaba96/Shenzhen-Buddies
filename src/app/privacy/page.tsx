@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     'How Shenzhen Buddies handles your data — plain English, no dark patterns.',
 }
 
-const LAST_UPDATED = 'May 2026'
+const LAST_UPDATED = 'June 2026'
 
 const SECTIONS: {
   id: string
@@ -112,8 +112,23 @@ export default function PrivacyPage() {
                 exchanging a message.
               </li>
               <li>
+                <strong>Bookings</strong> — the day and time you book, any note
+                you add, the amount paid, currency, and the Stripe checkout /
+                payment identifiers and status. Card numbers stay with Stripe.
+              </li>
+              <li>
                 <strong>Subscription</strong> — Stripe customer ID, status,
                 renewal/trial dates. Card numbers stay with Stripe.
+              </li>
+              <li>
+                <strong>Consent &amp; audit records</strong> — when you book, we
+                record that you agreed to our{' '}
+                <Link href="/terms" className="underline">Terms</Link> and{' '}
+                <Link href="/cancellation" className="underline">
+                  Cancellation Policy
+                </Link>
+                , the policy version, and your <strong>IP address</strong> and{' '}
+                <strong>browser (user-agent)</strong>, as proof of agreement.
               </li>
               <li>
                 <strong>Basic technical data</strong> — browser type,
@@ -126,7 +141,14 @@ export default function PrivacyPage() {
             <ul className="ml-5 list-disc space-y-2">
               <li>To match you with potential buddies who share your interests.</li>
               <li>To let you message, review, and be reviewed by other users.</li>
+              <li>
+                To take bookings and process payments and refunds via Stripe.
+              </li>
               <li>To process subscription payments via Stripe.</li>
+              <li>
+                To keep an audit record that you agreed to our Terms and
+                Cancellation Policy (a legal basis for the booking contract).
+              </li>
               <li>To investigate safety reports and protect users from abuse or fraud.</li>
             </ul>
             <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
@@ -169,8 +191,18 @@ export default function PrivacyPage() {
                 <strong>Vercel</strong> — application hosting and edge delivery.
               </li>
               <li>
-                <strong>Stripe</strong> — subscription billing. Stripe handles
-                all payment-card data.
+                <strong>Stripe</strong> — payments for bookings and
+                subscriptions, and refunds. Stripe handles all payment-card
+                data. (
+                <a
+                  href="https://stripe.com/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  policy
+                </a>
+                )
               </li>
             </ul>
           </Section>
@@ -186,8 +218,12 @@ export default function PrivacyPage() {
                 <Link href="/profile" className="underline">/profile</Link>.
               </li>
               <li>
-                <strong>Deletion</strong> — email us to delete your account; all
-                your data goes with it.
+                <strong>Deletion</strong> — email us to delete your account and
+                your profile, messages, and reviews. We may retain limited
+                booking, payment, and consent/audit records where we&apos;re
+                required to keep them (for example, tax, accounting, and
+                fraud-prevention obligations), then delete them when no longer
+                needed.
               </li>
               <li>
                 <strong>Cancel subscription</strong> — use the billing portal
