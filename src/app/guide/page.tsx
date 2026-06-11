@@ -8,10 +8,12 @@ import {
   ACTIVE_BOOKING_STATUSES,
   amountCentsForHours,
   bookableSegments,
+  cancellationRefundPercent,
   formatDay,
   formatHour,
   formatHourRange,
   formatMoney,
+  hoursUntilTourStart,
   HOURLY_RATE_CENTS,
   isHoldExpired,
   MAX_BOOKING_HOURS,
@@ -28,6 +30,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import {
   addGuideAvailability,
   approveGuideBooking,
+  cancelOwnBooking,
   deleteGuideAvailability,
   rejectGuideBooking,
   requestBooking,
@@ -43,6 +46,8 @@ type Props = {
     avail_deleted?: string
     approved?: string
     declined?: string
+    cancelled?: string
+    refund_cents?: string
     error?: string
   }>
 }
@@ -313,6 +318,14 @@ export default async function GuidePage({ searchParams }: Props) {
               : 'Booking declined — the tourist was refunded and the day is free again.'}
           </p>
         )}
+        {sp.cancelled && (
+          <p className="mt-6 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+            Booking cancelled.{' '}
+            {Number(sp.refund_cents) > 0
+              ? `${formatMoney(Number(sp.refund_cents))} will be refunded within a few business days.`
+              : 'No refund applies under the cancellation policy.'}
+          </p>
+        )}
         {sp.error && (
           <p className="mt-6 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
             {sp.error}
@@ -442,9 +455,19 @@ export default async function GuidePage({ searchParams }: Props) {
         {(myBookings?.length ?? 0) > 0 && (
           <section className="mt-8">
             <h2 className="text-xl font-semibold">Your requests</h2>
+            <p className="mt-1 text-xs text-zinc-500">
+              Cancellation: free up to 72h before · 30% fee within 72h · no
+              refund within 24h. Before it&apos;s confirmed, you&apos;re always
+              fully refunded.
+            </p>
             <ul className="mt-3 space-y-3">
               {myBookings!.map((b) => {
                 const status = STATUS_STYLES[b.status]
+                const hrs = hoursUntilTourStart(b.day, b.start_hour, nowMs)
+                const canCancel =
+                  (b.status === 'pending' || b.status === 'approved') &&
+                  hrs > 0
+                const pct = cancellationRefundPercent(b.status, hrs)
                 return (
                   <li
                     key={b.id}
@@ -468,11 +491,28 @@ export default async function GuidePage({ searchParams }: Props) {
                         </p>
                       )}
                     </div>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${status.className}`}
-                    >
-                      {status.label}
-                    </span>
+                    <div className="flex flex-col items-end gap-2">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${status.className}`}
+                      >
+                        {status.label}
+                      </span>
+                      {canCancel && (
+                        <form action={cancelOwnBooking}>
+                          <input type="hidden" name="id" value={b.id} />
+                          <SubmitButton
+                            pendingLabel="Cancelling…"
+                            className="text-xs text-zinc-500 underline underline-offset-2 hover:text-red-600"
+                          >
+                            {pct === 100
+                              ? 'Cancel (full refund)'
+                              : pct > 0
+                                ? `Cancel (${100 - pct}% fee)`
+                                : 'Cancel (no refund)'}
+                          </SubmitButton>
+                        </form>
+                      )}
+                    </div>
                   </li>
                 )
               })}

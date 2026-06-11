@@ -6,7 +6,7 @@ import {
   createAvailabilityWindow,
   removeAvailabilityWindow,
 } from '@/lib/availability'
-import { resolveBookingById } from '@/lib/bookings'
+import { cancelBookingByTourist, resolveBookingById } from '@/lib/bookings'
 import {
   ACTIVE_BOOKING_STATUSES,
   amountCentsForHours,
@@ -94,6 +94,24 @@ export async function rejectGuideBooking(formData: FormData) {
   revalidatePath('/guide')
   revalidatePath('/admin')
   redirect('/guide?declined=1')
+}
+
+// A tourist cancelling their own booking (refund per the cancellation policy).
+export async function cancelOwnBooking(formData: FormData) {
+  const supabase = await createSupabaseServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const result = await cancelBookingByTourist(
+    String(formData.get('id') ?? ''),
+    user.id,
+  )
+  if ('error' in result) availFail(result.error)
+  revalidatePath('/guide')
+  revalidatePath('/admin')
+  redirect(`/guide?cancelled=1&refund_cents=${result.refundCents}`)
 }
 
 function fail(message: string, day?: string): never {

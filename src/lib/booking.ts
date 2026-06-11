@@ -30,6 +30,33 @@ export function isHoldExpired(
   )
 }
 
+// Hours from `nowMs` until the tour starts. Shenzhen is UTC+8 (no DST).
+export function hoursUntilTourStart(
+  day: string,
+  startHour: number,
+  nowMs: number,
+): number {
+  const startMs = Date.parse(
+    `${day}T${String(startHour).padStart(2, '0')}:00:00+08:00`,
+  )
+  return (startMs - nowMs) / 3_600_000
+}
+
+// Refund percentage for a tourist-initiated cancellation:
+// - Not yet confirmed (pending): always 100% (the operator hadn't committed).
+// - Confirmed (approved): 100% if ≥72h before, 70% if 24–72h before
+//   (30% cancellation fee), 0% if <24h before (100% fee).
+export function cancellationRefundPercent(
+  status: BookingStatus,
+  hoursUntil: number,
+): number {
+  if (status === 'pending') return 100
+  if (status !== 'approved') return 0
+  if (hoursUntil >= 72) return 100
+  if (hoursUntil >= 24) return 70
+  return 0
+}
+
 export function amountCentsForHours(hours: number): number {
   return hours * HOURLY_RATE_CENTS
 }
