@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Avatar } from "@/components/Avatar";
 import { MobileMenu } from "@/components/MobileMenu";
 import { avatarPublicUrl } from "@/lib/avatars";
-import { isAdminEmail, isSingleGuideMode } from "@/lib/config";
+import { isAdminEmail, isSingleGuideMode, officialGuideId } from "@/lib/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import "./globals.css";
 
@@ -63,16 +63,24 @@ async function SiteHeader() {
     profile = data;
   }
 
+  // The /guide tab reads "Book a guide" for visitors, but for the official
+  // guide it's their own dashboard, so label it accordingly.
+  const isOfficialGuide =
+    !!user && isSingleGuideMode() && user.id === officialGuideId();
+  const browseHref = isSingleGuideMode() ? "/guide" : "/browse";
+  const browseLabel = isOfficialGuide
+    ? "My schedule"
+    : isSingleGuideMode()
+      ? "Book a guide"
+      : "Browse";
+
   // Same destinations as the desktop nav, reused by the mobile menu so
   // nothing on the PC header is missing on small screens.
   const navLinks = [
     { href: "/explore", label: "Explore" },
     ...(user
       ? [
-          {
-            href: isSingleGuideMode() ? "/guide" : "/browse",
-            label: isSingleGuideMode() ? "Book a guide" : "Browse",
-          },
+          { href: browseHref, label: browseLabel },
           { href: "/messages", label: "Messages" },
         ]
       : []),
@@ -111,10 +119,10 @@ async function SiteHeader() {
           </Link>
           {user && (
             <Link
-              href={isSingleGuideMode() ? "/guide" : "/browse"}
+              href={browseHref}
               className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
             >
-              {isSingleGuideMode() ? "Book a guide" : "Browse"}
+              {browseLabel}
             </Link>
           )}
           {user && (
