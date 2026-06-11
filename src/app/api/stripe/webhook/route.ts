@@ -172,8 +172,8 @@ async function markBookingPaid(session: Stripe.Checkout.Session) {
       `Time: ${formatHourRange(booking.start_hour, booking.end_hour)} (${booking.end_hour - booking.start_hour} hours)`,
       booking.note ? `Note: ${booking.note}` : 'Note: —',
       '',
-      "We'll let you know once it's confirmed.",
-      `See your bookings: ${siteUrl()}/guide`,
+      'Approve or decline it on your dashboard:',
+      `${siteUrl()}/guide`,
     ].join('\n'),
   )
 }

@@ -255,8 +255,8 @@ export async function requestBooking(formData: FormData) {
         `Time: ${formatHourRange(startHour, endHour)} (${duration} hours)`,
         note ? `Note: ${note}` : 'Note: —',
         '',
-        "We'll let you know once it's confirmed.",
-        `See your bookings: ${siteUrl()}/guide`,
+        'Approve or decline it on your dashboard:',
+        `${siteUrl()}/guide`,
       ].join('\n'),
     )
     revalidatePath('/guide')
