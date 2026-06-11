@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { POLICY_EFFECTIVE } from '@/lib/policy'
 
 export const metadata: Metadata = {
   title: 'Cancellation & Refund Policy — Shenzhen Buddies',
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
     'How cancellations and refunds work for Shenzhen Buddies guide bookings: full refund before confirmation, then a clear 72h / 24h tiered policy.',
 }
 
-const EFFECTIVE = 'June 11, 2026'
+const EFFECTIVE = POLICY_EFFECTIVE
 const CONTACT_EMAIL = 'hello@shenzhen-buddies.com'
 
 export default function CancellationPage() {

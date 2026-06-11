@@ -1,12 +1,15 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
 import {
   createAvailabilityWindow,
   removeAvailabilityWindow,
 } from '@/lib/availability'
 import { cancelBookingByTourist, resolveBookingById } from '@/lib/bookings'
+import { logBookingConsent } from '@/lib/consent'
+import { POLICY_VERSION } from '@/lib/policy'
 import {
   ACTIVE_BOOKING_STATUSES,
   amountCentsForHours,
@@ -231,6 +234,7 @@ export async function requestBooking(formData: FormData) {
       status: 'pending_payment',
       amount_cents: amountCents,
       currency: CURRENCY,
+      terms_version: POLICY_VERSION,
     })
     .select('id')
     .single<{ id: string }>()
@@ -242,6 +246,16 @@ export async function requestBooking(formData: FormData) {
     }
     fail(error?.message ?? 'Could not create the booking.', day)
   }
+
+  // Record the tourist's agreement to the Terms + Cancellation Policy (booking
+  // implies agreement, per the form) for audit. Best-effort.
+  const h = await headers()
+  await logBookingConsent({
+    userId: user.id,
+    bookingId: booking.id,
+    ip: h.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null,
+    userAgent: h.get('user-agent'),
+  })
 
   // Pilot fallback: with no Stripe key, skip payment and behave like before
   // (mark paid-equivalent 'pending' and notify admins).

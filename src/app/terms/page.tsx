@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { POLICY_EFFECTIVE } from '@/lib/policy'
 
 export const metadata: Metadata = {
   title: 'Terms of Service — Shenzhen Buddies',
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
     'The terms that govern your use of Shenzhen Buddies, operated by Tensai Tech Inc.',
 }
 
-const EFFECTIVE = 'June 11, 2026'
+const EFFECTIVE = POLICY_EFFECTIVE
 const COMPANY = 'Tensai Tech Inc.'
 const CONTACT_EMAIL = 'hello@shenzhen-buddies.com'
 const GOVERNING_LAW = 'the Province of Ontario, Canada'
