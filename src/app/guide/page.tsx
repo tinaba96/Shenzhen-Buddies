@@ -433,7 +433,22 @@ export default async function GuidePage({ searchParams }: Props) {
                     <p className="text-center text-xs text-zinc-500">
                       You pay {formatMoney(HOURLY_RATE_CENTS)}/hour now to hold
                       the day. We confirm within 3 business days — if we
-                      can&apos;t, you&apos;re fully refunded.
+                      can&apos;t, you&apos;re fully refunded. By booking you
+                      agree to our{' '}
+                      <Link
+                        href="/terms"
+                        className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
+                      >
+                        Terms
+                      </Link>{' '}
+                      and{' '}
+                      <Link
+                        href="/cancellation"
+                        className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
+                      >
+                        Cancellation Policy
+                      </Link>
+                      .
                     </p>
                   </form>
                 </>
@@ -458,7 +473,14 @@ export default async function GuidePage({ searchParams }: Props) {
             <p className="mt-1 text-xs text-zinc-500">
               Cancellation: free up to 72h before · 30% fee within 72h · no
               refund within 24h. Before it&apos;s confirmed, you&apos;re always
-              fully refunded.
+              fully refunded.{' '}
+              <Link
+                href="/cancellation"
+                className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
+              >
+                Full policy
+              </Link>
+              .
             </p>
             <ul className="mt-3 space-y-3">
               {myBookings!.map((b) => {
