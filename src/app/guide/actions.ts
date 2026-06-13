@@ -291,6 +291,28 @@ export async function requestBooking(formData: FormData) {
         `${siteUrl()}/guide`,
       ].join('\n'),
     )
+    if (user.email) {
+      await sendEmail({
+        to: user.email,
+        subject: `We received your booking request — ${formatDay(day)}`,
+        text: [
+          'Thanks! We’ve received your booking request.',
+          '',
+          `Day: ${formatDay(day)}`,
+          `Time: ${formatHourRange(startHour, endHour)} (${duration} hours)`,
+          note ? `Your note: ${note}` : '',
+          '',
+          'We’ll confirm your day by email within 3 business days. If we can’t confirm it, you’ll be refunded in full.',
+          `Cancellation policy: ${siteUrl()}/cancellation`,
+          '',
+          `View your booking anytime: ${siteUrl()}/guide`,
+          '',
+          'See you in Shenzhen!',
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      })
+    }
     revalidatePath('/guide')
     redirect('/guide?requested=1')
   }

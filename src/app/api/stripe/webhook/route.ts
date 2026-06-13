@@ -161,6 +161,31 @@ async function markBookingPaid(session: Stripe.Checkout.Session) {
     ].join('\n'),
   })
 
+  // Receipt to the tourist: confirm we received the request + payment.
+  if (touristAuth?.user?.email) {
+    await sendEmail({
+      to: touristAuth.user.email,
+      subject: `We received your booking request — ${formatDay(booking.day)}`,
+      text: [
+        'Thanks! We’ve received your booking request and your payment.',
+        '',
+        `Day: ${formatDay(booking.day)}`,
+        `Time: ${formatHourRange(booking.start_hour, booking.end_hour)} (${booking.end_hour - booking.start_hour} hours)`,
+        `Paid: ${paid}`,
+        booking.note ? `Your note: ${booking.note}` : '',
+        '',
+        'We’ll confirm your day by email within 3 business days. If we can’t confirm it, you’ll be refunded in full.',
+        `Cancellation policy: ${siteUrl()}/cancellation`,
+        '',
+        `View your booking anytime: ${siteUrl()}/guide`,
+        '',
+        'See you in Shenzhen!',
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    })
+  }
+
   // Keep the guide in the loop on their own bookings (informational; the
   // operator does the approving).
   await notifyGuide(
