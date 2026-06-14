@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
 import { BookingFields } from '@/components/BookingFields'
+import { StarRating } from '@/components/StarRating'
 import { SubmitButton } from '@/components/SubmitButton'
 import { avatarPublicUrl } from '@/lib/avatars'
 import {
@@ -129,8 +130,12 @@ export default async function GuidePage({ searchParams }: Props) {
   }
 
   const today = todayInShenzhen()
-  const [{ data: windows }, { data: activeBookings }, { data: myBookings }] =
-    await Promise.all([
+  const [
+    { data: windows },
+    { data: activeBookings },
+    { data: myBookings },
+    { data: guideReviews },
+  ] = await Promise.all([
       supabase
         .from('availability_windows')
         .select('id, day, start_hour, end_hour')
@@ -165,7 +170,19 @@ export default async function GuidePage({ searchParams }: Props) {
         .order('created_at', { ascending: false })
         .limit(20)
         .returns<BookingRow[]>(),
+      admin
+        .from('reviews')
+        .select('stars')
+        .eq('reviewee_id', guideId)
+        .returns<{ stars: number }[]>(),
     ])
+
+  const reviewCount = guideReviews?.length ?? 0
+  const avgStars =
+    reviewCount > 0
+      ? guideReviews!.reduce((s, r) => s + r.stars, 0) / reviewCount
+      : 0
+  const firstName = guide.display_name.split(' ')[0]
 
   // A day is taken by a confirmed/awaiting booking or a *fresh* hold. An
   // abandoned hold (older than 30 min) no longer blocks it, so the picker
@@ -247,50 +264,112 @@ export default async function GuidePage({ searchParams }: Props) {
 
   return (
     <main className="flex flex-1 flex-col">
-      {/* Cover banner */}
-      <section className="relative h-56 overflow-hidden sm:h-72">
+      {/* Hero */}
+      <section className="relative overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="https://images.unsplash.com/photo-1473625247510-8ceb1760943f?w=2000&q=80&auto=format&fit=crop"
           alt="Shenzhen skyline"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-500/20 via-rose-500/15 to-black/50" />
-        <div className="relative mx-auto flex max-w-3xl items-center justify-end px-4 py-4">
-          <Link
-            href="/profile"
-            className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
-          >
-            Your profile
-          </Link>
-        </div>
-      </section>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/55 to-black/85" />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-60 mix-blend-soft-light"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 20% 20%, rgba(245,158,11,0.5), transparent 45%), radial-gradient(circle at 80% 60%, rgba(244,63,94,0.5), transparent 50%)',
+          }}
+        />
+        <div className="relative mx-auto w-full max-w-3xl px-4 pb-10 pt-4">
+          <div className="flex justify-end">
+            <Link
+              href="/profile"
+              className="rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur transition hover:bg-white/20"
+            >
+              Your profile
+            </Link>
+          </div>
 
-      <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-8">
-        {/* Identity row */}
-        <div className="flex flex-wrap items-center gap-4">
-          <Avatar
-            src={avatarPublicUrl(guide.avatar_path, guide.updated_at)}
-            name={guide.display_name}
-            size={96}
-            className="ring-4 ring-white shadow-lg dark:ring-zinc-900"
-          />
-          <div className="min-w-0 flex-1 pb-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-2xl font-semibold">{guide.display_name}</h1>
-              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                Your guide
+          <div className="mt-8 flex flex-col items-center text-center text-white sm:mt-12">
+            <Avatar
+              src={avatarPublicUrl(guide.avatar_path, guide.updated_at)}
+              name={guide.display_name}
+              size={120}
+              className="ring-4 ring-white/80 shadow-2xl"
+            />
+            <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-wider backdrop-blur">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+              Your local guide
+            </span>
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight drop-shadow-lg sm:text-4xl">
+              {guide.display_name}
+            </h1>
+            <p className="mt-1 text-sm text-white/85">
+              📍 {guide.city} · with Shenzhen Buddies
+            </p>
+
+            {reviewCount > 0 ? (
+              <div className="mt-3 flex items-center gap-2 text-sm">
+                <StarRating value={avgStars} size={16} />
+                <span className="text-white/90">
+                  {avgStars.toFixed(1)} · {reviewCount}{' '}
+                  {reviewCount === 1 ? 'review' : 'reviews'}
+                </span>
+              </div>
+            ) : (
+              <span className="mt-3 rounded-full bg-white/15 px-3 py-0.5 text-xs font-medium backdrop-blur">
+                ✨ New guide — be among the first to explore with {firstName}
               </span>
-            </div>
-            <p className="mt-1 text-sm text-zinc-500">{guide.city}</p>
+            )}
+
+            {guide.languages.length > 0 && (
+              <div className="mt-4 flex flex-wrap justify-center gap-1.5">
+                {guide.languages.map((l) => (
+                  <span
+                    key={l}
+                    className="rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-xs font-medium backdrop-blur"
+                  >
+                    {l}
+                  </span>
+                ))}
+              </div>
+            )}
+
             <Link
               href={`/u/${guide.id}`}
-              className="mt-1 inline-block text-sm text-zinc-600 underline underline-offset-2 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+              className="mt-4 text-sm text-white/90 underline underline-offset-2 transition hover:text-white"
             >
               Full profile &amp; reviews
             </Link>
           </div>
         </div>
+      </section>
+
+      <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-8">
+        {/* Highlights */}
+        {!isOfficialGuide && (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <Highlight
+              icon="🗺️"
+              title="A real local"
+              body={`Spend the day with ${firstName}, not a tour script.`}
+            />
+            <Highlight
+              icon="💬"
+              title={
+                guide.languages.length > 0
+                  ? `Speaks ${guide.languages.length} ${guide.languages.length === 1 ? 'language' : 'languages'}`
+                  : 'Easy to talk to'
+              }
+              body="Match the day to how you like to explore."
+            />
+            <Highlight
+              icon="🛟"
+              title="Risk-free"
+              body="Full refund if we can’t confirm your day."
+            />
+          </div>
+        )}
 
         {/* Banners */}
         {(sp.requested || sp.paid) && (
@@ -334,14 +413,25 @@ export default async function GuidePage({ searchParams }: Props) {
 
         {/* About the guide */}
         <section className="mt-6 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <h2 className="text-lg font-semibold">About {firstName}</h2>
           {guide.bio && (
-            <p className="whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
+            <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
               {guide.bio}
             </p>
           )}
-          <Chips label="Hobbies" items={guide.hobbies} />
-          <Chips label="Languages" items={guide.languages} />
-          <Chips label="Personality traits" items={guide.personality_traits} />
+          {(guide.hobbies.length > 0 ||
+            guide.languages.length > 0 ||
+            guide.personality_traits.length > 0) && (
+            <div className="mt-6 grid gap-5 sm:grid-cols-3">
+              <InterestGroup label="Hobbies" items={guide.hobbies} tone="amber" />
+              <InterestGroup label="Languages" items={guide.languages} tone="sky" />
+              <InterestGroup
+                label="Personality"
+                items={guide.personality_traits}
+                tone="rose"
+              />
+            </div>
+          )}
         </section>
 
         {/* Booking (tourists) */}
@@ -747,16 +837,51 @@ function GuideAvailability({
   )
 }
 
-function Chips({ label, items }: { label: string; items: string[] }) {
-  if (!items || items.length === 0) return null
+function Highlight({
+  icon,
+  title,
+  body,
+}: {
+  icon: string
+  title: string
+  body: string
+}) {
   return (
-    <div className="mt-4 first:mt-0">
-      <p className="text-xs font-medium text-zinc-500">{label}</p>
-      <div className="mt-1 flex flex-wrap gap-1">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="text-xl" aria-hidden>
+        {icon}
+      </div>
+      <p className="mt-1.5 text-sm font-semibold">{title}</p>
+      <p className="mt-0.5 text-xs text-zinc-500">{body}</p>
+    </div>
+  )
+}
+
+function InterestGroup({
+  label,
+  items,
+  tone,
+}: {
+  label: string
+  items: string[]
+  tone: 'amber' | 'sky' | 'rose'
+}) {
+  if (!items || items.length === 0) return null
+  const chip = {
+    amber: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+    sky: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300',
+    rose: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300',
+  }[tone]
+  return (
+    <div>
+      <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+        {label}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
         {items.map((it) => (
           <span
             key={it}
-            className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${chip}`}
           >
             {it}
           </span>
