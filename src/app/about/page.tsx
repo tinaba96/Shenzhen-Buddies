@@ -10,12 +10,6 @@ export const metadata: Metadata = {
 const HERO_PHOTO =
   'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=2400&q=80&auto=format&fit=crop'
 
-const STATS = [
-  { value: '1', label: 'city · growing' },
-  { value: '40+', label: 'curated locals' },
-  { value: '11', label: 'languages spoken' },
-  { value: '14d', label: 'free trial' },
-]
 
 const PILLARS: {
   title: string
@@ -105,23 +99,6 @@ export default function AboutPage() {
             interests. Casual, affordable, personal — the opposite of a tour
             bus.
           </p>
-        </div>
-      </section>
-
-      <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-x-6 gap-y-8 px-6 py-12 md:grid-cols-4">
-          {STATS.map((s) => (
-            <div key={s.label} className="text-center">
-              <p className="text-4xl font-semibold tracking-tight sm:text-5xl">
-                <span className="bg-gradient-to-r from-amber-500 to-rose-500 bg-clip-text text-transparent">
-                  {s.value}
-                </span>
-              </p>
-              <p className="mt-1 text-xs uppercase tracking-wider text-zinc-500">
-                {s.label}
-              </p>
-            </div>
-          ))}
         </div>
       </section>
 
