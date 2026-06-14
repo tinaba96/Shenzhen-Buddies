@@ -19,7 +19,7 @@ export async function submitReview(formData: FormData) {
   }
 
   const trimmed = bodyRaw.trim()
-  const body = trimmed.length === 0 ? null : trimmed.slice(0, 500)
+  const body = trimmed.length === 0 ? null : trimmed.slice(0, 5000)
 
   const supabase = await createSupabaseServerClient()
   const {

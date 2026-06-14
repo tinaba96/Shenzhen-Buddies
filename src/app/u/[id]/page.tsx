@@ -281,12 +281,12 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
             <label className="block">
               <span className="text-sm font-medium">Comment</span>
               <span className="ml-1 text-xs text-zinc-500">
-                (optional, up to 500 chars)
+                (optional, up to 5000 chars)
               </span>
               <textarea
                 name="body"
-                rows={3}
-                maxLength={500}
+                rows={4}
+                maxLength={5000}
                 defaultValue={myReview?.body ?? ''}
                 placeholder={`Share what it was like meeting ${profile.display_name}…`}
                 className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
