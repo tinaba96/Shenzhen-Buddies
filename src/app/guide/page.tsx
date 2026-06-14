@@ -90,6 +90,25 @@ const STATUS_STYLES: Record<BookingStatus, { label: string; className: string }>
   },
 }
 
+const IDEAS = [
+  {
+    label: 'Street food & dim sum',
+    img: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=700&q=80&auto=format&fit=crop',
+  },
+  {
+    label: 'Electronics & maker markets',
+    img: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=700&q=80&auto=format&fit=crop',
+  },
+  {
+    label: 'Skyline & city views',
+    img: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=700&q=80&auto=format&fit=crop',
+  },
+  {
+    label: 'Parks & easy hikes',
+    img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=700&q=80&auto=format&fit=crop',
+  },
+]
+
 export default async function GuidePage({ searchParams }: Props) {
   if (!isSingleGuideMode()) redirect('/browse')
 
@@ -433,6 +452,36 @@ export default async function GuidePage({ searchParams }: Props) {
             </div>
           )}
         </section>
+
+        {/* Ideas for your day */}
+        {!isOfficialGuide && (
+          <section className="mt-8">
+            <h2 className="text-xl font-semibold">Ideas for your day</h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              A few ways {firstName} can show you around — tell them what
+              you&apos;re into and they&apos;ll shape the day with you.
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {IDEAS.map((idea) => (
+                <div
+                  key={idea.label}
+                  className="group relative aspect-[3/4] overflow-hidden rounded-2xl border border-zinc-200 shadow-sm dark:border-zinc-800"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={idea.img}
+                    alt={idea.label}
+                    className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                  <p className="absolute bottom-2 left-2 right-2 text-xs font-medium leading-tight text-white drop-shadow">
+                    {idea.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Booking (tourists) */}
         {!isOfficialGuide && (
