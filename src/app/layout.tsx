@@ -84,7 +84,6 @@ async function SiteHeader() {
           { href: "/messages", label: "Messages" },
         ]
       : []),
-    { href: "/pricing", label: "Pricing" },
     ...(user && isAdminEmail(user.email)
       ? [{ href: "/admin", label: "Admin" }]
       : []),
@@ -133,12 +132,6 @@ async function SiteHeader() {
               Messages
             </Link>
           )}
-          <Link
-            href="/pricing"
-            className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
-          >
-            Pricing
-          </Link>
           {user && isAdminEmail(user.email) && (
             <Link
               href="/admin"
@@ -216,7 +209,6 @@ function SiteFooter() {
             { href: "/welcome", label: "Get 10% off" },
             { href: "/explore", label: "Explore" },
             { href: "/browse", label: "Browse buddies" },
-            { href: "/pricing", label: "Pricing" },
           ]}
         />
         <FooterColumn
