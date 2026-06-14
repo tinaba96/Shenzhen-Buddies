@@ -96,21 +96,13 @@ export default async function MessagesIndexPage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-12">
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-semibold">Messages</h1>
-          {totalUnread > 0 && (
-            <span className="rounded-full bg-rose-500 px-2 py-0.5 text-xs font-medium text-white">
-              {totalUnread} unread
-            </span>
-          )}
-        </div>
-        <Link
-          href="/browse"
-          className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-        >
-          Find a buddy
-        </Link>
+      <div className="mb-6 flex items-center gap-2">
+        <h1 className="text-2xl font-semibold">Messages</h1>
+        {totalUnread > 0 && (
+          <span className="rounded-full bg-rose-500 px-2 py-0.5 text-xs font-medium text-white">
+            {totalUnread} unread
+          </span>
+        )}
       </div>
 
       {(convs?.length ?? 0) === 0 ? (
