@@ -53,7 +53,7 @@ const FOUNDERS = [
   {
     name: 'Takahiro Inaba',
     role: 'CTO · Toronto',
-    photo: 'https://i.pravatar.cc/400?img=53',
+    photo: '/team/taka.jpg',
     bio: 'Engineer + founder. Builds the product end-to-end. Believes the best travel memories come from people, not itineraries.',
   },
 ]
