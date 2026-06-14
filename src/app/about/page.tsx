@@ -45,13 +45,13 @@ const PILLARS: {
 
 const FOUNDERS = [
   {
-    name: 'Brian',
+    name: 'Bryan Wang',
     role: 'CEO · Shenzhen',
-    photo: 'https://i.pravatar.cc/400?img=68',
+    photo: '/team/bryan.jpg',
     bio: 'Born and raised in Shenzhen. Ran community programs for two startups before this. Knows every dim sum cart in Futian — and a lot of people.',
   },
   {
-    name: 'Taka',
+    name: 'Takahiro Inaba',
     role: 'CTO · Toronto',
     photo: 'https://i.pravatar.cc/400?img=53',
     bio: 'Engineer + founder. Builds the product end-to-end. Believes the best travel memories come from people, not itineraries.',

@@ -62,7 +62,7 @@ const CHANNELS: {
 const FACTS = [
   { label: 'Company', value: 'Tensai Tech Inc.' },
   { label: 'Founded', value: '2026 · Toronto + Shenzhen' },
-  { label: 'Team', value: 'Brian (CEO) · Taka (CTO)' },
+  { label: 'Team', value: 'Bryan Wang (CEO) · Takahiro Inaba (CTO)' },
   { label: 'Stage', value: 'Pilot — Shenzhen first' },
 ]
 
