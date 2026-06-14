@@ -48,13 +48,13 @@ const FOUNDERS = [
     name: 'Bryan Wang',
     role: 'CEO · Shenzhen',
     photo: '/team/bryan.jpg',
-    bio: 'Born and raised in Shenzhen. Ran community programs for two startups before this. Knows every dim sum cart in Futian — and a lot of people.',
+    bio: 'Native Chinese but have spent 8+ years in Canada. I love both countries 🇨🇦🇨🇳 Comfortable with adventure and meeting new people 🚵‍♂️ Currently based in Shenzhen — a coffee or a walk around the city on the weekend would be nice ☕🚶‍♂️',
   },
   {
     name: 'Takahiro Inaba',
     role: 'CTO · Toronto',
     photo: '/team/taka.jpg',
-    bio: 'Engineer + founder. Builds the product end-to-end. Believes the best travel memories come from people, not itineraries.',
+    bio: 'Japanese engineer with 10+ years in the tech industry 🇯🇵💻 Currently working as a CTO, building and scaling products across North America and Asia 🌏🚀 Originally from Japan, now operating internationally and focused on shipping real-world impact ⚙️✨',
   },
 ]
 
