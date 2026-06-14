@@ -458,8 +458,7 @@ export default async function GuidePage({ searchParams }: Props) {
           <section className="mt-8">
             <h2 className="text-xl font-semibold">Ideas for your day</h2>
             <p className="mt-1 text-sm text-zinc-500">
-              A few ways {firstName} can show you around — tell them what
-              you&apos;re into and they&apos;ll shape the day with you.
+              {`A few ways ${firstName} can show you around — tell them what you're into, and they'll shape the day with you.`}
             </p>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {IDEAS.map((idea) => (
