@@ -437,8 +437,8 @@ export default async function GuidePage({ searchParams }: Props) {
                         <li>
                           • 72h+ before the tour: <strong>full refund</strong>
                         </li>
-                        <li>• 72–24h before: 70% refund (30% fee)</li>
-                        <li>• Under 24h before: no refund</li>
+                        <li>• 72–24h before: 90% refund (10% fee)</li>
+                        <li>• Under 24h before: 20% refund (80% fee)</li>
                       </ul>
                       <Link
                         href="/cancellation"
@@ -495,9 +495,9 @@ export default async function GuidePage({ searchParams }: Props) {
           <section className="mt-8">
             <h2 className="text-xl font-semibold">Your requests</h2>
             <p className="mt-1 text-xs text-zinc-500">
-              Cancellation: free up to 72h before · 30% fee within 72h · no
-              refund within 24h. Before it&apos;s confirmed, you&apos;re always
-              fully refunded.{' '}
+              Cancellation: free up to 72h before · 10% fee within 72h · 80% fee
+              within 24h. Before it&apos;s confirmed, you&apos;re always fully
+              refunded.{' '}
               <Link
                 href="/cancellation"
                 className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"

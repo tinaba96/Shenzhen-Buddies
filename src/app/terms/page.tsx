@@ -140,8 +140,8 @@ export default function TermsPage() {
               </Link>
               , which forms part of these Terms. In summary: before a booking is
               confirmed you may cancel for a full refund; after confirmation,
-              refunds are 100% with 72+ hours&apos; notice, 70% between 72 and
-              24 hours, and 0% within 24 hours of the tour.
+              refunds are 100% with 72+ hours&apos; notice, 90% between 72 and
+              24 hours, and 20% within 24 hours of the tour.
             </p>
           </Section>
 

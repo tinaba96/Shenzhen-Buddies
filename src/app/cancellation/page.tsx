@@ -49,8 +49,8 @@ export default function CancellationPage() {
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
               <Row when="Before we confirm your booking" refund="100% — full refund" good />
               <Row when="72 hours or more before the tour" refund="100% — full refund" good />
-              <Row when="Between 72 and 24 hours before" refund="70% (30% cancellation fee)" />
-              <Row when="Less than 24 hours before" refund="No refund (100% fee)" bad />
+              <Row when="Between 72 and 24 hours before" refund="90% (10% cancellation fee)" />
+              <Row when="Less than 24 hours before" refund="20% (80% cancellation fee)" bad />
               <Row when="We can’t confirm / we decline" refund="100% — full refund" good />
             </tbody>
           </table>
@@ -78,11 +78,11 @@ export default function CancellationPage() {
                 refund (100%).
               </li>
               <li>
-                <strong>Between 72 and 24 hours before:</strong> 70% refund — a
-                30% cancellation fee applies.
+                <strong>Between 72 and 24 hours before:</strong> 90% refund — a
+                10% cancellation fee applies.
               </li>
               <li>
-                <strong>Less than 24 hours before:</strong> no refund — a 100%
+                <strong>Less than 24 hours before:</strong> 20% refund — an 80%
                 cancellation fee applies.
               </li>
             </ul>
@@ -104,8 +104,8 @@ export default function CancellationPage() {
             <p>
               If you do not show up at the agreed meeting time and place without
               cancelling in advance, the booking is treated as a cancellation{' '}
-              <strong>less than 24 hours before</strong> the tour and{' '}
-              <strong>no refund</strong> is provided.
+              <strong>less than 24 hours before</strong> the tour (
+              <strong>20% refund</strong>).
             </p>
           </Section>
 

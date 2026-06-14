@@ -106,6 +106,7 @@ export async function resolveBookingById(
         text: [
           `Unfortunately we couldn't confirm your request for ${when}.`,
           ...(refundLine ? [refundLine] : []),
+          '',
           'The time slot has been freed up — please pick another day or time.',
           '',
           `Pick a new slot: ${siteUrl()}/guide`,

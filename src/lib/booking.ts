@@ -44,8 +44,8 @@ export function hoursUntilTourStart(
 
 // Refund percentage for a tourist-initiated cancellation:
 // - Not yet confirmed (pending): always 100% (the operator hadn't committed).
-// - Confirmed (approved): 100% if ≥72h before, 70% if 24–72h before
-//   (30% cancellation fee), 0% if <24h before (100% fee).
+// - Confirmed (approved): 100% if ≥72h before, 90% if 24–72h before
+//   (10% cancellation fee), 20% if <24h before (80% fee).
 export function cancellationRefundPercent(
   status: BookingStatus,
   hoursUntil: number,
@@ -53,8 +53,8 @@ export function cancellationRefundPercent(
   if (status === 'pending') return 100
   if (status !== 'approved') return 0
   if (hoursUntil >= 72) return 100
-  if (hoursUntil >= 24) return 70
-  return 0
+  if (hoursUntil >= 24) return 90
+  return 20
 }
 
 export function amountCentsForHours(hours: number): number {
