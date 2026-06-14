@@ -58,6 +58,19 @@ const FOUNDERS = [
   },
 ]
 
+const TOGETHER = [
+  {
+    src: '/team/together-1.jpg',
+    alt: 'Bryan and Takahiro by the water at sunset',
+    caption: 'Sunset by the lake',
+  },
+  {
+    src: '/team/together-2.jpg',
+    alt: 'Bryan and Takahiro over Korean BBQ',
+    caption: 'Plotting over Korean BBQ',
+  },
+]
+
 export default function AboutPage() {
   return (
     <main className="flex flex-1 flex-col">
@@ -200,6 +213,34 @@ export default function AboutPage() {
                 </div>
               </article>
             ))}
+          </div>
+
+          {/* Off-the-clock photos of the two of us */}
+          <div className="mt-14">
+            <p className="text-center text-xs font-medium uppercase tracking-wider text-zinc-500">
+              Off the clock
+            </p>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              {TOGETHER.map((t) => (
+                <figure
+                  key={t.src}
+                  className="group relative overflow-hidden rounded-2xl border border-zinc-200 shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl dark:border-zinc-800"
+                >
+                  <div className="aspect-[4/5] overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={t.src}
+                      alt={t.alt}
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
+                    />
+                  </div>
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+                  <figcaption className="absolute bottom-3 left-4 text-sm font-medium text-white drop-shadow">
+                    {t.caption}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
           </div>
         </div>
       </section>
