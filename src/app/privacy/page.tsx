@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Privacy — Shenzhen Buddies',
   description:
-    'How Shenzhen Buddies handles your data — plain English, no dark patterns.',
+    'How Shenzhen Buddies handles your data — clearly, with no dark patterns.',
 }
 
 const LAST_UPDATED = 'June 2026'
