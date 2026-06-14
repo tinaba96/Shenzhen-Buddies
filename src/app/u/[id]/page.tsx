@@ -49,7 +49,7 @@ type ReviewerLite = {
   updated_at: string
 }
 
-const REVIEW_VISIBILITY_THRESHOLD = 3
+const REVIEW_VISIBILITY_THRESHOLD = 1
 
 export default async function ProfileDetailPage({ params, searchParams }: Props) {
   const { id } = await params
