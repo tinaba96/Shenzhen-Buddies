@@ -3,8 +3,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Privacy — Shenzhen Buddies',
-  description:
-    'How Shenzhen Buddies handles your data — clearly, with no dark patterns.',
+  description: 'How Shenzhen Buddies handles your data.',
 }
 
 const LAST_UPDATED = 'June 2026'
@@ -45,10 +44,7 @@ export default function PrivacyPage() {
             We don&apos;t sell your data.
           </span>
           <h1 className="mt-6 text-balance text-5xl font-semibold tracking-tight sm:text-6xl">
-            Privacy, in{' '}
-            <span className="bg-gradient-to-r from-amber-500 to-rose-500 bg-clip-text text-transparent">
-              plain English.
-            </span>
+            Privacy
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-base text-zinc-600 dark:text-zinc-400">
             What we collect, why, who sees it, and what you can do about it.
