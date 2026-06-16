@@ -62,8 +62,12 @@ type GuideProfile = {
   languages: string[]
   personality_traits: string[]
   avatar_path: string | null
+  cover_path: string | null
   updated_at: string
 }
+
+const DEFAULT_COVER =
+  'https://images.unsplash.com/photo-1473625247510-8ceb1760943f?w=2000&q=80&auto=format&fit=crop'
 
 const STATUS_STYLES: Record<BookingStatus, { label: string; className: string }> = {
   pending_payment: {
@@ -126,7 +130,7 @@ export default async function GuidePage({ searchParams }: Props) {
     admin
       .from('profiles')
       .select(
-        'id, display_name, bio, city, hobbies, languages, personality_traits, avatar_path, updated_at',
+        'id, display_name, bio, city, hobbies, languages, personality_traits, avatar_path, cover_path, updated_at',
       )
       .eq('id', guideId)
       .maybeSingle<GuideProfile>(),
@@ -287,8 +291,10 @@ export default async function GuidePage({ searchParams }: Props) {
       <section className="relative overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1473625247510-8ceb1760943f?w=2000&q=80&auto=format&fit=crop"
-          alt="Shenzhen skyline"
+          src={
+            avatarPublicUrl(guide.cover_path, guide.updated_at) ?? DEFAULT_COVER
+          }
+          alt={`${guide.display_name}'s cover`}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/55 to-black/85" />

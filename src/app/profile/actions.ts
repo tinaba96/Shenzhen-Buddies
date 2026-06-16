@@ -40,28 +40,32 @@ export async function saveProfile(formData: FormData) {
     redirect('/profile?error=invalid_visibility')
   }
 
-  let uploadedAvatarPath: string | null = null
-  const avatar = formData.get('avatar')
-  if (avatar instanceof File && avatar.size > 0) {
-    if (avatar.size > MAX_AVATAR_BYTES) {
-      redirect('/profile?error=avatar_too_large')
+  // Upload avatar and/or cover image (both live in the public "avatars"
+  // bucket, namespaced by user id so the per-folder storage policy applies).
+  async function uploadImage(
+    kind: 'avatar' | 'cover',
+  ): Promise<string | null> {
+    const file = formData.get(kind)
+    if (!(file instanceof File) || file.size === 0) return null
+    if (file.size > MAX_AVATAR_BYTES) {
+      redirect(`/profile?error=${kind}_too_large`)
     }
-    const ext = MIME_TO_EXT[avatar.type]
+    const ext = MIME_TO_EXT[file.type]
     if (!ext) {
-      redirect('/profile?error=avatar_type_unsupported')
+      redirect(`/profile?error=${kind}_type_unsupported`)
     }
-    const path = `${user.id}/avatar.${ext}`
+    const path = `${user!.id}/${kind}.${ext}`
     const { error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(path, avatar, {
-        contentType: avatar.type,
-        upsert: true,
-      })
+      .upload(path, file, { contentType: file.type, upsert: true })
     if (uploadError) {
       redirect(`/profile?error=${encodeURIComponent(uploadError.message)}`)
     }
-    uploadedAvatarPath = path
+    return path
   }
+
+  const uploadedAvatarPath = await uploadImage('avatar')
+  const uploadedCoverPath = await uploadImage('cover')
 
   const profile: Record<string, unknown> = {
     id: user.id,
@@ -76,6 +80,9 @@ export async function saveProfile(formData: FormData) {
   }
   if (uploadedAvatarPath) {
     profile.avatar_path = uploadedAvatarPath
+  }
+  if (uploadedCoverPath) {
+    profile.cover_path = uploadedCoverPath
   }
 
   if (!profile.display_name) {

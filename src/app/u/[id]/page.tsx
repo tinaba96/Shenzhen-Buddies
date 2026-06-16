@@ -29,8 +29,12 @@ type ProfileRow = {
   personality_traits: string[]
   visibility: 'public' | 'private'
   avatar_path: string | null
+  cover_path: string | null
   updated_at: string
 }
+
+const DEFAULT_COVER =
+  'https://images.unsplash.com/photo-1473625247510-8ceb1760943f?w=2000&q=80&auto=format&fit=crop'
 
 type ReviewRow = {
   id: string
@@ -66,7 +70,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
   const { data: profile } = await supabase
     .from('profiles')
     .select(
-      'id, role, display_name, bio, city, hobbies, languages, personality_traits, visibility, avatar_path, updated_at',
+      'id, role, display_name, bio, city, hobbies, languages, personality_traits, visibility, avatar_path, cover_path, updated_at',
     )
     .eq('id', id)
     .maybeSingle<ProfileRow>()
@@ -118,8 +122,11 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
       <section className="relative h-56 overflow-hidden sm:h-72">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1473625247510-8ceb1760943f?w=2000&q=80&auto=format&fit=crop"
-          alt="Shenzhen skyline"
+          src={
+            avatarPublicUrl(profile.cover_path, profile.updated_at) ??
+            DEFAULT_COVER
+          }
+          alt={`${profile.display_name}'s cover`}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-amber-500/20 via-rose-500/15 to-black/50" />

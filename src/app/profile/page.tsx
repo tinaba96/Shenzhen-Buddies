@@ -21,8 +21,12 @@ type Profile = {
   personality_traits: string[]
   visibility: 'public' | 'private'
   avatar_path: string | null
+  cover_path: string | null
   updated_at: string
 }
+
+const DEFAULT_COVER =
+  'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=2000&q=80&auto=format&fit=crop'
 
 export default async function ProfilePage({ searchParams }: Props) {
   const { error, saved } = await searchParams
@@ -47,8 +51,11 @@ export default async function ProfilePage({ searchParams }: Props) {
       <section className="relative h-48 overflow-hidden sm:h-56">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=2000&q=80&auto=format&fit=crop"
-          alt="Skyline at golden hour"
+          src={
+            avatarPublicUrl(profile?.cover_path, profile?.updated_at) ??
+            DEFAULT_COVER
+          }
+          alt="Profile cover"
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/30 via-rose-500/20 to-black/50" />
@@ -132,6 +139,32 @@ export default async function ProfilePage({ searchParams }: Props) {
               </div>
               <span className="mt-1 block text-xs text-zinc-500">
                 JPG, PNG, WebP, or GIF. Max 5 MB.
+              </span>
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium">Cover image</span>
+              <span className="ml-1 text-xs text-zinc-500">(optional)</span>
+              <div className="mt-2 h-24 w-full overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={
+                    avatarPublicUrl(profile?.cover_path, profile?.updated_at) ??
+                    DEFAULT_COVER
+                  }
+                  alt="Cover preview"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <input
+                type="file"
+                name="cover"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="mt-2 block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-900 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-zinc-700 dark:file:bg-white dark:file:text-zinc-900 dark:hover:file:bg-zinc-200"
+              />
+              <span className="mt-1 block text-xs text-zinc-500">
+                The banner on your public profile. JPG, PNG, WebP, or GIF. Max
+                5 MB.
               </span>
             </label>
 
