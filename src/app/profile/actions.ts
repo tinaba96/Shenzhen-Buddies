@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
-const MAX_AVATAR_BYTES = 5 * 1024 * 1024
+const MAX_AVATAR_BYTES = 10 * 1024 * 1024
 const MIME_TO_EXT: Record<string, string> = {
   'image/jpeg': 'jpg',
   'image/png': 'png',

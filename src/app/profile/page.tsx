@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
+import { ImageUpload } from '@/components/ImageUpload'
 import { SubmitButton } from '@/components/SubmitButton'
 import { avatarPublicUrl } from '@/lib/avatars'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -130,10 +131,8 @@ export default async function ProfilePage({ searchParams }: Props) {
                   name={profile?.display_name}
                   size={56}
                 />
-                <input
-                  type="file"
+                <ImageUpload
                   name="avatar"
-                  accept="image/jpeg,image/png,image/webp,image/gif"
                   className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-900 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-zinc-700 dark:file:bg-white dark:file:text-zinc-900 dark:hover:file:bg-zinc-200"
                 />
               </div>
@@ -156,10 +155,8 @@ export default async function ProfilePage({ searchParams }: Props) {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <input
-                type="file"
+              <ImageUpload
                 name="cover"
-                accept="image/jpeg,image/png,image/webp,image/gif"
                 className="mt-2 block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-zinc-900 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-zinc-700 dark:file:bg-white dark:file:text-zinc-900 dark:hover:file:bg-zinc-200"
               />
               <span className="mt-1 block text-xs text-zinc-500">
