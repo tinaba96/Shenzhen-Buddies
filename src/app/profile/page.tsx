@@ -168,25 +168,9 @@ export default async function ProfilePage({ searchParams }: Props) {
               </span>
             </label>
 
-            <fieldset className="space-y-2">
-              <legend className="text-sm font-medium">I am a…</legend>
-              <div className="grid grid-cols-2 gap-3">
-                <RolePill
-                  value="tourist"
-                  label="Tourist"
-                  description="Visiting Shenzhen"
-                  tone="sky"
-                  defaultChecked={profile?.role === 'tourist' || !profile}
-                />
-                <RolePill
-                  value="guide"
-                  label="Guide"
-                  description="Local who shows people around"
-                  tone="emerald"
-                  defaultChecked={profile?.role === 'guide'}
-                />
-              </div>
-            </fieldset>
+            {/* Role isn't user-selectable during the single-guide beta — the
+                server keeps an existing role and defaults everyone to tourist.
+                Restore this fieldset when matching comes back. */}
 
             <label className="block">
               <span className="text-sm font-medium">Display name</span>

@@ -30,10 +30,15 @@ export async function saveProfile(formData: FormData) {
     redirect('/login')
   }
 
-  const role = String(formData.get('role') ?? '')
-  if (role !== 'guide' && role !== 'tourist') {
-    redirect('/profile?error=invalid_role')
-  }
+  // Role is not user-selectable during the single-guide beta. Preserve an
+  // existing role (so the official guide stays a guide) and default everyone
+  // else to tourist.
+  const { data: existingProfile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle<{ role: string }>()
+  const role = existingProfile?.role === 'guide' ? 'guide' : 'tourist'
 
   const visibility = String(formData.get('visibility') ?? 'public')
   if (visibility !== 'public' && visibility !== 'private') {
