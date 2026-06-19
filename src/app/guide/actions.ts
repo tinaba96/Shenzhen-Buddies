@@ -332,17 +332,24 @@ export async function requestBooking(formData: FormData) {
       if (guide?.display_name) guideName = guide.display_name
     }
 
+    // WeChat Pay only works once the live account is eligible AND it's active
+    // in the dashboard. Listing it otherwise 400s the whole Checkout (taking
+    // card/Apple Pay down with it), so gate it behind an env flag — flip
+    // STRIPE_WECHAT_PAY=on once Stripe marks it active, no code change needed.
+    const wechatPay = process.env.STRIPE_WECHAT_PAY === 'on'
+
     const session = await stripe().checkout.sessions.create({
       mode: 'payment',
-      // Card (Apple/Google Pay ride on this) + Stripe Link — but no BNPL
-      // like Klarna/Affirm. WeChat Pay added for mainland-China tourists.
-      payment_method_types: ['card', 'link', 'wechat_pay'],
+      // Card (Apple/Google Pay ride on this) + Stripe Link — but no BNPL like
+      // Klarna/Affirm. WeChat Pay (one-time only) is added when enabled.
+      payment_method_types: wechatPay
+        ? ['card', 'link', 'wechat_pay']
+        : ['card', 'link'],
       // WeChat Pay needs its client surface set per session; 'web' renders a
-      // scannable QR in Checkout. It is one-time-payment only — fine here
-      // (mode: 'payment'); it cannot be used by the /pricing subscription flow.
-      payment_method_options: {
-        wechat_pay: { client: 'web' },
-      },
+      // scannable QR in Checkout.
+      ...(wechatPay
+        ? { payment_method_options: { wechat_pay: { client: 'web' as const } } }
+        : {}),
       // Show a promo-code field. Codes are created in the Stripe dashboard
       // (10/30/50/70/100% off); only people who know one can apply it, and
       // Stripe validates redemption/limits/expiry server-side.
