@@ -39,7 +39,15 @@ export default async function LoginPage({ searchParams }: Props) {
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium">Password</span>
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm font-medium">Password</span>
+              <Link
+                href="/forgot-password"
+                className="text-xs font-medium text-zinc-500 underline hover:text-zinc-700 dark:hover:text-zinc-300"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <input
               type="password"
               name="password"
