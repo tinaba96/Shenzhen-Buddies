@@ -335,8 +335,14 @@ export async function requestBooking(formData: FormData) {
     const session = await stripe().checkout.sessions.create({
       mode: 'payment',
       // Card (Apple/Google Pay ride on this) + Stripe Link — but no BNPL
-      // like Klarna/Affirm.
-      payment_method_types: ['card', 'link'],
+      // like Klarna/Affirm. WeChat Pay added for mainland-China tourists.
+      payment_method_types: ['card', 'link', 'wechat_pay'],
+      // WeChat Pay needs its client surface set per session; 'web' renders a
+      // scannable QR in Checkout. It is one-time-payment only — fine here
+      // (mode: 'payment'); it cannot be used by the /pricing subscription flow.
+      payment_method_options: {
+        wechat_pay: { client: 'web' },
+      },
       // Show a promo-code field. Codes are created in the Stripe dashboard
       // (10/30/50/70/100% off); only people who know one can apply it, and
       // Stripe validates redemption/limits/expiry server-side.
