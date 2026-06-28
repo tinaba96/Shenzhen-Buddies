@@ -276,8 +276,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
                 {myReview ? 'Update your review' : 'Leave a review'}
               </p>
               <p className="text-xs text-zinc-500">
-                You can review a guide after a confirmed booking (or once
-                you&apos;ve exchanged a message).
+                You can review your guide after your tour has finished.
               </p>
             </div>
             <div>

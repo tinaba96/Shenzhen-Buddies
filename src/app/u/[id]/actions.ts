@@ -50,7 +50,7 @@ export async function submitReview(formData: FormData) {
     const friendly =
       error.code === '42501' ||
       error.message.toLowerCase().includes('row-level security')
-        ? 'You can leave a review once you have a confirmed booking with this guide (or after exchanging a message).'
+        ? 'You can leave a review after your tour with this guide has finished.'
         : error.message
     redirect(`/u/${revieweeId}?error=${encodeURIComponent(friendly)}`)
   }
