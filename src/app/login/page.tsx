@@ -9,13 +9,16 @@ type Props = {
 const SIDE_PHOTO =
   'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1400&q=80&auto=format&fit=crop'
 
+const SPLITWHOM_URL =
+  'https://splitwhom.com/?utm_source=shenzhen-buddies&utm_medium=referral&utm_campaign=og_banner&utm_content=login'
+
 export default async function LoginPage({ searchParams }: Props) {
   const { error } = await searchParams
 
   return (
     <main className="flex flex-1">
       {/* Form panel */}
-      <div className="flex flex-1 items-center justify-center px-6 py-12 sm:px-12">
+      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 sm:px-12">
         <form
           action={login}
           className="w-full max-w-sm space-y-5 rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
@@ -73,6 +76,26 @@ export default async function LoginPage({ searchParams }: Props) {
             </Link>
           </p>
         </form>
+
+        {/* Small partner banner */}
+        <div className="mt-5 w-full max-w-sm">
+          <p className="mb-1.5 text-center text-[11px] uppercase tracking-wider text-zinc-400">
+            From a friend
+          </p>
+          <a
+            href={SPLITWHOM_URL}
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            className="group block overflow-hidden rounded-xl border border-zinc-200 shadow-sm transition hover:shadow-md dark:border-zinc-800"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/splitwhom-banner.png"
+              alt="SplitWhom — split shared expenses with friends"
+              className="w-full transition duration-500 group-hover:scale-[1.02]"
+            />
+          </a>
+        </div>
       </div>
 
       {/* Photo panel */}
