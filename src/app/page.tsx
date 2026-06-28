@@ -404,7 +404,7 @@ function StaticStars({ value }: { value: number }) {
 }
 
 const SPLITWHOM_URL =
-  'https://splitwhom.com/?utm_source=toronto-shotengai&utm_medium=referral&utm_campaign=og_banner'
+  'https://splitwhom.com/?utm_source=shenzhen-buddies&utm_medium=referral&utm_campaign=og_banner'
 
 function PartnerBanner() {
   return (
