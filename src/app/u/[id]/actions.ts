@@ -44,7 +44,15 @@ export async function submitReview(formData: FormData) {
     )
 
   if (error) {
-    redirect(`/u/${revieweeId}?error=${encodeURIComponent(error.message)}`)
+    // 42501 = RLS check failed: the reviewer isn't eligible yet (no confirmed
+    // booking and no message history). Show a clear message instead of the
+    // raw database error.
+    const friendly =
+      error.code === '42501' ||
+      error.message.toLowerCase().includes('row-level security')
+        ? 'You can leave a review once you have a confirmed booking with this guide (or after exchanging a message).'
+        : error.message
+    redirect(`/u/${revieweeId}?error=${encodeURIComponent(friendly)}`)
   }
 
   revalidatePath(`/u/${revieweeId}`)
