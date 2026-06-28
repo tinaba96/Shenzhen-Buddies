@@ -185,6 +185,9 @@ async function SiteHeader() {
   );
 }
 
+const SPLITWHOM_FOOTER_URL =
+  "https://splitwhom.com/?utm_source=shenzhen-buddies&utm_medium=referral&utm_campaign=og_banner&utm_content=footer";
+
 function SiteFooter() {
   const year = new Date().getFullYear();
   return (
@@ -204,6 +207,22 @@ function SiteFooter() {
           <p className="mt-3 max-w-xs text-xs text-zinc-500">
             Match with a local buddy in Shenzhen who shares your interests.
           </p>
+          <p className="mt-5 text-[11px] uppercase tracking-wider text-zinc-400">
+            From a friend
+          </p>
+          <a
+            href={SPLITWHOM_FOOTER_URL}
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            className="group mt-1.5 block max-w-[240px] overflow-hidden rounded-lg border border-zinc-200 shadow-sm transition hover:shadow-md dark:border-zinc-800"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/splitwhom-banner.png"
+              alt="SplitWhom — split shared expenses with friends"
+              className="w-full transition duration-500 group-hover:scale-[1.02]"
+            />
+          </a>
         </div>
         <FooterColumn
           title="Product"
