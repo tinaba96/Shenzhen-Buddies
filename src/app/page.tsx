@@ -14,6 +14,7 @@ export default async function Home() {
       <Audiences />
       <HowItWorks />
       <Testimonials />
+      <PartnerBanner />
       <FinalCTA loggedIn={!!user} />
     </main>
   )
@@ -399,6 +400,34 @@ function StaticStars({ value }: { value: number }) {
         </svg>
       ))}
     </span>
+  )
+}
+
+const SPLITWHOM_URL =
+  'https://splitwhom.com/?utm_source=toronto-shotengai&utm_medium=referral&utm_campaign=og_banner'
+
+function PartnerBanner() {
+  return (
+    <section className="border-t border-zinc-200 dark:border-zinc-800">
+      <div className="mx-auto max-w-3xl px-6 py-12">
+        <p className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-zinc-400">
+          From a friend
+        </p>
+        <a
+          href={SPLITWHOM_URL}
+          target="_blank"
+          rel="noopener noreferrer sponsored"
+          className="group block overflow-hidden rounded-2xl border border-zinc-200 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:border-zinc-800"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/splitwhom-banner.png"
+            alt="SplitWhom — split shared expenses with friends"
+            className="w-full transition duration-500 group-hover:scale-[1.02]"
+          />
+        </a>
+      </div>
+    </section>
   )
 }
 
