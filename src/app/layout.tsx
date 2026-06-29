@@ -198,7 +198,8 @@ function SplitWhomNote() {
         rel="noopener noreferrer sponsored"
         className="underline-offset-2 transition hover:text-zinc-600 hover:underline dark:hover:text-zinc-300"
       >
-        Friends of SplitWhom ↗
+        SplitWhom — for BBQs, parties &amp; trips: track who paid what and settle
+        up automatically ↗
       </a>
     </div>
   );
