@@ -191,15 +191,21 @@ const SPLITWHOM_FOOTER_URL =
 
 function SplitWhomNote() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-2 text-center text-[11px] text-zinc-400 sm:px-6">
+    <div className="mx-auto w-full max-w-6xl px-4 pb-4 pt-2 text-center text-xs text-zinc-500 sm:px-6">
       <a
         href={SPLITWHOM_FOOTER_URL}
         target="_blank"
         rel="noopener noreferrer sponsored"
-        className="underline-offset-2 transition hover:text-zinc-600 hover:underline dark:hover:text-zinc-300"
+        className="group inline-flex flex-wrap items-center justify-center gap-x-1.5 underline-offset-2 transition hover:text-zinc-700 dark:hover:text-zinc-300"
       >
-        SplitWhom — for BBQs, parties &amp; trips: track who paid what and settle
-        up automatically ↗
+        <span className="font-semibold text-zinc-700 group-hover:underline dark:text-zinc-300">
+          SplitWhom
+        </span>
+        <span className="text-zinc-400 dark:text-zinc-500">
+          BBQs, parties &amp; trips — track who paid what and settle up
+          automatically
+        </span>
+        <span aria-hidden>↗</span>
       </a>
     </div>
   );
