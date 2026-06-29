@@ -191,26 +191,34 @@ const SPLITWHOM_FOOTER_URL =
 
 function SplitWhomNote() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-8 pt-4 sm:px-6">
+    <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-6 sm:px-6">
       <a
         href={SPLITWHOM_FOOTER_URL}
         target="_blank"
         rel="noopener noreferrer sponsored"
-        className="group mx-auto flex max-w-xl flex-col items-center gap-2 rounded-2xl border border-zinc-200 bg-gradient-to-br from-amber-50/50 to-rose-50/40 px-6 py-6 text-center transition hover:border-amber-200 hover:shadow-sm dark:border-zinc-800 dark:from-amber-950/20 dark:to-rose-950/10 dark:hover:border-amber-900/50"
+        className="group mx-auto flex max-w-3xl flex-col items-center gap-4 rounded-3xl border border-zinc-200 bg-gradient-to-br from-amber-50/60 to-rose-50/50 px-8 py-8 text-center transition hover:border-amber-200 hover:shadow-md sm:flex-row sm:gap-6 sm:text-left dark:border-zinc-800 dark:from-amber-950/20 dark:to-rose-950/10 dark:hover:border-amber-900/50"
       >
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-zinc-400">
-          <span
-            aria-hidden
-            className="inline-block h-1.5 w-1.5 rounded-full bg-gradient-to-br from-amber-400 to-rose-500"
-          />
-          From a friend
+        <span
+          aria-hidden
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-rose-500 text-2xl shadow-sm"
+        >
+          🧾
         </span>
-        <span className="text-lg font-semibold text-zinc-800 group-hover:underline dark:text-zinc-100">
-          SplitWhom ↗
-        </span>
-        <span className="max-w-md text-sm text-zinc-500 dark:text-zinc-400">
-          BBQs, parties &amp; trips — buy together, then track who paid what and
-          settle up automatically.
+        <div className="flex flex-1 flex-col gap-1">
+          <span className="inline-flex items-center justify-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-zinc-400 sm:justify-start">
+            From a friend
+          </span>
+          <span className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+            SplitWhom
+          </span>
+          <span className="text-sm text-zinc-600 dark:text-zinc-400">
+            BBQs, parties &amp; trips — buy together, then track who paid what
+            and settle up automatically.
+          </span>
+        </div>
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition group-hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:group-hover:bg-zinc-200">
+          Try it
+          <span aria-hidden>→</span>
         </span>
       </a>
     </div>
