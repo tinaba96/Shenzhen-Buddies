@@ -196,13 +196,13 @@ function SplitWhomNote() {
         href={SPLITWHOM_FOOTER_URL}
         target="_blank"
         rel="noopener noreferrer sponsored"
-        className="group mx-auto flex max-w-3xl flex-col items-center gap-4 rounded-3xl border border-zinc-200 bg-gradient-to-br from-amber-50/60 to-rose-50/50 px-8 py-8 text-center transition hover:border-amber-200 hover:shadow-md sm:flex-row sm:gap-6 sm:text-left dark:border-zinc-800 dark:from-amber-950/20 dark:to-rose-950/10 dark:hover:border-amber-900/50"
+        className="group mx-auto flex max-w-3xl flex-col items-center gap-4 rounded-3xl border border-zinc-200 bg-gradient-to-br from-indigo-50/70 to-violet-50/50 px-8 py-8 text-center transition hover:border-indigo-200 hover:shadow-md sm:flex-row sm:gap-6 sm:text-left dark:border-zinc-800 dark:from-indigo-950/20 dark:to-violet-950/10 dark:hover:border-indigo-900/50"
       >
         <span
           aria-hidden
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-rose-500 text-2xl shadow-sm"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-500 text-2xl font-bold leading-none text-white shadow-sm"
         >
-          🧾
+          ÷
         </span>
         <div className="flex flex-1 flex-col gap-1">
           <span className="inline-flex items-center justify-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-zinc-400 sm:justify-start">
