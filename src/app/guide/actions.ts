@@ -34,6 +34,7 @@ import {
 } from '@/lib/config'
 import { sendEmail } from '@/lib/email'
 import { notifyGuide } from '@/lib/notify'
+import { validatePromoCode } from '@/lib/promo'
 import { stripe } from '@/lib/stripe'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -337,7 +338,7 @@ export async function startStripeCheckout(formData: FormData) {
   const admin = createSupabaseAdminClient()
   const { data: booking } = await admin
     .from('bookings')
-    .select('id, tourist_id, day, start_hour, end_hour, status')
+    .select('id, tourist_id, day, start_hour, end_hour, status, amount_cents')
     .eq('id', bookingId)
     .maybeSingle<{
       id: string
@@ -346,6 +347,7 @@ export async function startStripeCheckout(formData: FormData) {
       start_hour: number
       end_hour: number
       status: string
+      amount_cents: number | null
     }>()
   if (
     !booking ||
@@ -358,6 +360,22 @@ export async function startStripeCheckout(formData: FormData) {
   }
 
   const duration = booking.end_hour - booking.start_hour
+
+  // Apply a promo code (validated against Stripe, the source of truth) as a
+  // Checkout discount so Stripe applies it and records the redemption. A
+  // 100%-off code yields a $0 Checkout, which Stripe handles and the webhook
+  // marks paid.
+  const promoInput = String(formData.get('promo_code') ?? '')
+  let discounts: Array<{ promotion_code: string }> | undefined
+  if (promoInput) {
+    const promo = await validatePromoCode(promoInput, booking.amount_cents ?? 0)
+    if (!promo) {
+      redirect(
+        `/guide/pay/${booking.id}?error=${encodeURIComponent('That promo code is not valid.')}`,
+      )
+    }
+    discounts = [{ promotion_code: promo.promotionCodeId }]
+  }
 
   let guideName = 'your guide'
   const guideId = officialGuideId()
@@ -386,7 +404,10 @@ export async function startStripeCheckout(formData: FormData) {
       ...(wechatPay
         ? { payment_method_options: { wechat_pay: { client: 'web' as const } } }
         : {}),
-      allow_promotion_codes: true,
+      // Discount comes from the payment page's shared promo field (validated
+      // above), not Stripe's own promo field — so the same code drives PayPal
+      // too. discounts and allow_promotion_codes are mutually exclusive.
+      ...(discounts ? { discounts } : {}),
       expires_at: Math.floor(Date.now() / 1000) + CHECKOUT_EXPIRY_MINUTES * 60,
       customer_email: user.email ?? undefined,
       line_items: [

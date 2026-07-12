@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { CURRENCY } from '@/lib/booking'
 import { createPaypalOrder } from '@/lib/paypal'
+import { validatePromoCode } from '@/lib/promo'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
@@ -16,7 +17,10 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
-  const body = (await request.json().catch(() => ({}))) as { bookingId?: string }
+  const body = (await request.json().catch(() => ({}))) as {
+    bookingId?: string
+    promoCode?: string
+  }
   if (!body.bookingId) {
     return NextResponse.json({ error: 'missing bookingId' }, { status: 400 })
   }
@@ -43,9 +47,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'booking not payable' }, { status: 400 })
   }
 
+  // Apply a promo code if supplied. PayPal can't charge 0, so a code that
+  // zeroes the total is rejected here — the payment page steers free bookings
+  // to the card ($0 Stripe Checkout) path instead.
+  let chargeCents = booking.amount_cents
+  if (body.promoCode) {
+    const promo = await validatePromoCode(body.promoCode, booking.amount_cents)
+    if (!promo) {
+      return NextResponse.json({ error: 'invalid promo code' }, { status: 400 })
+    }
+    chargeCents = promo.discountedCents
+  }
+  if (chargeCents <= 0) {
+    return NextResponse.json(
+      { error: 'free bookings use card checkout' },
+      { status: 400 },
+    )
+  }
+
   try {
     const order = await createPaypalOrder({
-      amountCents: booking.amount_cents,
+      amountCents: chargeCents,
       currency: booking.currency ?? CURRENCY,
       referenceId: booking.id,
       description: `Shenzhen Buddies tour — ${booking.day}`,

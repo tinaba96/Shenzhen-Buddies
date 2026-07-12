@@ -1,12 +1,10 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { PayPalCheckout } from '@/components/PayPalCheckout'
-import { SubmitButton } from '@/components/SubmitButton'
-import { CURRENCY, formatDay, formatHourRange, formatMoney } from '@/lib/booking'
+import { PaymentPanel } from '@/components/PaymentPanel'
+import { CURRENCY, formatDay, formatHourRange } from '@/lib/booking'
 import { paypalConfigured } from '@/lib/paypal'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { startStripeCheckout } from '../../actions'
 
 type Props = {
   params: Promise<{ id: string }>
@@ -45,10 +43,6 @@ export default async function PayPage({ params, searchParams }: Props) {
   if (!booking || booking.tourist_id !== user.id) redirect('/guide')
   if (booking.status !== 'pending_payment') redirect('/guide')
 
-  const amount =
-    booking.amount_cents != null
-      ? formatMoney(booking.amount_cents, booking.currency ?? undefined)
-      : '—'
   const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
   const showPaypal = paypalConfigured() && Boolean(paypalClientId)
 
@@ -61,10 +55,6 @@ export default async function PayPage({ params, searchParams }: Props) {
         <p className="mt-1 font-medium">
           {formatDay(booking.day)} ·{' '}
           {formatHourRange(booking.start_hour, booking.end_hour)}
-        </p>
-        <p className="mt-3 flex items-baseline justify-between text-sm">
-          <span className="text-zinc-500">Total</span>
-          <span className="text-lg font-semibold">{amount}</span>
         </p>
       </div>
 
@@ -79,31 +69,14 @@ export default async function PayPage({ params, searchParams }: Props) {
         </p>
       )}
 
-      {/* Card (Stripe) */}
-      <form action={startStripeCheckout} className="mt-6">
-        <input type="hidden" name="booking_id" value={booking.id} />
-        <SubmitButton
-          pendingLabel="Going to payment…"
-          className="w-full rounded-full bg-zinc-900 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-        >
-          Pay by card
-        </SubmitButton>
-      </form>
-
-      {showPaypal && (
-        <>
-          <div className="my-5 flex items-center gap-3 text-xs text-zinc-400">
-            <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
-            or
-            <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
-          </div>
-          <PayPalCheckout
-            bookingId={booking.id}
-            clientId={paypalClientId!}
-            currency={booking.currency ?? CURRENCY}
-          />
-        </>
-      )}
+      <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <PaymentPanel
+          bookingId={booking.id}
+          baseAmountCents={booking.amount_cents ?? 0}
+          currency={booking.currency ?? CURRENCY}
+          paypalClientId={showPaypal ? paypalClientId! : null}
+        />
+      </div>
 
       <p className="mt-6 text-center text-xs text-zinc-500">
         We confirm within 3 business days — if we can&apos;t, you&apos;re fully

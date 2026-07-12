@@ -10,10 +10,12 @@ export function PayPalCheckout({
   bookingId,
   clientId,
   currency,
+  promoCode,
 }: {
   bookingId: string
   clientId: string
   currency: string
+  promoCode?: string
 }) {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
@@ -29,13 +31,16 @@ export function PayPalCheckout({
         }}
       >
         <PayPalButtons
+          // Re-init the buttons when the applied code changes so the order is
+          // created for the current (possibly discounted) amount.
+          forceReRender={[promoCode ?? '']}
           style={{ layout: 'vertical', label: 'pay' }}
           createOrder={async () => {
             setError(null)
             const res = await fetch('/api/paypal/create-order', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ bookingId }),
+              body: JSON.stringify({ bookingId, promoCode }),
             })
             const data = (await res.json()) as { orderId?: string; error?: string }
             if (!res.ok || !data.orderId) {
