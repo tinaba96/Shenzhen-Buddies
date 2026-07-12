@@ -317,21 +317,61 @@ export async function requestBooking(formData: FormData) {
     redirect('/guide?requested=1')
   }
 
-  // Start Stripe Checkout. The day stays held until payment succeeds
-  // (status -> pending via webhook) or the session expires (-> cancelled).
+  // Hold created — send the tourist to the payment page to choose card (Stripe)
+  // or PayPal. The hold keeps the day locked until a payment completes (status
+  // -> pending) or the hold expires and self-heals.
+  revalidatePath('/guide')
+  redirect(`/guide/pay/${booking.id}`)
+}
+
+// Start Stripe Checkout for an existing held booking. Invoked from the payment
+// page's "Pay by card" button. PayPal takes a separate route (/api/paypal/*).
+export async function startStripeCheckout(formData: FormData) {
+  const bookingId = String(formData.get('booking_id') ?? '')
+  const supabase = await createSupabaseServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const admin = createSupabaseAdminClient()
+  const { data: booking } = await admin
+    .from('bookings')
+    .select('id, tourist_id, day, start_hour, end_hour, status')
+    .eq('id', bookingId)
+    .maybeSingle<{
+      id: string
+      tourist_id: string
+      day: string
+      start_hour: number
+      end_hour: number
+      status: string
+    }>()
+  if (
+    !booking ||
+    booking.tourist_id !== user.id ||
+    booking.status !== 'pending_payment'
+  ) {
+    redirect(
+      `/guide?error=${encodeURIComponent('That booking is no longer awaiting payment.')}`,
+    )
+  }
+
+  const duration = booking.end_hour - booking.start_hour
+
+  let guideName = 'your guide'
+  const guideId = officialGuideId()
+  if (guideId) {
+    const { data: guide } = await admin
+      .from('profiles')
+      .select('display_name')
+      .eq('id', guideId)
+      .maybeSingle<{ display_name: string }>()
+    if (guide?.display_name) guideName = guide.display_name
+  }
+
   let checkoutUrl: string
   try {
-    let guideName = 'your guide'
-    const guideId = officialGuideId()
-    if (guideId) {
-      const { data: guide } = await admin
-        .from('profiles')
-        .select('display_name')
-        .eq('id', guideId)
-        .maybeSingle<{ display_name: string }>()
-      if (guide?.display_name) guideName = guide.display_name
-    }
-
     // WeChat Pay only works once the live account is eligible AND it's active
     // in the dashboard. Listing it otherwise 400s the whole Checkout (taking
     // card/Apple Pay down with it), so gate it behind an env flag — flip
@@ -340,22 +380,13 @@ export async function requestBooking(formData: FormData) {
 
     const session = await stripe().checkout.sessions.create({
       mode: 'payment',
-      // Card (Apple/Google Pay ride on this) + Stripe Link — but no BNPL like
-      // Klarna/Affirm. WeChat Pay (one-time only) is added when enabled.
       payment_method_types: wechatPay
         ? ['card', 'link', 'wechat_pay']
         : ['card', 'link'],
-      // WeChat Pay needs its client surface set per session; 'web' renders a
-      // scannable QR in Checkout.
       ...(wechatPay
         ? { payment_method_options: { wechat_pay: { client: 'web' as const } } }
         : {}),
-      // Show a promo-code field. Codes are created in the Stripe dashboard
-      // (10/30/50/70/100% off); only people who know one can apply it, and
-      // Stripe validates redemption/limits/expiry server-side.
       allow_promotion_codes: true,
-      // Session expires after the checkout window (Stripe minimum), after
-      // which the tourist can no longer pay and the day frees up.
       expires_at: Math.floor(Date.now() / 1000) + CHECKOUT_EXPIRY_MINUTES * 60,
       customer_email: user.email ?? undefined,
       line_items: [
@@ -365,8 +396,8 @@ export async function requestBooking(formData: FormData) {
             currency: CURRENCY,
             unit_amount: amountCentsForHours(1),
             product_data: {
-              name: `Tour with ${guideName} — ${formatDay(day)}`,
-              description: `${formatHourRange(startHour, endHour)} · ${duration} hours`,
+              name: `Tour with ${guideName} — ${formatDay(booking.day)}`,
+              description: `${formatHourRange(booking.start_hour, booking.end_hour)} · ${duration} hours`,
             },
           },
         },
@@ -376,7 +407,7 @@ export async function requestBooking(formData: FormData) {
         metadata: { booking_id: booking.id, user_id: user.id },
       },
       success_url: `${siteUrl()}/guide?paid=1`,
-      cancel_url: `${siteUrl()}/guide/cancel?day=${day}`,
+      cancel_url: `${siteUrl()}/guide/pay/${booking.id}?cancelled=1`,
     })
     if (!session.url) throw new Error('Stripe did not return a checkout URL')
 
@@ -386,12 +417,12 @@ export async function requestBooking(formData: FormData) {
       .eq('id', booking.id)
     checkoutUrl = session.url
   } catch (err) {
-    // Roll back the hold so the day isn't stuck if checkout couldn't start.
-    await admin.from('bookings').delete().eq('id', booking.id)
+    // Keep the hold so they can retry or pay with PayPal instead.
     console.error('Stripe checkout creation failed:', err)
-    fail('Could not start payment. Please try again.', day)
+    redirect(
+      `/guide/pay/${booking.id}?error=${encodeURIComponent('Could not start card payment. Try again or use PayPal.')}`,
+    )
   }
 
-  revalidatePath('/guide')
   redirect(checkoutUrl)
 }

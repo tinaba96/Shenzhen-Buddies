@@ -101,6 +101,8 @@ export type BookingRow = {
   amount_cents: number | null
   currency: string | null
   stripe_payment_intent_id: string | null
+  payment_provider: 'stripe' | 'paypal' | null
+  paypal_capture_id: string | null
   created_at: string
 }
 
