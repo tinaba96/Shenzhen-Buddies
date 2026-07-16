@@ -61,6 +61,9 @@ Vercel.
      an exclusion constraint)
    - `supabase/migrations/0009_booking_payments.sql` — adds Stripe payment
      columns + `pending_payment` hold state to `bookings`
+   - continue running the remaining files **in order** through
+     `supabase/migrations/0015_paypal_payments.sql` (0015 adds PayPal columns
+     — `payment_provider`, `paypal_order_id`, `paypal_capture_id`)
 
 4. **Auth settings** (Supabase dashboard → Authentication → URL Configuration)
    - **Site URL:** `http://localhost:3000` (plus your Vercel URL once deployed)
@@ -87,8 +90,28 @@ Vercel.
      `NEXT_PUBLIC_STRIPE_PRICE_ID` (price ID only needed for subscriptions).
    - Booking pricing is a flat CA$10/hour (5–15h), set in `src/lib/booking.ts`
      (`HOURLY_RATE_CENTS`, `CURRENCY`). Declining a paid booking auto-refunds.
+   - Promo codes are managed in the Stripe dashboard (Coupons → Promotion
+     codes). They're validated via Stripe and applied to **both** card and
+     PayPal from a single field on the payment page. A 100%-off code makes a
+     free booking (hides PayPal, uses the $0 card path).
 
-6. **Single-guide beta mode** (optional)
+6. **PayPal** (optional second booking-payment method)
+   - After the booking form, tourists land on a payment page
+     (`/guide/pay/[id]`) offering **card (Stripe)** and, if configured,
+     **PayPal**. Leave the PayPal vars blank to show card only.
+   - Create an app at <https://developer.paypal.com/dashboard/> — the Sandbox
+     and Live tabs each expose a **Client ID** and **Secret** (different pairs).
+   - Paste into `.env.local`: `PAYPAL_ENV` (`sandbox` or `live`),
+     `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, and
+     `NEXT_PUBLIC_PAYPAL_CLIENT_ID` (same value as `PAYPAL_CLIENT_ID`).
+   - `PAYPAL_ENV` must match the credentials pasted — sandbox keys against
+     `sandbox`, live keys against `live`, or PayPal returns `401
+     invalid_client`. Test with a Sandbox buyer account (Developer dashboard →
+     Testing Tools → Sandbox Accounts).
+   - Declining or cancelling a PayPal booking refunds via PayPal automatically
+     (Stripe bookings refund via Stripe) — the app routes refunds by provider.
+
+7. **Single-guide beta mode** (optional)
    - Sign the operator's guide up as a normal **guide** account and fill in
      their profile.
    - Set `OFFICIAL_GUIDE_ID` to that account's auth user id (Supabase
@@ -106,7 +129,7 @@ Vercel.
      From reaches inboxes without owning a domain. Leave blank locally and
      emails are logged to the server console instead.
 
-7. **Run**
+8. **Run**
    ```bash
    npm run dev
    ```
@@ -120,7 +143,9 @@ Vercel.
    `SUPABASE_SERVICE_ROLE_KEY`, and the three `STRIPE_*` /
    `NEXT_PUBLIC_STRIPE_PRICE_ID` if you're enabling subscriptions. For the
    single-guide beta also add `OFFICIAL_GUIDE_ID`, `ADMIN_EMAILS`,
-   `GMAIL_USER`, `GMAIL_APP_PASSWORD`, and `EMAIL_FROM`.
+   `GMAIL_USER`, `GMAIL_APP_PASSWORD`, and `EMAIL_FROM`. To enable PayPal add
+   `PAYPAL_ENV` (`live`), `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, and
+   `NEXT_PUBLIC_PAYPAL_CLIENT_ID`.
 3. Update Supabase Auth → URL Configuration with your Vercel URL.
 4. In Stripe, edit the webhook endpoint to point at your Vercel URL.
 
