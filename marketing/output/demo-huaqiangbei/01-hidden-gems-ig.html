@@ -1,0 +1,351 @@
+<!--
+  ============================================================
+  Buddy Studio — asset meta
+  Type       : Hidden Gems (pillar: Tech-city wonder × "explore with a local buddy")
+  Subject    : Huaqiangbei — the world's largest electronics market
+  Platform   : Instagram feed (slide 1 hook)
+  Spec       : 1080 x 1350 px (4:5) fixed canvas, self-contained HTML (no external assets)
+  Language   : English (neon sign romanized as HUAQIANGBEI; no live Japanese or Chinese copy)
+  Palette    : Night #0f1512 / Jade #0d8f6f / Jade Deep #086b53 /
+               Coral #d1533a / Warm off-white #f6f4ef / Amber #b7791f
+  Photo note : Yes — the entire frame is a live-photo placeholder (the whole canvas is the photo zone).
+               Shoot direction is noted in the SHOOT NOTE chip, top left.
+               No compositing of real people who don't exist (the background is CSS-only abstract bokeh).
+  Theme      : Single dark theme (an intentional commitment to a neon nightscape look. Static export image.)
+  Approval   : Pending Brand Guardian review (do not self-approve)
+  ============================================================
+-->
+<title>SZB — Huaqiangbei Hidden Gems (IG 1080x1350)</title>
+<style>
+  :root {
+    --night: #0f1512;
+    --jade: #0d8f6f;
+    --jade-deep: #086b53;
+    --coral: #d1533a;
+    --paper: #f6f4ef;
+    --amber: #b7791f;
+    --sans: -apple-system, "Helvetica Neue", "Segoe UI", Arial, "PingFang SC", "Hiragino Sans", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  .stage {
+    min-height: 100vh;
+    background: #060a08;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 0;
+  }
+
+  /* ================= 1080 x 1350 canvas ================= */
+  .canvas {
+    position: relative;
+    width: 1080px;
+    height: 1350px;
+    flex: 0 0 auto;
+    overflow: hidden;
+    background: var(--night);
+    font-family: var(--sans);
+    color: var(--paper);
+  }
+
+  /* --- layer 1: abstract neon bokeh (stand-in under the photo) --- */
+  .bokeh {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(340px 340px at 14% 22%, rgba(13,143,111,.34), transparent 70%),
+      radial-gradient(300px 300px at 86% 34%, rgba(209,83,58,.22), transparent 70%),
+      radial-gradient(420px 420px at 72% 78%, rgba(183,121,31,.26), transparent 70%),
+      radial-gradient(260px 260px at 30% 88%, rgba(13,143,111,.18), transparent 70%),
+      radial-gradient(180px 180px at 55% 12%, rgba(246,244,239,.05), transparent 70%);
+  }
+  /* faint market-aisle perspective lines */
+  .aisle {
+    position: absolute; inset: 0; opacity: .5;
+  }
+
+  /* --- layer 2: circuit traces --- */
+  .circuit { position: absolute; inset: 0; }
+
+  /* --- layer 3: legibility scrim --- */
+  .scrim {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg,
+      rgba(15,21,18,.62) 0%,
+      rgba(15,21,18,.18) 34%,
+      rgba(15,21,18,.30) 55%,
+      rgba(15,21,18,.90) 82%,
+      rgba(15,21,18,.96) 100%);
+  }
+
+  /* --- layer 4: full-bleed photo placeholder frame --- */
+  .photo-zone {
+    position: absolute; inset: 18px;
+    border: 2px dashed rgba(13,143,111,.45);
+    pointer-events: none;
+  }
+  .photo-zone::before, .photo-zone::after {
+    content: ""; position: absolute; width: 26px; height: 26px;
+  }
+  .photo-zone::before {
+    top: -2px; left: -2px;
+    border-top: 4px solid var(--jade); border-left: 4px solid var(--jade);
+  }
+  .photo-zone::after {
+    bottom: -2px; right: -2px;
+    border-bottom: 4px solid var(--jade); border-right: 4px solid var(--jade);
+  }
+
+  .shoot-note {
+    position: absolute; left: 48px; top: 118px;
+    width: 470px;
+    font-family: var(--mono);
+    font-size: 15px; line-height: 1.55;
+    letter-spacing: .02em;
+    color: rgba(246,244,239,.62);
+    background: rgba(15,21,18,.66);
+    border: 1px solid rgba(13,143,111,.5);
+    border-left: 4px solid var(--jade);
+    padding: 14px 18px 15px;
+  }
+  .shoot-note b {
+    display: block;
+    color: var(--jade); font-weight: 700;
+    font-size: 13px; letter-spacing: .18em;
+    margin-bottom: 6px;
+  }
+
+  /* --- top meta bar --- */
+  .meta {
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 40px 48px 0;
+    font-family: var(--mono);
+    font-size: 21px; letter-spacing: .14em;
+    color: rgba(246,244,239,.85);
+  }
+  .meta .dot { color: var(--jade); }
+  .meta-rule {
+    position: absolute; top: 92px; left: 48px; right: 48px;
+    height: 1px; background: linear-gradient(90deg, var(--jade), rgba(13,143,111,0));
+  }
+
+  /* --- vertical neon sign: HUAQIANGBEI --- */
+  .neon-sign {
+    position: absolute; right: 56px; top: 184px;
+    writing-mode: vertical-rl;
+    font-family: var(--sans);
+    font-weight: 900;
+    font-size: 72px;
+    letter-spacing: .16em;
+    color: #e8846d; /* coral tube lit from within */
+    text-shadow:
+      0 0 6px rgba(209,83,58,.9),
+      0 0 22px rgba(209,83,58,.65),
+      0 0 60px rgba(209,83,58,.4);
+    padding: 30px 14px;
+    border: 3px solid rgba(209,83,58,.55);
+    border-radius: 8px;
+    box-shadow:
+      0 0 18px rgba(209,83,58,.35),
+      inset 0 0 18px rgba(209,83,58,.18);
+    background: rgba(15,21,18,.35);
+  }
+  .neon-sub {
+    position: absolute; right: 208px; top: 244px;
+    writing-mode: vertical-rl;
+    font-family: var(--mono);
+    font-size: 17px; letter-spacing: .34em;
+    color: rgba(246,244,239,.55);
+  }
+
+  /* --- gem chips: electronics-bin labels --- */
+  .gems {
+    position: absolute; left: 48px; top: 352px;
+    display: flex; flex-direction: column; gap: 16px;
+    align-items: flex-start;
+  }
+  .gem {
+    display: flex; align-items: center; gap: 16px;
+    font-family: var(--mono);
+    font-size: 21px; letter-spacing: .03em;
+    color: var(--paper);
+    background: rgba(15,21,18,.78);
+    border: 1px solid rgba(13,143,111,.65);
+    border-radius: 2px;
+    padding: 10px 20px 10px 14px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.45);
+  }
+  .gem:nth-child(2) { transform: translateX(34px); }
+  .gem:nth-child(3) { transform: translateX(68px); }
+  .gem .idx {
+    color: var(--amber); font-weight: 700; letter-spacing: .1em;
+  }
+  .gem .bars {
+    display: inline-flex; gap: 3px; align-items: stretch; height: 22px;
+  }
+  .gem .bars i { display: block; width: 3px; background: rgba(13,143,111,.8); }
+  .gem .bars i:nth-child(2) { width: 6px; opacity: .55; }
+  .gem .bars i:nth-child(3) { width: 2px; }
+  .gem .bars i:nth-child(4) { width: 5px; opacity: .4; }
+  .gems-eyebrow {
+    font-family: var(--mono);
+    font-size: 16px; letter-spacing: .3em;
+    color: var(--jade);
+    margin-bottom: 4px;
+  }
+
+  /* --- headline block --- */
+  .hook {
+    position: absolute; left: 48px; right: 48px; bottom: 112px;
+  }
+  .hook h1 {
+    font-family: var(--sans);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.028em;
+    line-height: .92;
+    font-size: 132px;
+    color: var(--paper);
+    text-shadow: 0 2px 30px rgba(0,0,0,.55);
+  }
+  .hook h1 .friend {
+    display: block;
+    line-height: .9;
+    font-size: 168px;
+    color: var(--coral);
+    text-shadow:
+      0 0 12px rgba(209,83,58,.55),
+      0 0 46px rgba(209,83,58,.30),
+      0 2px 30px rgba(0,0,0,.55);
+  }
+  .hook .support {
+    margin-top: 26px;
+    max-width: 870px;
+    font-size: 29px; line-height: 1.42;
+    font-weight: 500;
+    color: rgba(246,244,239,.88);
+  }
+  .hook .support strong { color: var(--jade); font-weight: 700; }
+  .hook .jp {
+    margin-top: 14px;
+    font-size: 23px; letter-spacing: .06em;
+    color: rgba(246,244,239,.6);
+  }
+  .hook .jp::before {
+    content: "▸ ";
+    color: var(--coral);
+  }
+
+  /* --- footer --- */
+  .footer {
+    position: absolute; left: 48px; right: 48px; bottom: 40px;
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-top: 1px solid rgba(13,143,111,.55);
+    padding-top: 18px;
+  }
+  .footer .handle {
+    font-family: var(--mono);
+    font-size: 22px; letter-spacing: .12em;
+    color: var(--jade);
+  }
+  .footer .tagline {
+    font-family: var(--sans);
+    font-size: 22px; font-weight: 600; letter-spacing: .01em;
+    color: rgba(246,244,239,.68);
+  }
+</style>
+
+<div class="stage">
+  <div class="canvas">
+
+    <!-- L1: abstract stand-in glow (photo replaces everything under the scrim) -->
+    <div class="bokeh"></div>
+    <svg class="aisle" width="1080" height="1350" viewBox="0 0 1080 1350" aria-hidden="true">
+      <g stroke="rgba(246,244,239,.06)" stroke-width="2" fill="none">
+        <path d="M -40 1350 L 460 620" />
+        <path d="M 220 1350 L 500 640" />
+        <path d="M 1120 1350 L 560 620" />
+        <path d="M 860 1350 L 520 640" />
+      </g>
+      <g stroke="rgba(183,121,31,.14)" stroke-width="3" fill="none">
+        <path d="M 90 700 H 990" />
+        <path d="M 200 560 H 900" />
+      </g>
+    </svg>
+
+    <!-- L2: circuit traces -->
+    <svg class="circuit" width="1080" height="1350" viewBox="0 0 1080 1350" aria-hidden="true">
+      <g stroke="rgba(13,143,111,.22)" stroke-width="2.5" fill="none">
+        <path d="M 0 150 H 190 V 240 H 330" />
+        <path d="M 1080 480 H 930 V 560" />
+        <path d="M 60 1120 V 990 H 200" />
+        <path d="M 1080 1180 H 880 V 1090" />
+      </g>
+      <g fill="rgba(13,143,111,.4)">
+        <circle cx="330" cy="240" r="6" />
+        <circle cx="930" cy="560" r="6" />
+        <circle cx="200" cy="990" r="6" />
+        <circle cx="880" cy="1090" r="6" />
+      </g>
+      <g fill="none" stroke="rgba(13,143,111,.4)" stroke-width="2.5">
+        <circle cx="330" cy="240" r="12" />
+        <circle cx="880" cy="1090" r="12" />
+      </g>
+    </svg>
+
+    <!-- L3: scrim -->
+    <div class="scrim"></div>
+
+    <!-- L4: photo placeholder frame (photo zone = full canvas) -->
+    <div class="photo-zone"></div>
+    <div class="shoot-note">
+      <b>SHOOT NOTE — REPLACE FULL FRAME WITH PHOTO</b>
+      Night aisle inside Huaqiangbei. A local buddy mid-laugh,
+      pointing out a parts stall to a traveler; both lit by stall
+      LEDs + signage bokeh. 35mm, eye level, warm/cool mixed light.
+      Consent-cleared people only (brief §7).
+    </div>
+
+    <!-- top meta -->
+    <div class="meta">
+      <span>SZB<span class="dot">▮</span>FIELD&nbsp;NOTES</span>
+      <span>22.5486°N&nbsp;114.0884°E<span class="dot">&nbsp;·&nbsp;</span>SHENZHEN</span>
+    </div>
+    <div class="meta-rule"></div>
+
+    <!-- vertical neon sign -->
+    <div class="neon-sign">HUAQIANGBEI</div>
+    <div class="neon-sub">ELECTRONICS&nbsp;ST.</div>
+
+    <!-- hidden gems: bin labels -->
+    <div class="gems">
+      <div class="gems-eyebrow">HIDDEN GEMS №01 ⌁ BUDDY PICKS</div>
+      <div class="gem"><span class="idx">01</span> THE LED ALLEY <span class="bars"><i></i><i></i><i></i><i></i></span></div>
+      <div class="gem"><span class="idx">02</span> DRONE TEST BAYS <span class="bars"><i></i><i></i><i></i><i></i></span></div>
+      <div class="gem"><span class="idx">03</span> THE FIX-ANYTHING COUNTER <span class="bars"><i></i><i></i><i></i><i></i></span></div>
+    </div>
+
+    <!-- headline -->
+    <div class="hook">
+      <h1>
+        20,000 stalls.
+        <span class="friend">One<br>friend.</span>
+      </h1>
+      <p class="support">
+        Tourists get lost in the world's biggest electronics market.
+        A <strong>local buddy</strong> walks you straight to the treasure.
+      </p>
+      <p class="jp">With a local, the maze becomes a map.</p>
+    </div>
+
+    <!-- footer -->
+    <div class="footer">
+      <span class="handle">@shenzhenbuddies</span>
+      <span class="tagline">Don't tour Shenzhen. Have a friend there.</span>
+    </div>
+
+  </div>
+</div>
