@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { CURRENCY } from '@/lib/booking'
+import { amountCentsForHours, CURRENCY } from '@/lib/booking'
 import { createPaypalOrder } from '@/lib/paypal'
 import { validatePromoCode } from '@/lib/promo'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
@@ -8,8 +8,15 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 export const runtime = 'nodejs'
 
 // Create a PayPal order for a held booking. The browser calls this from the
-// PayPal buttons; we authorise the tourist and price the order server-side from
-// the stored hold so the amount can't be tampered with client-side.
+// PayPal buttons; we authorise the tourist and price the order here.
+//
+// The price is RECOMPUTED from the booking's hours, never read from the stored
+// `amount_cents`. That column is client-writable: the bookings INSERT policy
+// (supabase/migrations/0009) pins tourist_id, status, day and the availability
+// window, but says nothing about price — so a signed-in user can POST a row
+// straight to the REST API with amount_cents = 1 and then pay one cent for it.
+// Stripe was never exposed to this because it prices from hours already
+// (guide/actions.ts); this path now does the same.
 export async function POST(request: NextRequest) {
   const supabase = await createSupabaseServerClient()
   const {
@@ -28,12 +35,16 @@ export async function POST(request: NextRequest) {
   const admin = createSupabaseAdminClient()
   const { data: booking } = await admin
     .from('bookings')
-    .select('id, tourist_id, day, status, amount_cents, currency')
+    .select(
+      'id, tourist_id, day, start_hour, end_hour, status, amount_cents, currency',
+    )
     .eq('id', body.bookingId)
     .maybeSingle<{
       id: string
       tourist_id: string
       day: string
+      start_hour: number
+      end_hour: number
       status: string
       amount_cents: number | null
       currency: string | null
@@ -50,9 +61,18 @@ export async function POST(request: NextRequest) {
   // Apply a promo code if supplied. PayPal can't charge 0, so a code that
   // zeroes the total is rejected here — the payment page steers free bookings
   // to the card ($0 Stripe Checkout) path instead.
-  let chargeCents = booking.amount_cents
+  // Derived from the hours the booking actually holds — the same figure Stripe
+  // charges — so a tampered amount_cents column cannot lower the price.
+  const expectedCents = amountCentsForHours(
+    booking.end_hour - booking.start_hour,
+  )
+  if (expectedCents <= 0) {
+    return NextResponse.json({ error: 'booking not payable' }, { status: 400 })
+  }
+
+  let chargeCents = expectedCents
   if (body.promoCode) {
-    const promo = await validatePromoCode(body.promoCode, booking.amount_cents)
+    const promo = await validatePromoCode(body.promoCode, expectedCents)
     if (!promo) {
       return NextResponse.json({ error: 'invalid promo code' }, { status: 400 })
     }
