@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { DEFAULT_OG_IMAGE } from '@/lib/config'
 
 export const metadata: Metadata = {
   title: 'Contact — Shenzhen Buddies',
@@ -13,6 +14,8 @@ export const metadata: Metadata = {
     title: 'Contact — Shenzhen Buddies',
     description: 'Get in touch with the Shenzhen Buddies team — feedback, partnerships, press, or guide applications.',
     url: '/contact',
+    // Required alongside any openGraph object — see the note in about/page.tsx.
+    images: [DEFAULT_OG_IMAGE],
   },
 }
 

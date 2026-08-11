@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { isSingleGuideMode } from '@/lib/config'
+import { DEFAULT_OG_IMAGE, isSingleGuideMode } from '@/lib/config'
 
 const TITLE = 'Explore Shenzhen by district — Shenzhen Buddies'
 const DESCRIPTION =
@@ -13,7 +13,14 @@ export const metadata: Metadata = {
   // Declared explicitly: the root layout sets an openGraph block, and metadata
   // merges per key — so a page that omits this inherits the site's generic
   // title, description and an og:url pointing at the homepage.
-  openGraph: { title: TITLE, description: DESCRIPTION, url: '/explore' },
+  // `images` is not redundant: the object above replaces the inherited one, and
+  // the file-convention card goes with it. See DEFAULT_OG_IMAGE in lib/config.
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: '/explore',
+    images: [DEFAULT_OG_IMAGE],
+  },
 }
 
 // PHOTO PROVENANCE — read before changing any `photo` below.

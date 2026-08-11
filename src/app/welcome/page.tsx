@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { Avatar } from '@/components/Avatar'
 import { PromoCode } from '@/components/PromoCode'
+import { DEFAULT_OG_IMAGE } from '@/lib/config'
 
 const PROMO = 'WELCOME10'
 
@@ -17,6 +18,10 @@ export const metadata: Metadata = {
     title: 'Get 10% off your Shenzhen day — Shenzhen Buddies',
     description: 'Book a local guide in Shenzhen for a day out. Use code WELCOME10 for 10% off your first booking. CA$10/hour, 4–8 hours, fully refunded if we can’t confirm.',
     url: '/welcome',
+    // Required alongside any openGraph object — see the note in about/page.tsx.
+    // This page is the promo-code landing page pasted into Instagram, so a
+    // missing card here costs more than on any other route.
+    images: [DEFAULT_OG_IMAGE],
   },
 }
 

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
 import { BookingFields } from '@/components/BookingFields'
@@ -25,7 +26,7 @@ import {
   type BookingStatus,
   type FreeSegment,
 } from '@/lib/booking'
-import { isSingleGuideMode, officialGuideId } from '@/lib/config'
+import { DEFAULT_OG_IMAGE, isSingleGuideMode, officialGuideId } from '@/lib/config'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import {
@@ -36,6 +37,30 @@ import {
   rejectGuideBooking,
   requestBooking,
 } from './actions'
+
+// This page declared no metadata at all, which is not the same as declaring
+// nothing: it inherited the root layout's, including `alternates.canonical:
+// '/'`. So the booking page — the one route where money changes hands, listed
+// in the sitemap at priority 0.8 — served a canonical naming the homepage as
+// its real address, and a <title> identical to the homepage's. A self-referential
+// canonical is the whole point of the tag; pointing it elsewhere is an explicit
+// instruction to index that page instead of this one.
+const TITLE = 'Book a day with a local in Shenzhen — Shenzhen Buddies'
+const DESCRIPTION =
+  'Pick your day and your hours, then spend them with someone who actually lives here — no coach, no script, no fixed route. Four to eight hours, booked direct.'
+
+export const metadata: Metadata = {
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: '/guide' },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: '/guide',
+    // Required alongside any openGraph object — see the note in about/page.tsx.
+    images: [DEFAULT_OG_IMAGE],
+  },
+}
 
 type Props = {
   searchParams: Promise<{

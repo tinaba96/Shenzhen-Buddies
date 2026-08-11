@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { DEFAULT_OG_IMAGE } from '@/lib/config'
 
 export const metadata: Metadata = {
   title: 'About — Shenzhen Buddies',
@@ -13,6 +14,11 @@ export const metadata: Metadata = {
     title: 'About — Shenzhen Buddies',
     description: 'Built for explorers and the locals who love their city. Why we made Shenzhen Buddies, and how it works.',
     url: '/about',
+    // Not redundant with the root layout: the openGraph object above replaces
+    // the inherited one wholesale, and the file-convention card at
+    // src/app/opengraph-image.png goes with it, so without this line the page
+    // shares as a grey box. See DEFAULT_OG_IMAGE in src/lib/config.ts.
+    images: [DEFAULT_OG_IMAGE],
   },
 }
 

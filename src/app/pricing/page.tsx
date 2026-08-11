@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SubmitButton } from '@/components/SubmitButton'
+import { DEFAULT_OG_IMAGE } from '@/lib/config'
 import { isSubscriptionActive, type SubscriptionRow } from '@/lib/stripe'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { openBillingPortal, startCheckout } from './actions'
@@ -17,6 +18,8 @@ export const metadata: Metadata = {
     title: 'Pricing — Shenzhen Buddies',
     description: 'What a day with a local buddy in Shenzhen costs, and what is included.',
     url: '/pricing',
+    // Required alongside any openGraph object — see the note in about/page.tsx.
+    images: [DEFAULT_OG_IMAGE],
   },
 }
 
