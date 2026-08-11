@@ -34,12 +34,18 @@ const ROUTES: Array<{
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteUrl()
-  const lastModified = new Date()
 
   return [
+    // No `lastModified` on these. It was `new Date()`, i.e. build time, which
+    // told Google that /privacy and /terms changed on every deploy — including
+    // deploys that touched neither. Google's stated behaviour is to stop
+    // trusting a sitemap's lastmod once it finds it inconsistent with the page,
+    // and it applies that judgement to the whole file, so a fake date on twelve
+    // static routes would also discredit the real dates on the posts below.
+    // Omitting it is a supported case: the field is optional, and a missing
+    // lastmod is simply not a signal, where a wrong one is a negative one.
     ...ROUTES.map(({ path, priority, changeFrequency }) => ({
       url: path === '/' ? base : `${base}${path}`,
-      lastModified,
       changeFrequency,
       priority,
     })),

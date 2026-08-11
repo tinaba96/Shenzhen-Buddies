@@ -2,20 +2,22 @@
 
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { DEFAULT_SITE_URL } from '@/lib/config'
+import { siteUrl } from '@/lib/config'
 import { stripe } from '@/lib/stripe'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 const TRIAL_DAYS = 14
 
+// The request's own host first, so a preview deployment returns the subscriber
+// to the preview and not to production. siteUrl() rather than a raw read of
+// NEXT_PUBLIC_SITE_URL for the fallback: siteUrl() rejects a value with no
+// scheme, and a scheme-less success_url is rejected by Stripe at session
+// creation — after the operator has already been charged for nothing, and only
+// on the one request where the host header is missing.
 async function siteOrigin(): Promise<string> {
   const h = await headers()
   const fromHost = h.get('origin') ?? (h.get('host') ? `https://${h.get('host')}` : null)
-  return (
-    fromHost ??
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    DEFAULT_SITE_URL
-  )
+  return fromHost ?? siteUrl()
 }
 
 export async function startCheckout() {

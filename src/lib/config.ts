@@ -42,7 +42,18 @@ export function instagramUrl(): string {
 // and sitemap entry resolves against, so it must stay in sync with the domain
 // actually attached to the Vercel project. Changing it after launch splits
 // indexing across two hostnames.
-export const DEFAULT_SITE_URL = 'https://shenzhen-buddies.com'
+//
+// The `www.` is load-bearing, not cosmetic. The apex 308s to www:
+//   curl -sI https://shenzhen-buddies.com/  ->  308 -> https://www.shenzhen-buddies.com/
+// so www is the host that actually serves pages. With the apex here instead,
+// every page served on www declared a canonical and og:url on the apex, which
+// then redirected back to www — a crawler is told the real address is a URL
+// that bounces it to the page it was already on. Same for the sitemap: 13 URLs
+// none of which are the URL they resolve to.
+//
+// If the primary host is ever flipped in Vercel, flip this in the same change.
+// Verify with the curl above; whatever answers 200 is what belongs here.
+export const DEFAULT_SITE_URL = 'https://www.shenzhen-buddies.com'
 
 export function siteUrl(): string {
   const configured = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '')
