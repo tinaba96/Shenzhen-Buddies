@@ -1,8 +1,24 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SubmitButton } from '@/components/SubmitButton'
 import { isSubscriptionActive, type SubscriptionRow } from '@/lib/stripe'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { openBillingPortal, startCheckout } from './actions'
+
+export const metadata: Metadata = {
+  title: 'Pricing — Shenzhen Buddies',
+  description:
+    'What a day with a local buddy in Shenzhen costs, and what is included.',
+  alternates: { canonical: '/pricing' },
+  // Declared explicitly: the root layout sets an openGraph block, and
+  // metadata merges per key — so a page that omits this inherits the site's
+  // generic title, description and an og:url pointing at the homepage.
+  openGraph: {
+    title: 'Pricing — Shenzhen Buddies',
+    description: 'What a day with a local buddy in Shenzhen costs, and what is included.',
+    url: '/pricing',
+  },
+}
 
 type Props = {
   searchParams: Promise<{
@@ -14,7 +30,7 @@ type Props = {
 
 const TRIAL_DAYS = 14
 const HERO_PHOTO =
-  'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=2000&q=80&auto=format&fit=crop'
+  '/hero/preserved-fruit-jars.webp'
 
 const features = [
   {

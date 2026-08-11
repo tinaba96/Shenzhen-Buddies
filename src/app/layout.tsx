@@ -5,7 +5,14 @@ import { Analytics } from "@/components/Analytics";
 import { Avatar } from "@/components/Avatar";
 import { MobileMenu } from "@/components/MobileMenu";
 import { avatarPublicUrl } from "@/lib/avatars";
-import { isAdminEmail, isSingleGuideMode, officialGuideId } from "@/lib/config";
+import {
+  INSTAGRAM_HANDLE,
+  instagramUrl,
+  isAdminEmail,
+  isSingleGuideMode,
+  officialGuideId,
+  siteUrl,
+} from "@/lib/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import "./globals.css";
 
@@ -19,10 +26,38 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_NAME = "Shenzhen Buddies";
+const SITE_DESCRIPTION =
+  "Match with a local buddy in Shenzhen who shares your interests. Casual, affordable, personal.";
+
 export const metadata: Metadata = {
-  title: "Shenzhen Buddies",
-  description:
-    "Match with a local buddy in Shenzhen who shares your interests. Casual, affordable, personal.",
+  // Resolves every relative metadata URL below to an absolute one, so link
+  // previews stop breaking on share. siteUrl() is the single source of truth
+  // (NEXT_PUBLIC_SITE_URL, else DEFAULT_SITE_URL) — no domain is hardcoded,
+  // so the founder's custom domain is a Vercel env change, not a code change.
+  metadataBase: new URL(siteUrl()),
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "en_US",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    url: "/",
+  },
+  // Deliberately no `openGraph.images` / `twitter.images` here. The card image
+  // ships as the `opengraph-image` file convention, which takes priority over
+  // this object and fills in type/width/height automatically. Drop the
+  // 1200x630 file at src/app/opengraph-image.png (art-director, PRD R4) and
+  // og:image + twitter:image start rendering with no code change — until then
+  // no image tag is emitted at all, rather than one pointing at a 404.
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
@@ -30,12 +65,35 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const base = siteUrl();
+
+  // Organization structured data. `sameAs` is what ties this site to the
+  // Instagram account in Google's entity graph, which is the whole reason it
+  // is worth emitting while Instagram is the only live traffic source.
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: base,
+    logo: `${base}/icon.png`,
+    description: SITE_DESCRIPTION,
+    sameAs: [instagramUrl()],
+  };
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-zinc-900 dark:bg-black dark:text-zinc-100">
+        {/* JSON.stringify does not escape HTML, so `<` is scrubbed to its
+            unicode form to close the XSS vector. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
         <Analytics />
         <SiteHeader />
         <div className="flex flex-1 flex-col">{children}</div>
@@ -79,14 +137,14 @@ async function SiteHeader() {
 
   // Same destinations as the desktop nav, reused by the mobile menu so
   // nothing on the PC header is missing on small screens.
+  // The guide/browse pages are a public preview, so the link shows for
+  // logged-out visitors too. Messages stays behind login.
   const navLinks = [
     { href: "/explore", label: "Explore" },
-    ...(user
-      ? [
-          { href: browseHref, label: browseLabel },
-          { href: "/messages", label: "Messages" },
-        ]
-      : []),
+    { href: "/gallery", label: "Gallery" },
+    { href: "/blog", label: "Blog" },
+    { href: browseHref, label: browseLabel },
+    ...(user ? [{ href: "/messages", label: "Messages" }] : []),
     ...(user && isAdminEmail(user.email)
       ? [{ href: "/admin", label: "Admin" }]
       : []),
@@ -119,14 +177,24 @@ async function SiteHeader() {
           >
             Explore
           </Link>
-          {user && (
-            <Link
-              href={browseHref}
-              className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
-            >
-              {browseLabel}
-            </Link>
-          )}
+          <Link
+            href="/gallery"
+            className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+          >
+            Gallery
+          </Link>
+          <Link
+            href="/blog"
+            className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+          >
+            Blog
+          </Link>
+          <Link
+            href={browseHref}
+            className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+          >
+            {browseLabel}
+          </Link>
           {user && (
             <Link
               href="/messages"
@@ -244,12 +312,38 @@ function SiteFooter() {
           <p className="mt-3 max-w-xs text-xs text-zinc-500">
             Match with a local buddy in Shenzhen who shares your interests.
           </p>
+          {/* The one "seen on Instagram" surface (PRD R9) — site-wide via the
+              footer rather than a per-page treatment. */}
+          <a
+            href={instagramUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center gap-2 rounded-full border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-white"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-3.5 w-3.5"
+              aria-hidden
+            >
+              <rect x="2" y="2" width="20" height="20" rx="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+            </svg>
+            @{INSTAGRAM_HANDLE}
+          </a>
         </div>
         <FooterColumn
           title="Product"
           links={[
             { href: "/welcome", label: "Get 10% off" },
             { href: "/explore", label: "Explore" },
+            { href: "/gallery", label: "Gallery" },
+            { href: "/blog", label: "Blog" },
             { href: "/browse", label: "Browse buddies" },
           ]}
         />

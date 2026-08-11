@@ -6,7 +6,10 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
+  // sitemap.xml and robots.txt are excluded alongside favicon.ico so a crawler
+  // hit never runs updateSession() — no Supabase auth round-trip, no
+  // Set-Cookie on a bot request.
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
   ],
 }

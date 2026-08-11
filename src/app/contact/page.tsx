@@ -5,10 +5,19 @@ export const metadata: Metadata = {
   title: 'Contact — Shenzhen Buddies',
   description:
     'Get in touch with the Shenzhen Buddies team — feedback, partnerships, press, or guide applications.',
+  alternates: { canonical: '/contact' },
+  // Declared explicitly: the root layout sets an openGraph block, and
+  // metadata merges per key — so a page that omits this inherits the site's
+  // generic title, description and an og:url pointing at the homepage.
+  openGraph: {
+    title: 'Contact — Shenzhen Buddies',
+    description: 'Get in touch with the Shenzhen Buddies team — feedback, partnerships, press, or guide applications.',
+    url: '/contact',
+  },
 }
 
 const HERO_PHOTO =
-  'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=2400&q=80&auto=format&fit=crop'
+  '/hero/skyline-blue-towers-night.webp'
 
 const CONTACT_EMAIL = 'hello@shenzhen-buddies.com'
 const PRESS_EMAIL = 'press@shenzhen-buddies.com'

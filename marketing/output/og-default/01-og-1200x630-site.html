@@ -1,0 +1,163 @@
+<!doctype html>
+<!--
+  META
+  format:   Default Open Graph share image (site-wide, PRD seo-foundation R4)
+  platform: Any link preview surface — WhatsApp, iMessage, X, Facebook, LinkedIn, Slack
+  spec:     1200×630 exactly. Export to PNG at app/opengraph-image.png (target < 300 KB;
+            flat dark design compresses to well under that).
+  export:   npx playwright screenshot --viewport-size="1200,630" \
+              "file://$PWD/marketing/output/og-default/01-og-1200x630-site.html" \
+              app/opengraph-image.png
+  colors:   Night #0f1512 (ground) · Warm off-white #f6f4ef (type) · Jade #0d8f6f (accent,
+            "a friend", horizon) · Jade Deep #086b53 (building faces) · Amber #b7791f
+            (windows) · Coral #d1533a (single neon strip + pin dot — used sparingly)
+  photo:    None by design. Site-wide default must work behind every page and stay legible
+            at ~400px; skyline is built in-house SVG (no stock, no fabricated people).
+  theme:    Single-theme deliberately — this file is a print master for a PNG, not a page.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shenzhen Buddies — default OG 1200×630</title>
+<style>
+  :root {
+    --night: #0f1512;
+    --ink: #f6f4ef;
+    --jade: #0d8f6f;
+    --jade-deep: #086b53;
+    --amber: #b7791f;
+    --coral: #d1533a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    position: relative;
+    background: var(--night);
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+  }
+
+  /* Faint jade dusk behind the towers, weighted right so the left text field stays clean */
+  .sky-glow {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(560px 300px at 82% 88%, rgba(13,143,111,.16), transparent 70%),
+      radial-gradient(420px 240px at 55% 96%, rgba(183,121,31,.08), transparent 70%);
+  }
+
+  .skyline { position: absolute; left: 0; bottom: 0; width: 1200px; height: 630px; }
+
+  .lockup {
+    position: absolute; top: 62px; left: 64px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .lockup svg { display: block; }
+  .lockup .name {
+    font-size: 31px; font-weight: 700; letter-spacing: -0.015em; color: var(--ink);
+  }
+
+  .headline {
+    position: absolute; left: 64px; top: 218px; z-index: 2;
+    font-size: 96px; font-weight: 700; line-height: 1.08; letter-spacing: -0.03em;
+    color: var(--ink);
+  }
+  .headline .friend {
+    color: var(--jade);
+    text-shadow: 0 0 12px rgba(13,143,111,.3);
+  }
+</style>
+</head>
+<body>
+  <div class="sky-glow"></div>
+
+  <!-- Shenzhen silhouette: Ping An FC (tapered cap, right-of-center),
+       Shun Hing Square (twin masts, far right). Held dark; atmosphere, not focal point. -->
+  <svg class="skyline" viewBox="0 0 1200 630" aria-hidden="true">
+    <defs>
+      <pattern id="win" width="16" height="20" patternUnits="userSpaceOnUse">
+        <rect x="4" y="6" width="6" height="8" fill="#b7791f" opacity="0.55"/>
+      </pattern>
+      <pattern id="win2" width="18" height="24" patternUnits="userSpaceOnUse">
+        <rect x="5" y="8" width="5" height="7" fill="#f6f4ef" opacity="0.30"/>
+      </pattern>
+      <linearGradient id="horizon" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#0d8f6f" stop-opacity="0"/>
+        <stop offset="0.45" stop-color="#0d8f6f" stop-opacity="0.55"/>
+        <stop offset="0.85" stop-color="#0d8f6f" stop-opacity="0.9"/>
+        <stop offset="1" stop-color="#0d8f6f" stop-opacity="0.2"/>
+      </linearGradient>
+      <filter id="soft"><feGaussianBlur stdDeviation="5"/></filter>
+    </defs>
+
+    <!-- back row (darkest) -->
+    <g fill="#151d18">
+      <rect x="30"  y="500" width="72" height="90"/>
+      <rect x="150" y="462" width="56" height="128"/>
+      <rect x="255" y="488" width="84" height="102"/>
+      <rect x="470" y="470" width="78" height="120"/>
+      <rect x="690" y="442" width="92" height="148"/>
+      <rect x="905" y="392" width="58" height="198"/>
+    </g>
+
+    <!-- front row -->
+    <g fill="#1a231d">
+      <rect x="380" y="440" width="62" height="150"/>
+      <rect x="580" y="412" width="66" height="178"/>
+      <!-- KK100-style slanted crown -->
+      <polygon points="800,590 800,388 838,360 872,388 872,590"/>
+      <!-- Ping An Finance Centre: tall shaft + tapered cap -->
+      <rect x="1004" y="242" width="72" height="348"/>
+      <polygon points="1004,242 1040,168 1076,242"/>
+      <!-- Shun Hing Square + twin masts -->
+      <rect x="1112" y="330" width="62" height="260"/>
+      <polygon points="1112,330 1143,306 1174,330"/>
+      <rect x="1128" y="258" width="4" height="52" fill="#223028"/>
+      <rect x="1152" y="272" width="4" height="38" fill="#223028"/>
+    </g>
+
+    <!-- lit windows -->
+    <rect x="588" y="424" width="50" height="150" fill="url(#win)" opacity="0.7"/>
+    <rect x="812" y="396" width="52" height="180" fill="url(#win2)"/>
+    <rect x="1012" y="262" width="56" height="315" fill="url(#win)" opacity="0.55"/>
+    <rect x="1120" y="342" width="46" height="235" fill="url(#win2)" opacity="0.8"/>
+    <rect x="700" y="456" width="72" height="120" fill="url(#win)" opacity="0.35"/>
+    <rect x="390" y="452" width="42" height="125" fill="url(#win2)" opacity="0.5"/>
+    <!-- a few hand-placed bright windows -->
+    <g fill="#f6f4ef" opacity="0.75">
+      <rect x="1030" y="300" width="6" height="8"/>
+      <rect x="1048" y="380" width="6" height="8"/>
+      <rect x="826" y="430" width="5" height="7"/>
+      <rect x="606" y="470" width="5" height="7"/>
+    </g>
+
+    <!-- single coral neon sign (used once, per palette rule) -->
+    <rect x="648" y="470" width="7" height="96" fill="#d1533a" filter="url(#soft)" opacity="0.8"/>
+    <rect x="648" y="470" width="7" height="96" fill="#d1533a"/>
+
+    <!-- horizon line + water reflections -->
+    <rect x="0" y="589" width="1200" height="2.5" fill="url(#horizon)"/>
+    <g filter="url(#soft)" opacity="0.5">
+      <rect x="1014" y="596" width="52" height="26" fill="#0d8f6f" opacity="0.5"/>
+      <rect x="1122" y="596" width="42" height="20" fill="#086b53" opacity="0.6"/>
+      <rect x="816" y="596" width="44" height="16" fill="#b7791f" opacity="0.4"/>
+      <rect x="649" y="596" width="6" height="22" fill="#d1533a" opacity="0.7"/>
+      <rect x="592" y="596" width="40" height="12" fill="#b7791f" opacity="0.3"/>
+    </g>
+  </svg>
+
+  <!-- brand lockup: chat bubble whose tail is a map-pin point — "a friend, there" -->
+  <header class="lockup">
+    <svg width="42" height="46" viewBox="0 0 40 44">
+      <path d="M12 4 h16 a8 8 0 0 1 8 8 v10 a8 8 0 0 1 -8 8 h-1.5 L20 43 13.5 30 H12 a8 8 0 0 1 -8 -8 V12 a8 8 0 0 1 8 -8 Z"
+            fill="#0d8f6f"/>
+      <circle cx="20" cy="17" r="4.6" fill="#d1533a"/>
+    </svg>
+    <span class="name">Shenzhen Buddies</span>
+  </header>
+
+  <h1 class="headline">
+    Don&rsquo;t tour Shenzhen.<br>
+    Have <span class="friend">a friend</span> there.
+  </h1>
+</body>
+</html>
