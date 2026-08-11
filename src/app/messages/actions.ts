@@ -11,7 +11,9 @@ export async function startConversationWith(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  // /browse and /u/[id] are public previews, so this action can be reached
+  // without a session — gate it here rather than at the page.
+  if (!user) redirect(`/login?next=${encodeURIComponent(`/u/${otherId}`)}`)
 
   // Pre-check roles for a friendly error before hitting the RPC.
   const [{ data: me }, { data: other }] = await Promise.all([

@@ -6,6 +6,7 @@ import { SubmitButton } from '@/components/SubmitButton'
 import { avatarPublicUrl } from '@/lib/avatars'
 import { isSingleGuideMode } from '@/lib/config'
 import { scoreMatch, type MatchScore, type ProfileForMatching } from '@/lib/matching'
+import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { startConversationWith } from '@/app/messages/actions'
 import { applyFilters } from './actions'
@@ -139,34 +140,48 @@ export default async function BrowsePage({ searchParams }: Props) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
 
-  const { data: myProfile } = await supabase
-    .from('profiles')
-    .select('role, city, hobbies, languages, personality_traits')
-    .eq('id', user.id)
-    .maybeSingle<ProfileForMatching>()
+  let myProfile: ProfileForMatching | null = null
+  if (user) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('role, city, hobbies, languages, personality_traits')
+      .eq('id', user.id)
+      .maybeSingle<ProfileForMatching>()
+    myProfile = data
+  }
 
-  // Tourist ↔ guide matching only. Without a role we have nothing to match against.
-  const oppositeRole: 'guide' | 'tourist' | null =
-    myProfile?.role === 'tourist'
+  // Tourist ↔ guide matching only. Without a role we have nothing to match
+  // against. Anonymous visitors get the public guide listing — never tourist
+  // profiles — so cold traffic can see who they'd be booking before signing up.
+  const listRole: 'guide' | 'tourist' | null = !user
+    ? 'guide'
+    : myProfile?.role === 'tourist'
       ? 'guide'
       : myProfile?.role === 'guide'
-      ? 'tourist'
-      : null
+        ? 'tourist'
+        : null
+
+  // Public profiles aren't readable under RLS without a session, so the
+  // anonymous listing reads through the service-role client. The filters below
+  // (public + guide only) are the whole exposure — mutations stay auth-gated.
+  const reader = user ? supabase : createSupabaseAdminClient()
 
   let profiles: ProfileRow[] | null = null
   let error: { message: string } | null = null
-  if (oppositeRole) {
-    let query = supabase
+  if (listRole) {
+    let query = reader
       .from('profiles')
       .select(
         'id, role, display_name, bio, city, hobbies, languages, personality_traits, avatar_path, updated_at',
       )
-      .neq('id', user.id)
       .eq('visibility', 'public')
-      .eq('role', oppositeRole)
+      .eq('role', listRole)
       .limit(PAGE_LIMIT)
+
+    if (user) {
+      query = query.neq('id', user.id)
+    }
 
     if (q) {
       query = query.or(`display_name.ilike.%${q}%,bio.ilike.%${q}%`)
@@ -202,7 +217,7 @@ export default async function BrowsePage({ searchParams }: Props) {
   // optionally filter by minimum rating.
   const ratings = new Map<string, RatingStats>()
   if (profiles && profiles.length) {
-    const { data: reviewRows } = await supabase
+    const { data: reviewRows } = await reader
       .from('reviews')
       .select('reviewee_id, stars')
       .in(
@@ -279,7 +294,7 @@ export default async function BrowsePage({ searchParams }: Props) {
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=2000&q=80&auto=format&fit=crop"
+          src='/hero/preserved-fruit-jars.webp'
           alt="Shenzhen at dusk"
           className="absolute inset-0 h-full w-full object-cover"
         />
@@ -293,7 +308,9 @@ export default async function BrowsePage({ searchParams }: Props) {
               Browse buddies
             </h1>
             <p className="mt-2 max-w-xl text-sm text-white/85">
-              {myProfile?.role === 'tourist'
+              {!user
+                ? 'Local guides in Shenzhen — browse who you could spend a day with, no account needed.'
+                : myProfile?.role === 'tourist'
                 ? `Local guides in Shenzhen — ${sortByMatch ? 'sorted by match with your profile' : 'most recent first'}.`
                 : myProfile?.role === 'guide'
                 ? `Tourists looking for a buddy — ${sortByMatch ? 'sorted by match with your profile' : 'most recent first'}.`
@@ -301,18 +318,29 @@ export default async function BrowsePage({ searchParams }: Props) {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Link
-              href="/messages"
-              className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
-            >
-              Messages
-            </Link>
-            <Link
-              href="/profile"
-              className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
-            >
-              Your profile
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  href="/messages"
+                  className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
+                >
+                  Messages
+                </Link>
+                <Link
+                  href="/profile"
+                  className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
+                >
+                  Your profile
+                </Link>
+              </>
+            ) : (
+              <Link
+                href="/signup?next=%2Fbrowse"
+                className="rounded-md bg-white px-4 py-1.5 text-sm font-medium text-zinc-900 shadow-sm transition hover:bg-white/90"
+              >
+                Sign up to connect
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -559,7 +587,7 @@ export default async function BrowsePage({ searchParams }: Props) {
         </p>
       </div>
 
-      {!myProfile?.role && (
+      {user && !myProfile?.role && (
         <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
           <p>
             <strong>Set your role first.</strong> Tourists match with guides
@@ -639,15 +667,24 @@ export default async function BrowsePage({ searchParams }: Props) {
             <Chips label="Languages" items={p.languages} highlight={score.sharedLanguages} />
             <Chips label="Traits" items={p.personality_traits} highlight={score.sharedTraits} />
 
-            <form action={startConversationWith} className="relative z-10 mt-4">
-              <input type="hidden" name="other_id" value={p.id} />
-              <SubmitButton
-                pendingLabel="Opening…"
-                className="w-full rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            {user ? (
+              <form action={startConversationWith} className="relative z-10 mt-4">
+                <input type="hidden" name="other_id" value={p.id} />
+                <SubmitButton
+                  pendingLabel="Opening…"
+                  className="w-full rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  Message
+                </SubmitButton>
+              </form>
+            ) : (
+              <Link
+                href={`/signup?next=${encodeURIComponent(`/u/${p.id}`)}`}
+                className="relative z-10 mt-4 block w-full rounded-md bg-zinc-900 px-3 py-2 text-center text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
-                Message
-              </SubmitButton>
-            </form>
+                Sign up to message
+              </Link>
+            )}
           </li>
         ))}
       </ul>

@@ -1,16 +1,22 @@
 import Link from 'next/link'
 import { SubmitButton } from '@/components/SubmitButton'
+import { safeNextPath } from '@/lib/redirects'
 import { signup } from './actions'
 
 type Props = {
-  searchParams: Promise<{ error?: string; check_email?: string }>
+  searchParams: Promise<{ error?: string; check_email?: string; next?: string }>
 }
 
 const SIDE_PHOTO =
-  'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=1400&q=80&auto=format&fit=crop'
+  '/hero/night-market-skewers-stall.webp'
 
 export default async function SignupPage({ searchParams }: Props) {
-  const { error, check_email } = await searchParams
+  const { error, check_email, next } = await searchParams
+  // Set when the visitor was bounced here from a gated action (e.g. booking).
+  const nextPath = safeNextPath(next)
+  const loginHref = nextPath
+    ? `/login?next=${encodeURIComponent(nextPath)}`
+    : '/login'
 
   return (
     <main className="flex flex-1">
@@ -20,6 +26,8 @@ export default async function SignupPage({ searchParams }: Props) {
           action={signup}
           className="w-full max-w-sm space-y-5 rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
         >
+          {nextPath && <input type="hidden" name="next" value={nextPath} />}
+
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
               Get started
@@ -72,7 +80,7 @@ export default async function SignupPage({ searchParams }: Props) {
 
           <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
             Already have an account?{' '}
-            <Link href="/login" className="font-medium underline">
+            <Link href={loginHref} className="font-medium underline">
               Log in
             </Link>
           </p>

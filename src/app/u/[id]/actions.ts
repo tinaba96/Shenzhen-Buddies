@@ -25,7 +25,8 @@ export async function submitReview(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  // /u/[id] is a public preview for guide profiles — gate the write here.
+  if (!user) redirect(`/login?next=${encodeURIComponent(`/u/${revieweeId}`)}`)
 
   if (user.id === revieweeId) {
     redirect(`/u/${revieweeId}?error=${encodeURIComponent("You can't review yourself.")}`)

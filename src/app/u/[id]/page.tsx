@@ -9,6 +9,7 @@ import {
   type MatchScore,
   type ProfileForMatching,
 } from '@/lib/matching'
+import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { startConversationWith } from '@/app/messages/actions'
 import { submitReview } from './actions'
@@ -34,7 +35,7 @@ type ProfileRow = {
 }
 
 const DEFAULT_COVER =
-  'https://images.unsplash.com/photo-1473625247510-8ceb1760943f?w=2000&q=80&auto=format&fit=crop'
+  '/hero/skyline-tower-walkway-night.webp'
 
 type ReviewRow = {
   id: string
@@ -63,11 +64,15 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
 
-  const isSelf = user.id === id
+  const isSelf = user?.id === id
 
-  const { data: profile } = await supabase
+  // Guide profiles are the public landing page for cold traffic, and RLS
+  // doesn't expose profiles without a session — so anonymous reads go through
+  // the service-role client and are narrowed to public guides right below.
+  const reader = user ? supabase : createSupabaseAdminClient()
+
+  const { data: profile } = await reader
     .from('profiles')
     .select(
       'id, role, display_name, bio, city, hobbies, languages, personality_traits, visibility, avatar_path, cover_path, updated_at',
@@ -77,16 +82,25 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
 
   if (!profile) notFound()
   if (profile.visibility === 'private' && !isSelf) notFound()
+  // Only public *guide* profiles are part of the anonymous preview. Tourist
+  // profiles stay behind login exactly as before.
+  if (!user && profile.role !== 'guide') {
+    redirect(`/login?next=${encodeURIComponent(`/u/${id}`)}`)
+  }
 
-  const { data: myProfile } = await supabase
-    .from('profiles')
-    .select('role, city, hobbies, languages, personality_traits')
-    .eq('id', user.id)
-    .maybeSingle<ProfileForMatching>()
+  let myProfile: ProfileForMatching | null = null
+  if (user) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('role, city, hobbies, languages, personality_traits')
+      .eq('id', user.id)
+      .maybeSingle<ProfileForMatching>()
+    myProfile = data
+  }
 
   const score = scoreMatch(myProfile, profile)
 
-  const { data: reviews } = await supabase
+  const { data: reviews } = await reader
     .from('reviews')
     .select('id, reviewer_id, reviewee_id, stars, body, created_at, updated_at')
     .eq('reviewee_id', id)
@@ -101,18 +115,27 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
       : reviewList.reduce((sum, r) => sum + r.stars, 0) / reviewCount
   const canSeeReviews = isSelf || reviewCount >= REVIEW_VISIBILITY_THRESHOLD
 
-  const myReview = isSelf
-    ? null
-    : reviewList.find((r) => r.reviewer_id === user.id) ?? null
+  const myReview =
+    isSelf || !user
+      ? null
+      : reviewList.find((r) => r.reviewer_id === user.id) ?? null
 
+  // Reviewers are tourists, not part of the public preview. The anonymous
+  // path reads with the service-role client, which bypasses RLS, so the
+  // profiles rule (`visibility = 'public' or id = auth.uid()`) is restated
+  // here as a query filter. Reviews from reviewers we can't name still
+  // render — the identity degrades to "Traveler", the rating never changes.
   const reviewerIds = Array.from(new Set(reviewList.map((r) => r.reviewer_id)))
   const reviewerById = new Map<string, ReviewerLite>()
   if (reviewerIds.length) {
-    const { data: reviewers } = await supabase
+    const reviewerQuery = reader
       .from('profiles')
       .select('id, display_name, avatar_path, updated_at')
       .in('id', reviewerIds)
-      .returns<ReviewerLite[]>()
+    const { data: reviewers } = await (user
+      ? reviewerQuery.or(`visibility.eq.public,id.eq.${user.id}`)
+      : reviewerQuery.eq('visibility', 'public')
+    ).returns<ReviewerLite[]>()
     for (const r of reviewers ?? []) reviewerById.set(r.id, r)
   }
 
@@ -138,18 +161,29 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
             ← Browse
           </Link>
           <div className="flex items-center gap-2">
-            <Link
-              href="/messages"
-              className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
-            >
-              Messages
-            </Link>
-            <Link
-              href="/profile"
-              className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
-            >
-              Your profile
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  href="/messages"
+                  className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
+                >
+                  Messages
+                </Link>
+                <Link
+                  href="/profile"
+                  className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
+                >
+                  Your profile
+                </Link>
+              </>
+            ) : (
+              <Link
+                href={`/signup?next=${encodeURIComponent(`/u/${id}`)}`}
+                className="rounded-md bg-white px-4 py-1.5 text-sm font-medium text-zinc-900 shadow-sm transition hover:bg-white/90"
+              >
+                Sign up
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -225,7 +259,15 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
           />
 
           <div className="mt-6">
-          {isSelf ? (
+          {!user ? (
+            // Auth kicks in here: viewing is public, messaging is not.
+            <Link
+              href={`/signup?next=${encodeURIComponent(`/u/${id}`)}`}
+              className="inline-block rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            >
+              Sign up to message {profile.display_name}
+            </Link>
+          ) : isSelf ? (
             <Link
               href="/profile"
               className="inline-block rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
@@ -331,6 +373,9 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
           <ul className="space-y-3">
             {reviewList.map((r) => {
               const reviewer = reviewerById.get(r.reviewer_id)
+              // Reviewers whose profile isn't ours to show (private, or hidden
+              // from anonymous visitors) keep the review and lose the name.
+              const reviewerName = reviewer?.display_name ?? 'Traveler'
               return (
                 <li
                   key={r.id}
@@ -342,14 +387,12 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
                         reviewer?.avatar_path,
                         reviewer?.updated_at,
                       )}
-                      name={reviewer?.display_name}
+                      name={reviewerName}
                       size={40}
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="truncate font-medium">
-                          {reviewer?.display_name ?? 'Unknown user'}
-                        </p>
+                        <p className="truncate font-medium">{reviewerName}</p>
                         <span className="text-xs text-zinc-500">
                           {new Date(r.created_at).toLocaleDateString()}
                         </span>

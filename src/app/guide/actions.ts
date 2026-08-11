@@ -41,12 +41,15 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 // The official guide manages their own availability from /guide. Operators
 // (admins) can do it too, here or from /admin.
+//
+// /guide itself is a public preview, so every action in this file re-checks
+// auth here rather than leaning on a page-level redirect.
 async function requireGuideOrAdmin() {
   const supabase = await createSupabaseServerClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect('/login?next=/guide')
   const isGuide = officialGuideId() !== null && user.id === officialGuideId()
   if (!isGuide && !isAdminEmail(user.email)) notFound()
   return user
@@ -106,7 +109,7 @@ export async function cancelOwnBooking(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect('/login?next=/guide')
 
   const result = await cancelBookingByTourist(
     String(formData.get('id') ?? ''),
@@ -126,11 +129,21 @@ function fail(message: string, day?: string): never {
 export async function requestBooking(formData: FormData) {
   if (!isSingleGuideMode()) redirect('/browse')
 
+  const day = String(formData.get('day') ?? '')
+
   const supabase = await createSupabaseServerClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  // The booking form is the auth wall for the public /guide preview. Send
+  // anonymous visitors to log in and back to the day they picked.
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        /^\d{4}-\d{2}-\d{2}$/.test(day) ? `/guide?day=${day}` : '/guide',
+      )}`,
+    )
+  }
 
   const { data: myProfile } = await supabase
     .from('profiles')
@@ -141,7 +154,6 @@ export async function requestBooking(formData: FormData) {
     fail('Only tourists can request a booking. Set your role on your profile.')
   }
 
-  const day = String(formData.get('day') ?? '')
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) {
     fail('Pick a day first.')
   }
@@ -333,7 +345,7 @@ export async function startStripeCheckout(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect(`/login?next=${encodeURIComponent(`/guide/pay/${bookingId}`)}`)
 
   const admin = createSupabaseAdminClient()
   const { data: booking } = await admin
