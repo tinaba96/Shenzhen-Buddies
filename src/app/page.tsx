@@ -25,8 +25,8 @@ function Hero({ loggedIn }: { loggedIn: boolean }) {
     <section className="relative overflow-hidden">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=2000&q=80&auto=format&fit=crop"
-        alt="City skyline at dusk"
+        src="/hero/skyline-tower-walkway-night.webp"
+        alt="A Shenzhen tower lit white against the night sky, seen past a raised pedestrian walkway"
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/45 to-black/75" />
@@ -138,8 +138,8 @@ function Audiences() {
       <div className="mx-auto grid max-w-5xl gap-6 px-6 py-20 md:grid-cols-2">
         <AudienceCard
           tone="amber"
-          photo="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&q=80&auto=format&fit=crop"
-          alt="Traveler with a camera on a city street"
+          photo="/gallery/night-market-skewers-stall.webp"
+          alt="A Shenzhen night market stall laid with trays of skewered insects"
           icon={
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
               <path d="M3 7l9-4 9 4" />
@@ -157,8 +157,8 @@ function Audiences() {
         />
         <AudienceCard
           tone="rose"
-          photo="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80&auto=format&fit=crop"
-          alt="Two friends laughing in a café"
+          photo="/gallery/chicken-rice-table.webp"
+          alt="A shared table of chicken rice, noodles and fried tofu skin in Shenzhen"
           icon={
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
               <path d="M12 21s-7-7-7-12a7 7 0 1 1 14 0c0 5-7 12-7 12z" />
@@ -245,7 +245,7 @@ function HowItWorks() {
       title: 'Create your profile',
       body: 'Tell us your hobbies, languages, and what kind of day you’d like.',
       photo:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=900&q=80&auto=format&fit=crop',
+        '/gallery/bakery-bread-counter.webp',
       alt: 'Person smiling at the camera',
     },
     {
@@ -253,7 +253,7 @@ function HowItWorks() {
       title: 'Browse buddies',
       body: 'Find locals (or visitors) who share your interests and city.',
       photo:
-        'https://images.unsplash.com/photo-1517292987719-0369a794ec0f?w=900&q=80&auto=format&fit=crop',
+        '/gallery/preserved-fruit-jars.webp',
       alt: 'Holding a phone in the city',
     },
     {
@@ -261,7 +261,7 @@ function HowItWorks() {
       title: 'Plan and go',
       body: 'Message, meet, and explore. Leave a review afterward.',
       photo:
-        'https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?w=900&q=80&auto=format&fit=crop',
+        '/gallery/skyline-blue-towers-night.webp',
       alt: 'Two people walking through the city',
     },
   ]

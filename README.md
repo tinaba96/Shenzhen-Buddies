@@ -149,6 +149,74 @@ Vercel.
 3. Update Supabase Auth → URL Configuration with your Vercel URL.
 4. In Stripe, edit the webhook endpoint to point at your Vercel URL.
 
+## Campaign links (UTM convention)
+
+Instagram is currently the only live traffic source, and an untagged click from
+the bio is indistinguishable from direct traffic in GA4. **Every** bio link,
+story link and swipe-up must carry:
+
+```
+?utm_source=instagram&utm_medium=social&utm_campaign=<slug>
+```
+
+`<slug>` names the campaign or post series, lowercase and hyphenated
+(`hidden-gems`, `street-food-aug`). Keep one slug per series so sessions group.
+
+```
+<NEXT_PUBLIC_SITE_URL>/guide?utm_source=instagram&utm_medium=social&utm_campaign=hidden-gems
+```
+
+Point campaign links at `/guide` (the page that closes a booking) or `/` — both
+are public, so a logged-out follower sees the guide preview rather than a login
+wall. To fire a custom GA4 event from a client component, use the `track()`
+helper in `src/lib/analytics.ts`; it no-ops safely when `NEXT_PUBLIC_GA_ID` is
+unset and must never be passed personal data.
+
+## Gallery photos (how to add real photos)
+
+`/gallery` reads from `src/content/gallery.ts` — a typed module, not a database
+table. Adding photos is three steps and no migration.
+
+**1. Drop the originals** into a topic folder under `marketing/assets/`, named
+per that folder's README (`huaqiangbei-aisle-night-01.jpg`). The originals are
+gitignored — camera files carry EXIF GPS and full-resolution faces, and git
+history is permanent. Before photographing any identifiable person, read
+`marketing/assets/CONSENT.md`: consent is a logged ledger entry, and the
+filename carries only the opaque consent ID (`…-SBC-2026-08-001-consented.jpg`),
+never a name.
+
+**2. Convert them.** This resizes the longest edge to 1600px, writes WebP into
+`public/gallery/` under the 300 KB budget, and prints a paste-ready block with
+the measured `width`/`height` for each file:
+
+```
+node scripts/img.mjs marketing/assets/huaqiangbei
+```
+
+**3. Paste each block into the `galleryItems` array** in
+`src/content/gallery.ts` and fill in `alt`, `title`, `location`, `themes`, and
+optionally `caption` / `featured`.
+
+The build is the validation layer. `assertGalleryValid()` runs when the module
+loads, so `npm run build` fails — rather than production — on a duplicate `id`,
+an empty `alt`, a missing `width`/`height`, or a `people: 'consented'` item whose
+`consentRef` is not a well-formed consent ID (`SBC-YYYY-MM-NNN`).
+
+What that does **not** cover: `people` is one flag for the whole frame, so a
+consented subject photographed in front of recognisable bystanders passes the
+build and still contains unconsented faces. Composition is the control there —
+"shoot places, not faces", per `CONSENT.md`. Only fields listed in
+`PublicGalleryItem` are sent to the browser, so `consentRef` and `credit` stay
+server-side.
+
+A location only gets a filter chip once it has **4 items**, so a half-shot
+neighbourhood stays invisible instead of rendering a chip that leads to two
+photos. With zero items the page renders its "first batch is being shot" state.
+
+Video is the exception to "commit it": MP4s go to the Supabase Storage public
+`gallery` bucket (≤ 8 MB, ≤ 20 s) and the item carries the absolute URL plus a
+`poster` WebP that does live in `public/gallery/`.
+
 ## Code layout
 
 ```
@@ -158,11 +226,13 @@ src/
     login/                         email + password login
     signup/                        email + password signup
     profile/                       protected: create / edit profile
-    browse/                        protected: discover other profiles
+    browse/                        public: discover guides (messaging gated)
+    guide/                         public: guide preview + booking (auth at book)
     u/[id]/                        public profile detail + review form
     messages/                      conversations list
     messages/[id]/                 thread view (client realtime)
     pricing/                       subscription page (Stripe Checkout)
+    gallery/                       public: real photos, ?loc= server-filtered
     auth/confirm/route.ts          email-confirmation callback
     api/stripe/webhook/route.ts    Stripe webhook handler
     layout.tsx                     root layout (header + footer)
@@ -170,6 +240,8 @@ src/
     Avatar.tsx                     image / initials fallback
     SubmitButton.tsx               useFormStatus pending state
     StarRating.tsx                 display + input variants
+  content/
+    gallery.ts                     typed photo library + build-time validation
   lib/
     avatars.ts                     public-URL helper
     matching.ts                    score function for browse
@@ -180,6 +252,8 @@ src/
       admin.ts                     service-role client (webhook only)
       proxy.ts                     session refresh in src/proxy.ts
   proxy.ts                         runs on every request
+scripts/
+  img.mjs                          founder photos -> WebP in public/gallery/
 supabase/
   migrations/                      run in order in the SQL editor
 ```

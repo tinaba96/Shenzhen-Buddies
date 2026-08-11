@@ -1,140 +1,210 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { isSingleGuideMode } from '@/lib/config'
+
+const TITLE = 'Explore Shenzhen by district — Shenzhen Buddies'
+const DESCRIPTION =
+  "Shenzhen's six main districts — Nanshan, Futian, Luohu, Bao'an, Longhua and Longgang — what each one is actually for, and a local who knows it."
 
 export const metadata: Metadata = {
-  title: 'Explore Shenzhen — Shenzhen Buddies',
-  description:
-    'Six sides of Shenzhen, from skyline-and-finance Futian to the oil-painting alleys of Dafen — and a local who can show you each one.',
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: '/explore' },
+  // Declared explicitly: the root layout sets an openGraph block, and metadata
+  // merges per key — so a page that omits this inherits the site's generic
+  // title, description and an og:url pointing at the homepage.
+  openGraph: { title: TITLE, description: DESCRIPTION, url: '/explore' },
 }
 
-// PLACEHOLDER PHOTOS — generic Unsplash imagery, not Shenzhen-specific.
-// Swap each `photo` URL with a curated Shenzhen photo before any paid
-// acquisition. Keep dimensions ≥ 1200×800 for crisp display on retina.
+// PHOTO PROVENANCE — read before changing any `photo` below.
+//
+// The district tiles are freely-licensed photographs from Wikimedia Commons,
+// each showing a landmark whose district is a matter of public record: the
+// district is verifiable from the BUILDING, not from trusting a caption. That
+// distinction is the whole point — captions on the open web are wrong
+// constantly, and "a photo someone labelled Longgang" is not evidence.
+//
+// Two candidates were rejected on inspection rather than on metadata: a file
+// named for the Universiade Center turned out to be the inside of a shop, and
+// a "Dongmen, Luohu" street scene had two passers-by with clearly recognisable
+// faces. Publishing those would have broken the consent rule in
+// marketing/assets/CONSENT.md that this company applies to its own photography.
+// Every tile below is cropped to the landmark so no identifiable face is
+// published.
+//
+// CC BY and CC BY-SA REQUIRE attribution, and these crops are adaptations, so
+// the credit block at the foot of this page is a licence condition, not a
+// courtesy. Do not delete it. Anything added here needs the same treatment.
+//
+// The hero and the "moments" strip are the founder's own photographs.
 
-type Tile = {
-  title: string
+type District = {
+  slug: string
+  name: string
+  cn: string
   blurb: string
   photo: string
   alt: string
+  credit: {
+    what: string
+    author: string
+    licence: string
+    licenceUrl: string
+    source: string
+  }
 }
 
-const HERO_PHOTO =
-  'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1600&q=80&auto=format&fit=crop'
+const HERO_PHOTO = '/hero/skyline-blue-towers-night.webp'
 
-const tiles: Tile[] = [
+const districts: District[] = [
   {
-    title: 'Futian — the modern downtown',
+    slug: 'nanshan',
+    name: 'Nanshan',
+    cn: '南山',
     blurb:
-      "Glass towers, the city's tallest skyline, Lianhuashan park views, and the metro hub that ties it all together. Best at golden hour.",
-    photo:
-      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80&auto=format&fit=crop',
-    alt: 'Modern city skyline at dusk',
+      "The tech end of the city, and the green one. Company headquarters and universities inland, Shenzhen Bay and the coastal park on the water side, Shekou's expat bars and ferry pier further west.",
+    photo: '/explore/nanshan.webp',
+    alt: 'The shell-like perforated roof of Shenzhen Bay Sports Center in Nanshan, against a clear sky',
+    credit: {
+      what: 'Shenzhen Bay Sports Center',
+      author: 'Dinkun Chen',
+      licence: 'CC BY-SA 4.0',
+      licenceUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+      source:
+        'https://commons.wikimedia.org/wiki/File:SHENZHEN_BAY_SPORTS_CENTER_(4).jpg',
+    },
   },
   {
-    title: 'OCT-Loft — art and design',
+    slug: 'futian',
+    name: 'Futian',
+    cn: '福田',
     blurb:
-      'A converted industrial estate full of galleries, indie cafés, design studios, and weekend pop-ups. Quietly Shenzhen-cool.',
-    photo:
-      'https://images.unsplash.com/photo-1531913764164-f85c52e6e654?w=1200&q=80&auto=format&fit=crop',
-    alt: 'Art gallery interior with framed works',
+      'The central business district — the tallest towers, the civic centre, and the checkpoint most people cross from Hong Kong. Lianhuashan park is the climb everyone does for the skyline view back over it.',
+    photo: '/explore/futian.webp',
+    alt: 'Ping An Finance Centre, the tapered supertall tower in Futian, rising into a blue sky',
+    credit: {
+      what: 'Ping An Finance Centre',
+      author: 'Chris from Shenzhen, China',
+      licence: 'CC BY-SA 2.0',
+      licenceUrl: 'https://creativecommons.org/licenses/by-sa/2.0/',
+      source:
+        'https://commons.wikimedia.org/wiki/File:Ping_An_Finance_Centre_Shenzhen_city_China_(36461945211).jpg',
+    },
   },
   {
-    title: 'Dafen Village — oil-painting alleys',
+    slug: 'luohu',
+    name: 'Luohu',
+    cn: '罗湖',
     blurb:
-      "An entire village of painters reproducing every famous canvas you've ever seen, plus original work tucked into back streets.",
-    photo:
-      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=1200&q=80&auto=format&fit=crop',
-    alt: 'Oil paint on a palette',
+      'Where the city started, and where most first-timers arrive — the Luohu crossing puts you a short walk from the old downtown. Dongmen’s market streets are here, and the food is older and cheaper than the towers to the west.',
+    photo: '/explore/luohu.webp',
+    alt: 'The Guangzhou–Shenzhen intercity railway entrance at Luohu station, with its blue signage',
+    credit: {
+      what: 'Luohu Port railway station facade',
+      author: 'Wikimedia Commons contributor',
+      licence: 'CC0',
+      licenceUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      source:
+        'https://commons.wikimedia.org/wiki/File:SZ_%E6%B7%B1%E5%9C%B3_Shenzhen_%E7%BE%85%E6%B9%96%E5%8F%A3%E5%B2%B8_Luohu_Port_%E7%BE%85%E6%B9%96%E7%81%AB%E8%BB%8A%E7%AB%99_Railway_Station_building_facade_November_2025_N13P_02.jpg',
+    },
   },
   {
-    title: 'Huaqiangbei — electronics megamarket',
+    slug: 'baoan',
+    name: "Bao'an",
+    cn: '宝安',
     blurb:
-      'A multi-block maze of chip vendors, drone shops, repair counters, and one-off components. Bring a list; leave with more.',
-    photo:
-      'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80&auto=format&fit=crop',
-    alt: 'Circuit board with electronic components',
+      'The airport district, and the one that actually makes things — workshops and factories that supply the markets downtown. The coastal strip has been rebuilt with parks and a promenade worth the trip out.',
+    photo: '/explore/baoan.webp',
+    alt: "Shenzhen Bao'an International Airport Terminal 3 from above, its white perforated roof spread across the apron",
+    credit: {
+      what: "Shenzhen Bao'an International Airport",
+      author: '準建築人手札網站 Forgemind ArchiMedia',
+      licence: 'CC BY 2.0',
+      licenceUrl: 'https://creativecommons.org/licenses/by/2.0/',
+      source:
+        "https://commons.wikimedia.org/wiki/File:Shenzhen_Bao'an_Airport.jpg",
+    },
   },
   {
-    title: 'Shekou & the coast',
+    slug: 'longhua',
+    name: 'Longhua',
+    cn: '龙华',
     blurb:
-      'Sea World plaza, ferry docks, expat-leaning bars, and a sunset walk along the harbor. Easy half-day if downtown burns you out.',
-    photo:
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80&auto=format&fit=crop',
-    alt: 'Coastline at sunset',
+      'The high-speed rail gateway — trains to Guangzhou in half an hour and most of the country from the same hall. Around the station it is manufacturing and dense new housing, with prices that pull younger residents north.',
+    photo: '/explore/longhua.webp',
+    alt: 'The roofline of Shenzhen North Railway Station in Longhua, with 深圳北站 in red characters',
+    credit: {
+      what: 'Shenzhen North Railway Station',
+      author: 'Dinkun Chen',
+      licence: 'CC BY-SA 4.0',
+      licenceUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+      source:
+        'https://commons.wikimedia.org/wiki/File:SHENZHEN_NORTH_RAILWAY_STATION.jpg',
+    },
   },
   {
-    title: 'Street food, dim sum, and night markets',
+    slug: 'longgang',
+    name: 'Longgang',
+    cn: '龙岗',
     blurb:
-      'Cantonese dim sum, Hunanese chilies, Dongbei skewers, durian stalls. Bring an empty stomach and a guide who knows where to point.',
-    photo:
-      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80&auto=format&fit=crop',
-    alt: 'Spread of Asian dishes on a table',
+      'The outer east — the Universiade complex built for the 2011 games, big tech campuses, and the point where the city thins out into hills and reservoirs. Furthest from the border, and the least touristed of the six.',
+    photo: '/explore/longgang.webp',
+    alt: 'The faceted green crystal roofs of the Universiade Sports Centre in Longgang',
+    credit: {
+      what: 'Shenzhen Universiade Sports Centre',
+      author: 'Stephen Woolverton',
+      licence: 'CC BY-SA 4.0',
+      licenceUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+      source:
+        'https://commons.wikimedia.org/wiki/File:ShenZhen_Universiade_Sports_Centre.jpg',
+    },
   },
 ]
 
-const moments = [
-  {
-    src: 'https://images.unsplash.com/photo-1523920290228-4f321a939b4c?w=600&q=80&auto=format&fit=crop',
-    alt: 'Neon-lit alley at night',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80&auto=format&fit=crop',
-    alt: 'Steaming bowl of noodles',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600&q=80&auto=format&fit=crop',
-    alt: 'Subway platform with people',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=600&q=80&auto=format&fit=crop',
-    alt: 'Cherry blossoms in a city park',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1473625247510-8ceb1760943f?w=600&q=80&auto=format&fit=crop',
-    alt: 'Bridge over water at twilight',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=600&q=80&auto=format&fit=crop',
-    alt: 'Hands sharing a hot pot',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80&auto=format&fit=crop',
-    alt: 'Crowd at an outdoor festival',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80&auto=format&fit=crop',
-    alt: 'Mountains and mist at sunrise',
-  },
+// The founder's own photographs — see src/content/gallery.ts for the library.
+const moments: { src: string; alt: string }[] = [
+  { src: '/gallery/night-market-skewers-stall.webp', alt: 'A night market stall of skewered insects in Shenzhen' },
+  { src: '/gallery/crayfish-noodles-lift.webp', alt: 'Chopsticks lifting noodles beside a bowl of garlic crayfish' },
+  { src: '/gallery/maker-desk-dev-boards.webp', alt: 'Single-board computers and jumper wires on a workbench' },
+  { src: '/gallery/skyline-tower-walkway-night.webp', alt: 'A Shenzhen tower lit white at night above a pedestrian walkway' },
+  { src: '/gallery/chicken-rice-closeup.webp', alt: 'Poached chicken over rice with ginger-scallion oil and greens' },
+  { src: '/gallery/preserved-fruit-jars.webp', alt: 'Clip-top jars of kumquats and plums preserved in syrup' },
+  { src: '/gallery/bakery-bread-counter.webp', alt: 'Sourdough rounds and baguettes on a Shenzhen bakery counter' },
+  { src: '/gallery/maker-desk-headset-teardown.webp', alt: 'An AR headset opened on a bench with its ribbon cables exposed' },
 ]
 
 export default function ExplorePage() {
+  // /browse forwards to /guide while the beta runs one guide, and takes no
+  // `city` param — appending one would be silently dropped.
+  const ctaHref = isSingleGuideMode() ? '/guide' : '/browse'
+
   return (
     <main className="flex flex-1 flex-col">
-      {/* HERO with photo + gradient wash */}
+      {/* HERO */}
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={HERO_PHOTO}
-          alt="Shenzhen at dusk"
+          alt="Shenzhen towers lit blue at night, seen from street level"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/45 to-black/70" />
         <div className="relative mx-auto max-w-5xl px-6 py-24 text-center text-white sm:py-32">
           <p className="text-xs font-medium uppercase tracking-wide text-white/80">
             Explore
           </p>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight drop-shadow sm:text-5xl">
-            Six sides of Shenzhen.
+            Six districts, six different cities.
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-white/90 drop-shadow">
-            Pick what you came for — skyline, art, gadgets, food, or salt air.
-            Each one has a local who knows it well.
+            Shenzhen is too big to &ldquo;see&rdquo; in a day. Pick the part
+            that matches what you came for — and meet someone who lives there.
           </p>
           <Link
-            href="/browse?city=Shenzhen"
+            href={ctaHref}
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-zinc-900 shadow-sm transition hover:bg-zinc-100"
           >
-            Browse buddies in Shenzhen
+            Meet a local
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />
@@ -143,28 +213,35 @@ export default function ExplorePage() {
         </div>
       </section>
 
-      {/* SIX TILES, each with a photo header */}
+      {/* SIX DISTRICTS */}
       <section className="mx-auto w-full max-w-5xl px-6 py-16">
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {tiles.map((t) => (
-            <li key={t.title}>
+          {districts.map((d) => (
+            <li key={d.slug}>
               <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
                 <div className="relative h-44 overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={t.photo}
-                    alt={t.alt}
+                    src={d.photo}
+                    alt={d.alt}
+                    width={1600}
+                    height={640}
                     className="h-full w-full object-cover transition duration-300 hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-3 left-4 text-white drop-shadow">
+                    <h2 className="text-lg font-semibold leading-tight">
+                      {d.name}
+                    </h2>
+                    <p className="text-xs text-white/85">{d.cn}</p>
+                  </div>
                 </div>
                 <div className="flex flex-1 flex-col p-5">
-                  <h2 className="text-base font-semibold">{t.title}</h2>
-                  <p className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400">
-                    {t.blurb}
+                  <p className="flex-1 text-sm text-zinc-600 dark:text-zinc-400">
+                    {d.blurb}
                   </p>
                   <Link
-                    href="/browse?city=Shenzhen"
+                    href={ctaHref}
                     className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-zinc-900 hover:underline dark:text-white"
                   >
                     Find a guide
@@ -180,7 +257,7 @@ export default function ExplorePage() {
         </ul>
       </section>
 
-      {/* MOMENTS — masonry-feel photo grid */}
+      {/* MOMENTS — the founder's own photographs */}
       <section className="border-t border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-950/30">
         <div className="mx-auto max-w-5xl px-6 py-16">
           <div className="text-center">
@@ -190,6 +267,13 @@ export default function ExplorePage() {
             <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
               A day in Shenzhen, give or take.
             </h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm text-zinc-600 dark:text-zinc-400">
+              Our own photos, not stock.{' '}
+              <Link href="/gallery" className="underline underline-offset-2">
+                See the whole gallery
+              </Link>
+              .
+            </p>
           </div>
           <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {moments.map((m, i) => (
@@ -203,6 +287,7 @@ export default function ExplorePage() {
                 <img
                   src={m.src}
                   alt={m.alt}
+                  loading="lazy"
                   className="h-48 w-full object-cover transition duration-300 hover:scale-105 sm:h-full"
                 />
               </li>
@@ -232,6 +317,49 @@ export default function ExplorePage() {
               <path d="m12 5 7 7-7 7" />
             </svg>
           </Link>
+        </div>
+      </section>
+
+      {/* PHOTO CREDITS — a licence condition for the CC BY / CC BY-SA tiles
+          above, not a courtesy. The crops are adaptations, so they carry the
+          same licence as the originals. */}
+      <section className="border-t border-zinc-200 dark:border-zinc-800">
+        <div className="mx-auto max-w-5xl px-6 py-10">
+          <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+            District photo credits
+          </h2>
+          <p className="mt-3 max-w-2xl text-xs text-zinc-500 dark:text-zinc-500">
+            District photographs are from Wikimedia Commons, cropped to the
+            building. Adaptations of share-alike originals are offered under the
+            same licence. The hero and the Moments strip above are our own.
+          </p>
+          <ul className="mt-4 grid gap-2 text-xs text-zinc-500 sm:grid-cols-2 dark:text-zinc-500">
+            {districts.map((d) => (
+              <li key={d.slug}>
+                <span className="text-zinc-600 dark:text-zinc-400">
+                  {d.name}
+                </span>{' '}
+                — {d.credit.what},{' '}
+                <a
+                  href={d.credit.source}
+                  className="underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {d.credit.author}
+                </a>
+                ,{' '}
+                <a
+                  href={d.credit.licenceUrl}
+                  className="underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {d.credit.licence}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
     </main>
