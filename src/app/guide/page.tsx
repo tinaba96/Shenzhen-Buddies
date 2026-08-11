@@ -61,13 +61,14 @@ type GuideProfile = {
   hobbies: string[]
   languages: string[]
   personality_traits: string[]
+  visibility: 'public' | 'private'
   avatar_path: string | null
   cover_path: string | null
   updated_at: string
 }
 
 const DEFAULT_COVER =
-  'https://images.unsplash.com/photo-1473625247510-8ceb1760943f?w=2000&q=80&auto=format&fit=crop'
+  '/hero/skyline-tower-walkway-night.webp'
 
 const STATUS_STYLES: Record<BookingStatus, { label: string; className: string }> = {
   pending_payment: {
@@ -97,19 +98,23 @@ const STATUS_STYLES: Record<BookingStatus, { label: string; className: string }>
 const IDEAS = [
   {
     label: 'Street food & dim sum',
-    img: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=700&q=80&auto=format&fit=crop',
+    img: '/gallery/night-market-skewers-stall.webp',
   },
   {
     label: 'Electronics & maker markets',
-    img: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=700&q=80&auto=format&fit=crop',
+    img: '/gallery/maker-desk-dev-boards.webp',
   },
   {
     label: 'Skyline & city views',
-    img: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=700&q=80&auto=format&fit=crop',
+    img: '/gallery/skyline-blue-towers-night.webp',
   },
+  // Was 'Parks & easy hikes'. Relabelled to match the photo library — there is
+  // no park shot in it yet, and an idea illustrated by a picture of something
+  // else is the stock-photo problem in miniature. Change it back the day a
+  // real park photo lands.
   {
-    label: 'Parks & easy hikes',
-    img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=700&q=80&auto=format&fit=crop',
+    label: 'Bakeries & coffee stops',
+    img: '/gallery/bakery-bread-counter.webp',
   },
 ]
 
@@ -121,27 +126,45 @@ export default async function GuidePage({ searchParams }: Props) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
 
   const guideId = officialGuideId()!
   const admin = createSupabaseAdminClient()
 
+  // The guide's profile and availability are the public preview cold traffic
+  // lands on, so they're read with the service-role client — RLS only exposes
+  // them to signed-in users. Auth kicks in at the booking action below, and
+  // every mutation re-checks it server-side in ./actions.ts.
   const [{ data: guide }, { data: myProfile }] = await Promise.all([
     admin
       .from('profiles')
       .select(
-        'id, display_name, bio, city, hobbies, languages, personality_traits, avatar_path, cover_path, updated_at',
+        'id, display_name, bio, city, hobbies, languages, personality_traits, visibility, avatar_path, cover_path, updated_at',
       )
       .eq('id', guideId)
       .maybeSingle<GuideProfile>(),
-    supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle<{ role: 'guide' | 'tourist' }>(),
+    user
+      ? supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle<{ role: 'guide' | 'tourist' }>()
+      : Promise.resolve({ data: null as { role: 'guide' | 'tourist' } | null }),
   ])
 
-  if (!guide) {
+  // A private guide is hidden from everyone but themselves — and that rule has
+  // to be restated here, because the read above goes through the service-role
+  // client and so bypasses the RLS policy that used to enforce it
+  // (`visibility = 'public' or id = auth.uid()`). Checking only `!user` would
+  // make "private" mean "visible to anyone who registers an account", which is
+  // weaker than what signed-in visitors saw before this page went public.
+  const guideHidden =
+    !!guide && guide.visibility === 'private' && user?.id !== guideId
+
+  if (!user && guideHidden) redirect('/login?next=/guide')
+
+  // A signed-in non-owner gets exactly what RLS gave them before: no row, and
+  // therefore this page.
+  if (!guide || guideHidden) {
     return (
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center px-4 py-24 text-center">
         <h1 className="text-2xl font-semibold">Our guide is almost ready</h1>
@@ -159,7 +182,9 @@ export default async function GuidePage({ searchParams }: Props) {
     { data: myBookings },
     { data: guideReviews },
   ] = await Promise.all([
-      supabase
+      // Part of the public preview (RLS limits it to signed-in users), so it
+      // goes through the service-role client. Read-only, days and hours only.
+      admin
         .from('availability_windows')
         .select('id, day, start_hour, end_hour')
         .gte('day', today)
@@ -183,16 +208,18 @@ export default async function GuidePage({ searchParams }: Props) {
             tourist_id: string
           }[]
         >(),
-      supabase
-        .from('bookings')
-        .select(
-          'id, tourist_id, day, start_hour, end_hour, status, note, amount_cents, currency, stripe_payment_intent_id, created_at',
-        )
-        .eq('tourist_id', user.id)
-        .neq('status', 'pending_payment')
-        .order('created_at', { ascending: false })
-        .limit(20)
-        .returns<BookingRow[]>(),
+      user
+        ? supabase
+            .from('bookings')
+            .select(
+              'id, tourist_id, day, start_hour, end_hour, status, note, amount_cents, currency, stripe_payment_intent_id, created_at',
+            )
+            .eq('tourist_id', user.id)
+            .neq('status', 'pending_payment')
+            .order('created_at', { ascending: false })
+            .limit(20)
+            .returns<BookingRow[]>()
+        : Promise.resolve({ data: null as BookingRow[] | null }),
       admin
         .from('reviews')
         .select('stars')
@@ -219,9 +246,10 @@ export default async function GuidePage({ searchParams }: Props) {
         (b) => !isHoldExpired(b.status, new Date(b.created_at).getTime(), nowMs),
       )
       // Your own in-progress hold shouldn't hide the day from you — you can
-      // reclaim it (requestBooking drops it first). It still blocks others.
+      // reclaim it (requestBooking drops it first). It still blocks others,
+      // including anonymous visitors browsing the preview.
       .filter(
-        (b) => !(b.status === 'pending_payment' && b.tourist_id === user.id),
+        (b) => !(b.status === 'pending_payment' && b.tourist_id === user?.id),
       )
       .map((b) => b.day),
   )
@@ -260,7 +288,11 @@ export default async function GuidePage({ searchParams }: Props) {
   })
 
   const isTourist = myProfile?.role === 'tourist'
-  const isOfficialGuide = user.id === guideId
+  const isOfficialGuide = user?.id === guideId
+
+  // Anonymous visitors get the full preview; signing in is only asked for at
+  // the booking step, and `next` brings them back to the day they picked.
+  const bookingNext = selectedDay ? `/guide?day=${selectedDay.day}` : '/guide'
 
   // The guide's own schedule: upcoming awaiting/confirmed bookings.
   let guideBookings: GuideBookingRow[] = []
@@ -307,12 +339,14 @@ export default async function GuidePage({ searchParams }: Props) {
         />
         <div className="relative mx-auto w-full max-w-3xl px-4 pb-10 pt-4">
           <div className="flex justify-end">
-            <Link
-              href="/profile"
-              className="rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur transition hover:bg-white/20"
-            >
-              Your profile
-            </Link>
+            {user && (
+              <Link
+                href="/profile"
+                className="rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur transition hover:bg-white/20"
+              >
+                Your profile
+              </Link>
+            )}
           </div>
 
           <div className="mt-8 flex flex-col items-center text-center text-white sm:mt-12">
@@ -488,7 +522,7 @@ export default async function GuidePage({ searchParams }: Props) {
           </section>
         )}
 
-        {/* Booking (tourists) */}
+        {/* Booking — open days are public; claiming one needs an account */}
         {!isOfficialGuide && (
         <section className="mt-8">
           <h2 className="text-xl font-semibold">Book a day together</h2>
@@ -500,7 +534,7 @@ export default async function GuidePage({ searchParams }: Props) {
             you book; if we can&apos;t confirm, you&apos;re fully refunded.
           </p>
 
-          {!isTourist ? (
+          {user && !isTourist ? (
             <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 px-6 py-8 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
               Booking is open to tourists.{' '}
               {!myProfile && (
@@ -546,6 +580,12 @@ export default async function GuidePage({ searchParams }: Props) {
                       .join(' · ')}
                   </p>
 
+                  {!user ? (
+                    <AnonBookingCta
+                      nextPath={bookingNext}
+                      firstName={firstName}
+                    />
+                  ) : (
                   <form action={requestBooking} className="mt-4 space-y-4">
                     <input type="hidden" name="day" value={selectedDay.day} />
                     <BookingFields
@@ -619,6 +659,7 @@ export default async function GuidePage({ searchParams }: Props) {
                       .
                     </p>
                   </form>
+                  )}
                 </>
               )}
             </div>
@@ -711,6 +752,40 @@ export default async function GuidePage({ searchParams }: Props) {
         )}
       </div>
     </main>
+  )
+}
+
+// Where the auth wall sits for cold traffic: anonymous visitors see the guide
+// and their real open days, and only need an account to claim one. `next`
+// carries the day they picked through login/signup and back here.
+function AnonBookingCta({
+  nextPath,
+  firstName,
+}: {
+  nextPath: string
+  firstName: string
+}) {
+  const next = encodeURIComponent(nextPath)
+  return (
+    <div className="mt-4 space-y-3">
+      <Link
+        href={`/signup?next=${next}`}
+        className="block w-full rounded-full bg-zinc-900 px-4 py-3 text-center text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+      >
+        Sign up to book this day
+      </Link>
+      <p className="text-center text-xs text-zinc-500">
+        Takes under a minute. Already have an account?{' '}
+        <Link
+          href={`/login?next=${next}`}
+          className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
+        >
+          Log in
+        </Link>
+        . This day stays open while you do — and if {firstName}&apos;s day
+        can&apos;t be confirmed, you&apos;re fully refunded.
+      </p>
+    </div>
   )
 }
 

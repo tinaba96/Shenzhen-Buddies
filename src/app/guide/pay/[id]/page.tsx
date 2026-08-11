@@ -19,7 +19,7 @@ export default async function PayPage({ params, searchParams }: Props) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect(`/login?next=${encodeURIComponent(`/guide/pay/${id}`)}`)
 
   // Read via the service-role client (the hold isn't visible under normal RLS)
   // and enforce ownership + the awaiting-payment state ourselves.

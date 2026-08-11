@@ -5,10 +5,19 @@ export const metadata: Metadata = {
   title: 'About — Shenzhen Buddies',
   description:
     'Built for explorers and the locals who love their city. Why we made Shenzhen Buddies, and how it works.',
+  alternates: { canonical: '/about' },
+  // Declared explicitly: the root layout sets an openGraph block, and
+  // metadata merges per key — so a page that omits this inherits the site's
+  // generic title, description and an og:url pointing at the homepage.
+  openGraph: {
+    title: 'About — Shenzhen Buddies',
+    description: 'Built for explorers and the locals who love their city. Why we made Shenzhen Buddies, and how it works.',
+    url: '/about',
+  },
 }
 
 const HERO_PHOTO =
-  'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=2400&q=80&auto=format&fit=crop'
+  '/hero/crayfish-noodles-lift.webp'
 
 
 const PILLARS: {

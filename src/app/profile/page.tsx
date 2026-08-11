@@ -27,7 +27,7 @@ type Profile = {
 }
 
 const DEFAULT_COVER =
-  'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=2000&q=80&auto=format&fit=crop'
+  '/hero/crayfish-noodles-lift.webp'
 
 export default async function ProfilePage({ searchParams }: Props) {
   const { error, saved } = await searchParams

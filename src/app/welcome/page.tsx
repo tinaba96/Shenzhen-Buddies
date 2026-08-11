@@ -9,10 +9,19 @@ export const metadata: Metadata = {
   title: 'Get 10% off your Shenzhen day — Shenzhen Buddies',
   description:
     'Book a local guide in Shenzhen for a day out. Use code WELCOME10 for 10% off your first booking. CA$10/hour, 4–8 hours, fully refunded if we can’t confirm.',
+  alternates: { canonical: '/welcome' },
+  // Declared explicitly: the root layout sets an openGraph block, and
+  // metadata merges per key — so a page that omits this inherits the site's
+  // generic title, description and an og:url pointing at the homepage.
+  openGraph: {
+    title: 'Get 10% off your Shenzhen day — Shenzhen Buddies',
+    description: 'Book a local guide in Shenzhen for a day out. Use code WELCOME10 for 10% off your first booking. CA$10/hour, 4–8 hours, fully refunded if we can’t confirm.',
+    url: '/welcome',
+  },
 }
 
 const HERO_PHOTO =
-  'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=2400&q=80&auto=format&fit=crop'
+  '/hero/night-market-skewers-stall.webp'
 
 export default function WelcomePage() {
   return (

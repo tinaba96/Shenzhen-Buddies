@@ -6,8 +6,9 @@ Founder-provided photos and video live here. **The studio always checks this fol
 
 1. Drop files into a topic folder: `marketing/assets/<topic>/` (e.g. `huaqiangbei/`, `night-market/`, `guides/`, `skyline/`).
 2. Use descriptive filenames: `huaqiangbei-aisle-night-01.jpg`, not `IMG_4821.jpg`. What's in the shot should be guessable from the name.
-3. **Consent flag (required for people)**: any file showing an identifiable person must end in `-consented` before the extension (e.g. `guide-lin-laughing-consented.jpg`). Files without the flag are treated as **background-only** — the studio will not feature the person.
-4. Prefer high resolution originals; the studio downsizes for embedding.
+3. **Consent flag (required for people)**: any file showing an identifiable person must end in `-consented` before the extension — and must carry its consent ID, not a name: `huaqiangbei-portrait-01-SBC-2026-08-001-consented.jpg`. Files without the flag are treated as **background-only** — the studio will not feature the person. **The flag is a pointer, not the record.** The record lives in the private consent ledger; see `CONSENT.md` in this folder before you shoot anyone.
+4. **Never put a person's name, WeChat ID, or phone number in a filename.** This folder sits in a public-ish repo, and `consentRef` is served to the browser in page source.
+5. Prefer high resolution originals; the studio downsizes for embedding.
 
 ## How the studio uses this folder
 
@@ -17,6 +18,7 @@ Founder-provided photos and video live here. **The studio always checks this fol
 
 ## Rules (from `marketing/brand-brief.md` §7)
 
-- People appear only with consent. No exceptions, no "it's probably fine."
+- People appear only with consent. No exceptions, no "it's probably fine." **Consent means a logged record, not a remembered nod — `CONSENT.md`.**
+- **Nobody who might be under 18, ever.** Not with a parent present, not in the background of a shot you like.
 - No fabricated people, no misleading composites.
 - Location/food shots should be real and recent — credibility is the product.

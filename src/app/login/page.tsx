@@ -1,19 +1,25 @@
 import Link from 'next/link'
 import { SubmitButton } from '@/components/SubmitButton'
+import { safeNextPath } from '@/lib/redirects'
 import { login } from './actions'
 
 type Props = {
-  searchParams: Promise<{ error?: string }>
+  searchParams: Promise<{ error?: string; next?: string }>
 }
 
 const SIDE_PHOTO =
-  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1400&q=80&auto=format&fit=crop'
+  '/hero/skyline-blue-towers-night.webp'
 
 const SPLITWHOM_URL =
   'https://splitwhom.com/?utm_source=shenzhen-buddies&utm_medium=referral&utm_campaign=og_banner&utm_content=login'
 
 export default async function LoginPage({ searchParams }: Props) {
-  const { error } = await searchParams
+  const { error, next } = await searchParams
+  // Set when the visitor was bounced here from a gated action (e.g. booking).
+  const nextPath = safeNextPath(next)
+  const signupHref = nextPath
+    ? `/signup?next=${encodeURIComponent(nextPath)}`
+    : '/signup'
 
   return (
     <main className="flex flex-1">
@@ -23,11 +29,18 @@ export default async function LoginPage({ searchParams }: Props) {
           action={login}
           className="w-full max-w-sm space-y-5 rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
         >
+          {nextPath && <input type="hidden" name="next" value={nextPath} />}
+
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
               Welcome back
             </p>
             <h1 className="mt-1 text-2xl font-semibold">Log in</h1>
+            {nextPath && (
+              <p className="mt-1 text-xs text-zinc-500">
+                We&apos;ll take you right back to where you left off.
+              </p>
+            )}
           </div>
 
           <label className="block">
@@ -71,7 +84,7 @@ export default async function LoginPage({ searchParams }: Props) {
 
           <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
             No account?{' '}
-            <Link href="/signup" className="font-medium underline">
+            <Link href={signupHref} className="font-medium underline">
               Sign up
             </Link>
           </p>
