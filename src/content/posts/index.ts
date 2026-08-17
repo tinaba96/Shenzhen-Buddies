@@ -6,12 +6,13 @@ import { requireGalleryItem } from '@/content/gallery'
 
 import { AUTHORS, PILLARS, type Pillar, type Post } from './types'
 import { shenzhenFromHongKongDayTrip } from './shenzhen-from-hong-kong-day-trip'
+import { whatShenzhenActuallyEats } from './what-shenzhen-actually-eats'
 
 export * from './types'
 
 // Registration order does not matter — everything reads through the sorted
 // accessors below.
-export const posts: Post[] = [shenzhenFromHongKongDayTrip]
+export const posts: Post[] = [shenzhenFromHongKongDayTrip, whatShenzhenActuallyEats]
 
 // Average adult reading speed for web prose. Reading time is computed rather
 // than stored so it cannot drift out of sync with an edited body.
