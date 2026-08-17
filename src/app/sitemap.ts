@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 
+import { packages } from '@/content/packages'
 import { publishedPosts } from '@/content/posts'
 import { siteUrl } from '@/lib/config'
 
@@ -15,6 +16,10 @@ const ROUTES: Array<{
   changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']
 }> = [
   { path: '/', priority: 1.0, changeFrequency: 'weekly' },
+  // The experience catalogue is now the primary path from the homepage to
+  // checkout, so it ranks alongside /guide rather than below it. Individual
+  // experiences are appended below.
+  { path: '/tours', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/guide', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/explore', priority: 0.8, changeFrequency: 'weekly' },
   // Only the bare path. `?loc=` variants canonicalise back to /gallery, so
@@ -48,6 +53,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: path === '/' ? base : `${base}${path}`,
       changeFrequency,
       priority,
+    })),
+    // One entry per experience. No lastModified for the same reason as the
+    // static routes above: the copy changes when someone edits it, not when
+    // the site is deployed, and there is no edit date on the record to use.
+    ...packages.map((pkg) => ({
+      url: `${base}/tours/${pkg.slug}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
     })),
     // publishedPosts() already drops drafts, so a post under review never
     // reaches the sitemap. lastModified is the post's own date rather than the

@@ -26,6 +26,9 @@ import {
   type BookingStatus,
   type FreeSegment,
 } from '@/lib/booking'
+import { bookingNoteFor } from '@/content/packages'
+import { localizedPackage } from '@/content/packages-i18n'
+import { getI18n } from '@/i18n/server'
 import { DEFAULT_OG_IMAGE, isSingleGuideMode, officialGuideId } from '@/lib/config'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -65,6 +68,10 @@ export const metadata: Metadata = {
 type Props = {
   searchParams: Promise<{
     day?: string
+    // Set by the "Book these four hours" button on /tours/[slug]. It only
+    // pre-fills the note field below — no schema change, and the guide sees
+    // which experience was booked in the email they already receive.
+    package?: string
     requested?: string
     paid?: string
     payment_cancelled?: string
@@ -147,6 +154,13 @@ export default async function GuidePage({ searchParams }: Props) {
   if (!isSingleGuideMode()) redirect('/browse')
 
   const sp = await searchParams
+  const { locale, t: i18n } = await getI18n()
+  // An unknown ?package= is ignored rather than 404ing: the booking page still
+  // works perfectly without one, and a stale link from an old campaign should
+  // land on a usable form, not an error.
+  const selectedPackage = sp.package
+    ? localizedPackage(sp.package, locale)
+    : undefined
   const supabase = await createSupabaseServerClient()
   const {
     data: { user },
@@ -316,8 +330,13 @@ export default async function GuidePage({ searchParams }: Props) {
   const isOfficialGuide = user?.id === guideId
 
   // Anonymous visitors get the full preview; signing in is only asked for at
-  // the booking step, and `next` brings them back to the day they picked.
-  const bookingNext = selectedDay ? `/guide?day=${selectedDay.day}` : '/guide'
+  // the booking step, and `next` brings them back to the day they picked —
+  // and to the experience they picked, which is otherwise lost across the
+  // login round trip.
+  const packageParam = selectedPackage ? `package=${selectedPackage.slug}` : ''
+  const dayHref = (day: string) =>
+    `/guide?day=${day}${packageParam ? `&${packageParam}` : ''}`
+  const bookingNext = selectedDay ? dayHref(selectedDay.day) : '/guide'
 
   // The guide's own schedule: upcoming awaiting/confirmed bookings.
   let guideBookings: GuideBookingRow[] = []
@@ -550,6 +569,54 @@ export default async function GuidePage({ searchParams }: Props) {
         {/* Booking — open days are public; claiming one needs an account */}
         {!isOfficialGuide && (
         <section className="mt-8">
+          {/* The experience carried in from /tours/[slug], if there was one. */}
+          {selectedPackage && (
+            <div className="mb-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="flex gap-4 p-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={selectedPackage.photo}
+                  alt={selectedPackage.alt}
+                  className="h-20 w-20 shrink-0 rounded-xl object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                    {i18n.guide.selectedPackage.label}
+                  </p>
+                  <p className="mt-0.5 truncate text-base font-semibold">
+                    {selectedPackage.title}{' '}
+                    <span className="font-normal text-zinc-500">
+                      {selectedPackage.cn}
+                    </span>
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {i18n.guide.selectedPackage.note}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-3 text-xs">
+                    <Link
+                      href={`/tours/${selectedPackage.slug}`}
+                      className="underline underline-offset-2 hover:text-zinc-900 dark:hover:text-white"
+                    >
+                      {i18n.common.seeDetails}
+                    </Link>
+                    <Link
+                      href="/tours"
+                      className="underline underline-offset-2 hover:text-zinc-900 dark:hover:text-white"
+                    >
+                      {i18n.guide.selectedPackage.change}
+                    </Link>
+                    <Link
+                      href={selectedDay ? `/guide?day=${selectedDay.day}` : '/guide'}
+                      className="text-zinc-400 underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
+                    >
+                      {i18n.guide.selectedPackage.clear}
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <h2 className="text-xl font-semibold">Book a day together</h2>
           <p className="mt-1 text-sm text-zinc-500">
             Tours run from {MIN_BOOKING_HOURS} to {MAX_BOOKING_HOURS} hours at{' '}
@@ -583,7 +650,7 @@ export default async function GuidePage({ searchParams }: Props) {
                 {dayOptions.map((d) => (
                   <Link
                     key={d.day}
-                    href={`/guide?day=${d.day}`}
+                    href={dayHref(d.day)}
                     className={
                       d.day === selectedDay?.day
                         ? 'rounded-full bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white dark:bg-white dark:text-zinc-900'
@@ -629,6 +696,15 @@ export default async function GuidePage({ searchParams }: Props) {
                         name="note"
                         rows={3}
                         maxLength={500}
+                        // Pre-filled from ?package=, and editable — the
+                        // traveller can delete it, and the server action
+                        // treats it as an ordinary note either way. Nothing
+                        // downstream depends on this string being present.
+                        defaultValue={
+                          selectedPackage
+                            ? `${bookingNoteFor(selectedPackage)}\n`
+                            : undefined
+                        }
                         placeholder="What you'd love to see, dietary needs, meeting point ideas…"
                         className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
                       />
