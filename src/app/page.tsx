@@ -1,35 +1,59 @@
 import Link from 'next/link'
 import { Avatar } from '@/components/Avatar'
+import { PackageCard } from '@/components/PackageCard'
+import { galleryItems, requireGalleryItem } from '@/content/gallery'
+import { packagePrice } from '@/content/packages'
+import {
+  localizedFeaturedPackage,
+  localizedOtherPackages,
+} from '@/content/packages-i18n'
+import { publishedPosts } from '@/content/posts'
+import type { Dictionary } from '@/i18n'
+import { getI18n } from '@/i18n/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import type { Locale } from '@/i18n/config'
 
 export default async function Home() {
-  const supabase = await createSupabaseServerClient()
+  const [{ locale, t }, supabase] = await Promise.all([
+    getI18n(),
+    createSupabaseServerClient(),
+  ])
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   return (
     <main className="flex flex-1 flex-col">
-      <Hero loggedIn={!!user} />
-      <Audiences />
-      <HowItWorks />
-      <Testimonials />
-      <PartnerBanner />
-      <FinalCTA loggedIn={!!user} />
+      <Hero loggedIn={!!user} t={t} />
+      <Ticker />
+      <Packages locale={locale} t={t} />
+      <Promise_ t={t} />
+      <Districts t={t} />
+      <HowItWorks t={t} />
+      <Audiences t={t} />
+      <Testimonials t={t} />
+      <Journal t={t} />
+      <Moments t={t} />
+      <PartnerBanner t={t} />
+      <FinalCTA loggedIn={!!user} t={t} />
     </main>
   )
 }
 
-function Hero({ loggedIn }: { loggedIn: boolean }) {
+// ---------------------------------------------------------------------------
+
+function Hero({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
   return (
-    <section className="relative overflow-hidden">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/hero/skyline-tower-walkway-night.webp"
-        alt="A Shenzhen tower lit white against the night sky, seen past a raised pedestrian walkway"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/45 to-black/75" />
+    <section className="sb-grain relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/hero/skyline-tower-walkway-night.webp"
+          alt="A Shenzhen tower lit white against the night sky, seen past a raised pedestrian walkway"
+          className="sb-drift h-full w-full object-cover"
+        />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/50 to-black/85" />
       <div
         className="absolute inset-0 opacity-60 mix-blend-soft-light"
         style={{
@@ -38,140 +62,482 @@ function Hero({ loggedIn }: { loggedIn: boolean }) {
         }}
       />
 
-      <div className="relative mx-auto flex max-w-5xl flex-col items-center px-6 py-28 text-center text-white sm:py-36">
+      <div className="relative mx-auto flex max-w-5xl flex-col items-center px-6 py-28 text-center text-white sm:py-40">
         <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium tracking-wide text-white backdrop-blur">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-          Now matching in Shenzhen
+          {t.home.hero.badge}
         </p>
 
-        <h1 className="mt-6 max-w-3xl text-balance text-5xl font-semibold tracking-tight drop-shadow-lg sm:text-7xl">
-          See Shenzhen with someone{' '}
-          <span className="bg-gradient-to-r from-amber-300 to-rose-300 bg-clip-text text-transparent">
-            who gets you.
-          </span>
+        <h1 className="sb-display mt-7 max-w-4xl text-balance text-5xl leading-[1.05] tracking-tight drop-shadow-xl sm:text-7xl lg:text-8xl">
+          {t.home.hero.titleLead}{' '}
+          <span className="sb-shine italic">{t.home.hero.titleAccent}</span>
         </h1>
 
-        <p className="mt-6 max-w-xl text-pretty text-lg text-white/90 drop-shadow sm:text-xl">
-          Skip the tour bus. Get matched with a local who shares your
-          interests — language, food, art, sports — and explore the city like
-          a friend would.
+        <p className="mt-7 max-w-xl text-pretty text-lg text-white/90 drop-shadow sm:text-xl">
+          {t.home.hero.body}
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           {loggedIn ? (
             <>
               <Link
-                href="/browse"
-                className="rounded-full bg-white px-6 py-3 text-sm font-medium text-zinc-900 shadow-lg shadow-black/20 transition hover:bg-zinc-100"
+                href="/tours"
+                className="rounded-full bg-white px-7 py-3.5 text-sm font-medium text-zinc-900 shadow-lg shadow-black/20 transition hover:bg-zinc-100"
               >
-                Browse buddies
+                {t.home.hero.primaryCta}
               </Link>
               <Link
                 href="/profile"
-                className="rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
+                className="rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
               >
-                Your profile
+                {t.common.yourProfile}
               </Link>
             </>
           ) : (
             <>
               <Link
-                href="/signup?as=tourist"
-                className="rounded-full bg-white px-6 py-3 text-sm font-medium text-zinc-900 shadow-lg shadow-black/20 transition hover:bg-zinc-100"
+                href="/tours"
+                className="rounded-full bg-white px-7 py-3.5 text-sm font-medium text-zinc-900 shadow-lg shadow-black/20 transition hover:bg-zinc-100"
               >
-                Find a local →
+                {t.home.hero.primaryCta}
               </Link>
               <Link
                 href="/signup?as=guide"
-                className="rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
+                className="rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
               >
-                Become a guide
+                {t.home.hero.secondaryCta}
               </Link>
             </>
           )}
         </div>
 
+        {/* The old entry points are still here — signup-as-tourist, /explore
+            and /login — demoted to the fine print rather than removed, because
+            the primary path is now the experience catalogue. */}
         {!loggedIn && (
           <p className="mt-6 text-xs text-white/70">
-            Free during pilot ·{' '}
+            {t.common.freeDuringPilot} ·{' '}
+            <Link href="/signup?as=tourist" className="underline hover:text-white">
+              {t.common.findALocal}
+            </Link>{' '}
+            ·{' '}
             <Link href="/explore" className="underline hover:text-white">
-              Explore Shenzhen first
+              {t.common.exploreFirst}
             </Link>{' '}
             ·{' '}
             <Link href="/login" className="underline hover:text-white">
-              Already have an account?
+              {t.common.alreadyHaveAccount}
+            </Link>{' '}
+            ·{' '}
+            <Link href="/pricing" className="underline hover:text-white">
+              {t.common.freeTrial}
             </Link>
           </p>
         )}
 
         {/* Trust strip */}
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs uppercase tracking-wider text-white/60">
-          <span className="flex items-center gap-1.5">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
-              <path d="M9 12l2 2 4-4" />
-              <circle cx="12" cy="12" r="10" />
-            </svg>
-            ID-verified locals
-          </span>
-          <span className="flex items-center gap-1.5">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
-              <path d="m9 11 3 3L22 4" />
-              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-            </svg>
-            Free 14-day trial
-          </span>
-          <span className="flex items-center gap-1.5">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
-              <path d="M12 2 4 7v6c0 5 4 8 8 9 4-1 8-4 8-9V7z" />
-            </svg>
-            Reviewed by the community
-          </span>
+        <div className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs uppercase tracking-wider text-white/60">
+          <TrustItem label={t.home.trust.verified}>
+            <path d="M9 12l2 2 4-4" />
+            <circle cx="12" cy="12" r="10" />
+          </TrustItem>
+          <TrustItem label={t.home.trust.refund}>
+            <path d="m9 11 3 3L22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          </TrustItem>
+          <TrustItem label={t.home.trust.noGroups}>
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21a8 8 0 0 1 16 0" />
+          </TrustItem>
+          <TrustItem label={t.home.trust.reviewed}>
+            <path d="M12 2 4 7v6c0 5 4 8 8 9 4-1 8-4 8-9V7z" />
+          </TrustItem>
         </div>
       </div>
     </section>
   )
 }
 
-function Audiences() {
+function TrustItem({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactNode
+}) {
   return (
-    <section className="border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="mx-auto grid max-w-5xl gap-6 px-6 py-20 md:grid-cols-2">
+    <span className="flex items-center gap-1.5">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+        className="h-3.5 w-3.5"
+      >
+        {children}
+      </svg>
+      {label}
+    </span>
+  )
+}
+
+// The place-name ticker. Names are shown in Chinese and romanised together and
+// are not translated — they are the actual names of the actual places, and a
+// traveller pointing at 华强北 on a phone screen is the point.
+const TICKER = [
+  '华强北 Huaqiangbei',
+  '东门 Dongmen',
+  '蛇口 Shekou',
+  '福田 Futian',
+  '南山 Nanshan',
+  '罗湖 Luohu',
+  '莲花山 Lianhuashan',
+  '大排档 Dàpáidàng',
+  '深圳湾 Shenzhen Bay',
+  '龙岗 Longgang',
+  '宝安 Baoan',
+  '龙华 Longhua',
+]
+
+function Ticker() {
+  return (
+    <div className="sb-marquee-host relative overflow-hidden border-y border-zinc-200 bg-zinc-950 py-3 dark:border-zinc-800">
+      <div className="sb-marquee">
+        {/* Rendered twice so the -50% loop lands on an identical frame. The
+            duplicate is aria-hidden so a screen reader reads the list once. */}
+        {[0, 1].map((copy) => (
+          <ul
+            key={copy}
+            aria-hidden={copy === 1}
+            className="flex shrink-0 items-center gap-8 pr-8 text-xs uppercase tracking-[0.25em] text-zinc-500"
+          >
+            {TICKER.map((name) => (
+              <li key={name} className="flex items-center gap-8 whitespace-nowrap">
+                {name}
+                <span aria-hidden className="text-amber-500/60">
+                  ✦
+                </span>
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// The tour package boxes.
+async function Packages({ locale, t }: { locale: Locale; t: Dictionary }) {
+  const featured = localizedFeaturedPackage(locale)
+  const rest = localizedOtherPackages(locale)
+  const price = packagePrice()
+
+  return (
+    <section className="relative border-b border-zinc-200 dark:border-zinc-800">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-80 opacity-60 dark:opacity-30"
+        style={{
+          backgroundImage:
+            'radial-gradient(ellipse at 50% 0%, rgba(244,63,94,0.16), transparent 65%)',
+        }}
+      />
+      <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+        <div className="sb-rise max-w-2xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            {t.home.packages.kicker}
+          </p>
+          <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+            {t.home.packages.title}
+          </h2>
+          <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
+            {t.home.packages.body}
+          </p>
+          <p className="mt-3 text-sm text-zinc-500">
+            {t.home.packages.priceNote.replace('{price}', price)}
+          </p>
+        </div>
+
+        <div className="sb-rise mt-12">
+          <PackageCard
+            pkg={featured}
+            t={t}
+            price={price}
+            variant="featured"
+            featuredLabel={t.home.packages.featuredLabel}
+            eager
+          />
+        </div>
+
+        <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {rest.map((pkg) => (
+            <li key={pkg.slug} className="sb-rise">
+              <PackageCard pkg={pkg} t={t} price={price} />
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-10 text-center">
+          <Link
+            href="/tours"
+            className="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-6 py-3 text-sm font-medium transition hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:border-zinc-600 dark:hover:bg-zinc-900"
+          >
+            {t.home.packages.allLink}
+            <span aria-hidden>→</span>
+          </Link>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// `Promise` is a global. Named with a trailing underscore rather than shadowing it.
+function Promise_({ t }: { t: Dictionary }) {
+  const icons = [
+    <>
+      <path d="M5 8h14" />
+      <path d="M7 4h10" />
+      <path d="m9 20 3-8 3 8" />
+      <path d="M10 17h4" />
+    </>,
+    <>
+      <rect x="2" y="5" width="20" height="14" rx="3" />
+      <path d="M2 10h20" />
+      <path d="M7 15h3" />
+    </>,
+    <>
+      <circle cx="12" cy="10" r="3" />
+      <path d="M12 21s-7-7-7-11a7 7 0 1 1 14 0c0 4-7 11-7 11z" />
+    </>,
+    <>
+      <path d="M12 2v20" />
+      <path d="M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    </>,
+    <>
+      <path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 9 9" />
+      <path d="m3 12 3-3 3 3" />
+      <path d="M21 12a9 9 0 0 1-9 9" />
+    </>,
+    <>
+      <path d="M3 6v6a9 9 0 0 0 9 9 9 9 0 0 0 9-9V6l-9-4z" />
+      <path d="m9 12 2 2 4-4" />
+    </>,
+  ]
+
+  return (
+    <section className="border-b border-zinc-200 bg-zinc-50/60 dark:border-zinc-800 dark:bg-zinc-950/40">
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+        <div className="sb-rise max-w-2xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            {t.home.promise.kicker}
+          </p>
+          <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+            {t.home.promise.title}
+          </h2>
+          <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
+            {t.home.promise.body}
+          </p>
+        </div>
+
+        <ul className="mt-12 grid gap-px overflow-hidden rounded-3xl border border-zinc-200 bg-zinc-200 sm:grid-cols-2 lg:grid-cols-3 dark:border-zinc-800 dark:bg-zinc-800">
+          {t.home.promise.items.map((item, i) => (
+            <li
+              key={item.title}
+              className="group bg-white p-7 transition hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900"
+            >
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-100 to-rose-100 text-zinc-800 transition duration-500 group-hover:scale-110 group-hover:from-amber-200 group-hover:to-rose-200 dark:from-amber-500/15 dark:to-rose-500/15 dark:text-zinc-100">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                  className="h-5 w-5"
+                >
+                  {icons[i]}
+                </svg>
+              </span>
+              <h3 className="mt-5 text-lg font-semibold">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                {item.body}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+// A typographic index rather than six photo tiles. The district photographs
+// live on /explore and are Wikimedia CC BY-SA files whose licence requires the
+// attribution block that sits under them there; reproducing the images here
+// would mean reproducing that block here too. Type carries the section fine.
+const DISTRICTS = [
+  { name: 'Nanshan', cn: '南山' },
+  { name: 'Futian', cn: '福田' },
+  { name: 'Luohu', cn: '罗湖' },
+  { name: "Bao'an", cn: '宝安' },
+  { name: 'Longhua', cn: '龙华' },
+  { name: 'Longgang', cn: '龙岗' },
+]
+
+function Districts({ t }: { t: Dictionary }) {
+  return (
+    <section className="border-b border-zinc-200 bg-zinc-950 text-white dark:border-zinc-800">
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+        <div className="sb-rise flex flex-wrap items-end justify-between gap-6">
+          <div className="max-w-xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              {t.home.districts.kicker}
+            </p>
+            <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+              {t.home.districts.title}
+            </h2>
+            <p className="mt-4 text-base text-zinc-400">{t.home.districts.body}</p>
+          </div>
+          <Link
+            href="/explore"
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
+          >
+            {t.home.districts.cta}
+            <span aria-hidden>→</span>
+          </Link>
+        </div>
+
+        <ol className="mt-12 border-t border-white/10">
+          {DISTRICTS.map((d, i) => (
+            <li key={d.name}>
+              <Link
+                href="/explore"
+                className="group flex items-baseline gap-5 border-b border-white/10 py-5 transition hover:bg-white/5 sm:gap-8 sm:py-6"
+              >
+                <span className="w-8 shrink-0 font-mono text-xs tabular-nums text-zinc-600">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className="sb-display flex-1 text-3xl tracking-tight transition group-hover:translate-x-2 sm:text-4xl">
+                  {d.name}
+                </span>
+                <span className="text-lg text-zinc-500 transition group-hover:text-amber-400 sm:text-2xl">
+                  {d.cn}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )
+}
+
+function HowItWorks({ t }: { t: Dictionary }) {
+  const photos = [
+    {
+      src: '/gallery/bakery-bread-counter.webp',
+      alt: 'Sourdough rounds and baguettes on a Shenzhen bakery counter',
+    },
+    {
+      src: '/gallery/preserved-fruit-jars.webp',
+      alt: 'Clip-top jars of kumquats and plums preserved in syrup',
+    },
+    {
+      src: '/gallery/skyline-blue-towers-night.webp',
+      alt: 'Shenzhen towers lit blue at night, seen from street level',
+    },
+  ]
+
+  return (
+    <section className="relative border-b border-zinc-200 dark:border-zinc-800">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-50 dark:opacity-20"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at 10% 10%, rgba(245,158,11,0.15), transparent 50%), radial-gradient(circle at 90% 90%, rgba(244,63,94,0.15), transparent 50%)',
+        }}
+      />
+      <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+        <div className="sb-rise text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            {t.home.howItWorks.kicker}
+          </p>
+          <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+            {t.home.howItWorks.title}
+          </h2>
+        </div>
+
+        <ol className="mt-14 grid gap-6 md:grid-cols-3">
+          {t.home.howItWorks.steps.map((step, i) => (
+            // sb-rise and sb-lift must not sit on the same element: a
+            // scroll-driven animation owns `transform` for as long as it is
+            // attached, so the hover lift silently stops working. Reveal on
+            // the wrapper, lift on the card.
+            <li key={step.title} className="sb-rise">
+            <div className="sb-lift group relative h-full overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="relative h-44 overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={photos[i].src}
+                  alt={photos[i].alt}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                <span className="sb-display absolute left-5 top-3 text-6xl text-white/90 drop-shadow-lg">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+              </div>
+              <div className="p-6">
+                <h3 className="text-lg font-semibold">{step.title}</h3>
+                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                  {step.body}
+                </p>
+              </div>
+            </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )
+}
+
+function Audiences({ t }: { t: Dictionary }) {
+  return (
+    <section className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-20 sm:px-6 md:grid-cols-2">
         <AudienceCard
           tone="amber"
           photo="/gallery/night-market-skewers-stall.webp"
           alt="A Shenzhen night market stall laid with trays of skewered insects"
           icon={
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+            <>
               <path d="M3 7l9-4 9 4" />
               <path d="M3 7l9 4 9-4" />
               <path d="M3 7v6c0 4 4 7 9 7s9-3 9-7V7" />
-            </svg>
+            </>
           }
-          title="For travelers"
-          subtitle="Visiting Shenzhen"
-          points={[
-            'Skip the language barrier — match by shared languages',
-            'Discover spots only locals know',
-            'Personal, casual, and affordable',
-          ]}
+          title={t.home.audiences.travelerTitle}
+          subtitle={t.home.audiences.travelerSubtitle}
+          points={t.home.audiences.travelerPoints}
         />
         <AudienceCard
           tone="rose"
           photo="/gallery/chicken-rice-table.webp"
           alt="A shared table of chicken rice, noodles and fried tofu skin in Shenzhen"
           icon={
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+            <>
               <path d="M12 21s-7-7-7-12a7 7 0 1 1 14 0c0 5-7 12-7 12z" />
               <circle cx="12" cy="9" r="2.5" />
-            </svg>
+            </>
           }
-          title="For locals"
-          subtitle="Live in Shenzhen"
-          points={[
-            'Meet people from around the world',
-            'Share your favorite spots and stories',
-            'Pick the days, topics, and pace that work for you',
-          ]}
+          title={t.home.audiences.localTitle}
+          subtitle={t.home.audiences.localSubtitle}
+          points={t.home.audiences.localPoints}
         />
       </div>
     </section>
@@ -205,28 +571,53 @@ function AudienceCard({
       : 'from-rose-500/40 via-rose-400/10'
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="relative h-48 overflow-hidden">
+    // Reveal on the wrapper, lift on the card — see the note in HowItWorks.
+    <div className="sb-rise">
+    <article className="sb-lift group h-full overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="relative h-52 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photo}
           alt={alt}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          loading="lazy"
+          className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
         />
         <div className={`absolute inset-0 bg-gradient-to-t ${gradient} to-transparent`} />
-        <div className={`absolute left-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-xl shadow-lg backdrop-blur ${accent}`}>
-          {icon}
+        <div
+          className={`absolute left-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-xl shadow-lg backdrop-blur ${accent}`}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+            className="h-6 w-6"
+          >
+            {icon}
+          </svg>
         </div>
       </div>
-      <div className="p-6">
+      <div className="p-7">
         <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
           {subtitle}
         </p>
-        <h3 className="mt-1 text-2xl font-semibold tracking-tight">{title}</h3>
-        <ul className="mt-4 space-y-2 text-sm text-zinc-700 dark:text-zinc-300">
+        <h3 className="sb-display mt-1 text-3xl tracking-tight">{title}</h3>
+        <ul className="mt-5 space-y-2.5 text-sm text-zinc-700 dark:text-zinc-300">
           {points.map((p) => (
-            <li key={p} className="flex items-start gap-2">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600 dark:text-emerald-400">
+            <li key={p} className="flex items-start gap-2.5">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+                className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600 dark:text-emerald-400"
+              >
                 <polyline points="20 6 9 17 4 12" />
               </svg>
               <span>{p}</span>
@@ -235,89 +626,13 @@ function AudienceCard({
         </ul>
       </div>
     </article>
+    </div>
   )
 }
 
-function HowItWorks() {
-  const steps = [
-    {
-      n: '01',
-      title: 'Create your profile',
-      body: 'Tell us your hobbies, languages, and what kind of day you’d like.',
-      photo:
-        '/gallery/bakery-bread-counter.webp',
-      alt: 'Person smiling at the camera',
-    },
-    {
-      n: '02',
-      title: 'Browse buddies',
-      body: 'Find locals (or visitors) who share your interests and city.',
-      photo:
-        '/gallery/preserved-fruit-jars.webp',
-      alt: 'Holding a phone in the city',
-    },
-    {
-      n: '03',
-      title: 'Plan and go',
-      body: 'Message, meet, and explore. Leave a review afterward.',
-      photo:
-        '/gallery/skyline-blue-towers-night.webp',
-      alt: 'Two people walking through the city',
-    },
-  ]
-
-  return (
-    <section className="relative border-t border-zinc-200 dark:border-zinc-800">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-50 dark:opacity-25"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle at 10% 10%, rgba(245,158,11,0.15), transparent 50%), radial-gradient(circle at 90% 90%, rgba(244,63,94,0.15), transparent 50%)',
-        }}
-      />
-      <div className="relative mx-auto max-w-5xl px-6 py-24">
-        <div className="text-center">
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-            How it works
-          </p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Three small steps.
-          </h2>
-        </div>
-
-        <ol className="mt-12 grid gap-6 md:grid-cols-3">
-          {steps.map((s) => (
-            <li
-              key={s.n}
-              className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <div className="relative h-40 overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={s.photo}
-                  alt={s.alt}
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                <span className="absolute left-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-sm font-bold tracking-wide text-zinc-900 shadow backdrop-blur">
-                  {s.n}
-                </span>
-              </div>
-              <div className="p-6">
-                <h3 className="text-lg font-semibold">{s.title}</h3>
-                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                  {s.body}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
-  )
-}
-
-function Testimonials() {
+function Testimonials({ t }: { t: Dictionary }) {
+  // Left in the language they were given in. A quote translated by the company
+  // that is quoting it stops being a quote.
   const reviews = [
     {
       stars: 5,
@@ -346,14 +661,14 @@ function Testimonials() {
   ]
 
   return (
-    <section className="border-t border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-950/30">
-      <div className="mx-auto max-w-5xl px-6 py-20">
-        <div className="text-center">
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-            From our pilot community
+    <section className="border-b border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-950/30">
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <div className="sb-rise text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            {t.home.testimonials.kicker}
           </p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Real stories from buddies.
+          <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+            {t.home.testimonials.title}
           </h2>
         </div>
 
@@ -361,13 +676,13 @@ function Testimonials() {
           {reviews.map((r) => (
             <li
               key={r.name}
-              className="flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+              className="sb-rise flex flex-col rounded-3xl border border-zinc-200 bg-white p-7 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
             >
               <StaticStars value={r.stars} />
               <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
                 &ldquo;{r.quote}&rdquo;
               </blockquote>
-              <figcaption className="mt-5 flex items-center gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+              <figcaption className="mt-6 flex items-center gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
                 <Avatar src={r.photo} name={r.name} size={40} />
                 <div>
                   <p className="text-sm font-medium">{r.name}</p>
@@ -403,26 +718,156 @@ function StaticStars({ value }: { value: number }) {
   )
 }
 
+function Journal({ t }: { t: Dictionary }) {
+  const posts = publishedPosts().slice(0, 3)
+  if (posts.length === 0) return null
+
+  return (
+    <section className="border-b border-zinc-200 dark:border-zinc-800">
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <div className="sb-rise flex flex-wrap items-end justify-between gap-6">
+          <div className="max-w-xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              {t.home.journal.kicker}
+            </p>
+            <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+              {t.home.journal.title}
+            </h2>
+            <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
+              {t.home.journal.body}
+            </p>
+          </div>
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-medium transition hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
+          >
+            {t.home.journal.cta}
+            <span aria-hidden>→</span>
+          </Link>
+        </div>
+
+        <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => {
+            const hero = post.heroGalleryId
+              ? requireGalleryItem(post.heroGalleryId, 'home/journal')
+              : null
+            return (
+              <li key={post.slug}>
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="sb-lift group flex h-full flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
+                >
+                  {hero && (
+                    <div className="relative h-44 overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={hero.src}
+                        alt={hero.alt}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                      />
+                    </div>
+                  )}
+                  <div className="flex flex-1 flex-col p-6">
+                    <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+                      {post.publishedAt}
+                    </p>
+                    <h3 className="sb-display mt-2 text-2xl leading-snug tracking-tight">
+                      {post.title}
+                    </h3>
+                    <p className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400">
+                      {post.excerpt}
+                    </p>
+                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium transition group-hover:gap-2.5">
+                      {t.common.readMore}
+                      <span aria-hidden>→</span>
+                    </span>
+                  </div>
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+function Moments({ t }: { t: Dictionary }) {
+  const shots = galleryItems.filter((i) => i.kind === 'image').slice(0, 8)
+
+  return (
+    <section className="border-b border-zinc-200 bg-zinc-50/60 dark:border-zinc-800 dark:bg-zinc-950/40">
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <div className="sb-rise text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            {t.home.moments.kicker}
+          </p>
+          <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+            {t.home.moments.title}
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-base text-zinc-600 dark:text-zinc-400">
+            {t.home.moments.body}
+          </p>
+        </div>
+
+        <ul className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {shots.map((shot) => (
+            <li key={shot.id} className="overflow-hidden rounded-2xl">
+              <Link href="/gallery" className="block">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={shot.src}
+                  alt={shot.alt}
+                  width={shot.width}
+                  height={shot.height}
+                  loading="lazy"
+                  className="h-40 w-full object-cover transition duration-500 hover:scale-110 sm:h-48"
+                />
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-8 text-center">
+          <Link
+            href="/gallery"
+            className="inline-flex items-center gap-2 text-sm font-medium underline underline-offset-4"
+          >
+            {t.home.moments.cta}
+            <span aria-hidden>→</span>
+          </Link>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 const SPLITWHOM_URL =
   'https://splitwhom.com/?utm_source=shenzhen-buddies&utm_medium=referral&utm_campaign=og_banner'
 
-function PartnerBanner() {
+// Kept, but demoted. It used to sit mid-page at full width between the
+// testimonials and the closing CTA; it is now a narrow strip below the fold,
+// so the partner is still credited and still clickable without competing with
+// the experiences for attention.
+function PartnerBanner({ t }: { t: Dictionary }) {
   return (
-    <section className="border-t border-zinc-200 dark:border-zinc-800">
-      <div className="mx-auto max-w-3xl px-6 py-12">
-        <p className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-zinc-400">
-          From a friend
+    <section className="border-b border-zinc-200 dark:border-zinc-800">
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+        <p className="mb-3 text-center text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-400">
+          {t.partner.kicker}
         </p>
         <a
           href={SPLITWHOM_URL}
           target="_blank"
           rel="noopener noreferrer sponsored"
-          className="group block overflow-hidden rounded-2xl border border-zinc-200 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:border-zinc-800"
+          className="group block overflow-hidden rounded-2xl border border-zinc-200 opacity-80 shadow-sm transition hover:opacity-100 hover:shadow-lg dark:border-zinc-800"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/splitwhom-banner.png"
             alt="SplitWhom — split shared expenses with friends"
+            loading="lazy"
             className="w-full transition duration-500 group-hover:scale-[1.02]"
           />
         </a>
@@ -431,29 +876,37 @@ function PartnerBanner() {
   )
 }
 
-function FinalCTA({ loggedIn }: { loggedIn: boolean }) {
+function FinalCTA({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
   return (
-    <section className="border-t border-zinc-200 dark:border-zinc-800">
-      <div className="relative mx-auto max-w-3xl px-6 py-20 text-center">
-        <div className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-32 max-w-2xl bg-gradient-to-r from-amber-200/40 via-rose-200/40 to-transparent blur-3xl dark:from-amber-500/15 dark:via-rose-500/15" />
-        <div className="relative">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            {loggedIn ? 'Find your next buddy.' : 'Ready to explore together?'}
-          </h2>
-          <p className="mt-3 text-zinc-600 dark:text-zinc-400">
-            {loggedIn
-              ? 'Browse public profiles and start a conversation.'
-              : 'Free to join during the pilot. Takes under a minute.'}
-          </p>
+    <section className="relative overflow-hidden bg-zinc-950 text-white">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-70"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at 20% 20%, rgba(245,158,11,0.25), transparent 45%), radial-gradient(circle at 80% 70%, rgba(244,63,94,0.25), transparent 50%)',
+        }}
+      />
+      <div className="relative mx-auto max-w-3xl px-6 py-24 text-center sm:py-32">
+        <h2 className="sb-display text-4xl leading-tight tracking-tight sm:text-6xl">
+          {loggedIn ? t.home.finalCta.titleLoggedIn : t.home.finalCta.titleAnon}
+        </h2>
+        <p className="mt-4 text-zinc-400">
+          {loggedIn ? t.home.finalCta.bodyLoggedIn : t.home.finalCta.bodyAnon}
+        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Link
             href={loggedIn ? '/browse' : '/signup'}
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-zinc-900 shadow-lg transition hover:bg-zinc-100"
           >
-            {loggedIn ? 'Browse buddies' : 'Get started'}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
+            {loggedIn ? t.common.browseBuddies : t.common.getStarted}
+            <span aria-hidden>→</span>
+          </Link>
+          <Link
+            href="/tours"
+            className="inline-flex items-center gap-2 rounded-full border border-white/25 px-7 py-3.5 text-sm font-medium text-white transition hover:bg-white/10"
+          >
+            {t.home.packages.allLink}
           </Link>
         </div>
       </div>

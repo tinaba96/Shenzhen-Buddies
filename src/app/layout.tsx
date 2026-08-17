@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import Link from "next/link";
 import { Analytics } from "@/components/Analytics";
 import { Avatar } from "@/components/Avatar";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { MobileMenu } from "@/components/MobileMenu";
+import { getI18n } from "@/i18n/server";
 import { avatarPublicUrl } from "@/lib/avatars";
 import {
   INSTAGRAM_HANDLE,
@@ -26,50 +28,71 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// The editorial display face for headlines. One weight, Latin only — CJK
+// locales are switched back to the sans in globals.css, because this family
+// has no Chinese or Japanese glyphs and would fall back to a mismatched
+// system serif mid-headline.
+const displaySerif = Instrument_Serif({
+  variable: "--font-display-serif",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
 const SITE_NAME = "Shenzhen Buddies";
 const SITE_DESCRIPTION =
   "Match with a local buddy in Shenzhen who shares your interests. Casual, affordable, personal.";
 
-export const metadata: Metadata = {
-  // Resolves every relative metadata URL below to an absolute one, so link
-  // previews stop breaking on share. siteUrl() is the single source of truth
-  // (NEXT_PUBLIC_SITE_URL, else DEFAULT_SITE_URL) — no domain is hardcoded,
-  // so the founder's custom domain is a Vercel env change, not a code change.
-  metadataBase: new URL(siteUrl()),
-  title: SITE_NAME,
-  description: SITE_DESCRIPTION,
-  alternates: { canonical: "/" },
-  openGraph: {
-    type: "website",
-    siteName: SITE_NAME,
-    locale: "en_US",
-    title: SITE_NAME,
-    description: SITE_DESCRIPTION,
-    url: "/",
-  },
-  // Deliberately no `openGraph.images` / `twitter.images` here. The card image
-  // ships as the `opengraph-image` file convention, which takes priority over
-  // this object and fills in type/width/height automatically. Drop the
-  // 1200x630 file at src/app/opengraph-image.png (art-director, PRD R4) and
-  // og:image + twitter:image start rendering with no code change — until then
-  // no image tag is emitted at all, rather than one pointing at a 404.
-  twitter: {
-    card: "summary_large_image",
-    title: SITE_NAME,
-    description: SITE_DESCRIPTION,
-  },
-};
+// Localised per the visitor's cookie. The canonical, OG url and JSON-LD below
+// stay English on purpose — see the `seo` note in i18n/dictionaries/en.ts.
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
 
-export default function RootLayout({
+  return {
+    // Resolves every relative metadata URL below to an absolute one, so link
+    // previews stop breaking on share. siteUrl() is the single source of truth
+    // (NEXT_PUBLIC_SITE_URL, else DEFAULT_SITE_URL) — no domain is hardcoded,
+    // so the founder's custom domain is a Vercel env change, not a code change.
+    metadataBase: new URL(siteUrl()),
+    title: t.seo.siteTitle,
+    description: t.seo.siteDescription,
+    alternates: { canonical: "/" },
+    openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      locale: "en_US",
+      title: t.seo.siteTitle,
+      description: t.seo.siteDescription,
+      url: "/",
+    },
+    // Deliberately no `openGraph.images` / `twitter.images` here. The card image
+    // ships as the `opengraph-image` file convention, which takes priority over
+    // this object and fills in type/width/height automatically. Drop the
+    // 1200x630 file at src/app/opengraph-image.png (art-director, PRD R4) and
+    // og:image + twitter:image start rendering with no code change — until then
+    // no image tag is emitted at all, rather than one pointing at a 404.
+    twitter: {
+      card: "summary_large_image",
+      title: t.seo.siteTitle,
+      description: t.seo.siteDescription,
+    },
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const base = siteUrl();
+  const { meta } = await getI18n();
 
   // Organization structured data. `sameAs` is what ties this site to the
   // Instagram account in Google's entity graph, which is the whole reason it
   // is worth emitting while Instagram is the only live traffic source.
+  //
+  // Kept in English regardless of the reader's locale: it describes the
+  // organisation to a crawler, and the crawler sees the English page.
   const organizationJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -82,8 +105,9 @@ export default function RootLayout({
 
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang={meta.htmlLang}
+      dir={meta.dir}
+      className={`${geistSans.variable} ${geistMono.variable} ${displaySerif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-white text-zinc-900 dark:bg-black dark:text-zinc-100">
         {/* JSON.stringify does not escape HTML, so `<` is scrubbed to its
@@ -105,7 +129,10 @@ export default function RootLayout({
 }
 
 async function SiteHeader() {
-  const supabase = await createSupabaseServerClient();
+  const [{ locale, t }, supabase] = await Promise.all([
+    getI18n(),
+    createSupabaseServerClient(),
+  ]);
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -130,30 +157,31 @@ async function SiteHeader() {
     !!user && isSingleGuideMode() && user.id === officialGuideId();
   const browseHref = isSingleGuideMode() ? "/guide" : "/browse";
   const browseLabel = isOfficialGuide
-    ? "My schedule"
+    ? t.nav.mySchedule
     : isSingleGuideMode()
-      ? "Book a guide"
-      : "Browse";
+      ? t.nav.bookAGuide
+      : t.nav.browse;
 
   // Same destinations as the desktop nav, reused by the mobile menu so
   // nothing on the PC header is missing on small screens.
   // The guide/browse pages are a public preview, so the link shows for
   // logged-out visitors too. Messages stays behind login.
   const navLinks = [
-    { href: "/explore", label: "Explore" },
-    { href: "/gallery", label: "Gallery" },
-    { href: "/blog", label: "Blog" },
+    { href: "/tours", label: t.nav.tours },
+    { href: "/explore", label: t.nav.explore },
+    { href: "/gallery", label: t.nav.gallery },
+    { href: "/blog", label: t.nav.blog },
     { href: browseHref, label: browseLabel },
-    ...(user ? [{ href: "/messages", label: "Messages" }] : []),
+    ...(user ? [{ href: "/messages", label: t.nav.messages }] : []),
     ...(user && isAdminEmail(user.email)
-      ? [{ href: "/admin", label: "Admin" }]
+      ? [{ href: "/admin", label: t.nav.admin }]
       : []),
   ];
   const accountLinks = user
-    ? [{ href: "/profile", label: profile?.display_name || "Your profile" }]
+    ? [{ href: "/profile", label: profile?.display_name || t.common.yourProfile }]
     : [
-        { href: "/login", label: "Log in" },
-        { href: "/signup", label: "Sign up" },
+        { href: "/login", label: t.common.logIn },
+        { href: "/signup", label: t.common.signUp },
       ];
 
   return (
@@ -161,59 +189,37 @@ async function SiteHeader() {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 font-semibold tracking-tight"
+          className="group flex items-center gap-2 font-semibold tracking-tight"
         >
           <span
             aria-hidden
-            className="inline-block h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-rose-500 shadow-sm"
+            className="inline-block h-6 w-6 rounded-full bg-gradient-to-br from-amber-400 to-rose-500 shadow-sm transition duration-500 group-hover:rotate-180 group-hover:shadow-rose-500/40"
           />
           <span className="hidden sm:inline">Shenzhen Buddies</span>
         </Link>
 
         <nav className="hidden flex-1 items-center justify-center gap-6 text-sm md:flex">
-          <Link
-            href="/explore"
-            className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
-          >
-            Explore
-          </Link>
-          <Link
-            href="/gallery"
-            className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
-          >
-            Gallery
-          </Link>
-          <Link
-            href="/blog"
-            className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
-          >
-            Blog
-          </Link>
-          <Link
-            href={browseHref}
-            className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
-          >
-            {browseLabel}
-          </Link>
-          {user && (
+          {navLinks.map((l) => (
             <Link
-              href="/messages"
-              className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
+              key={l.href}
+              href={l.href}
+              className="relative text-zinc-600 transition after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-gradient-to-r after:from-amber-400 after:to-rose-500 after:transition-all after:duration-300 hover:text-zinc-900 hover:after:w-full dark:text-zinc-300 dark:hover:text-white"
             >
-              Messages
+              {l.label}
             </Link>
-          )}
-          {user && isAdminEmail(user.email) && (
-            <Link
-              href="/admin"
-              className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
-            >
-              Admin
-            </Link>
-          )}
+          ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <LanguageSwitcher
+            current={locale}
+            labels={{
+              label: t.language.label,
+              choose: t.language.choose,
+              switchTo: t.language.switchTo,
+              note: t.language.note,
+            }}
+          />
           {user ? (
             <Link
               href="/profile"
@@ -228,7 +234,7 @@ async function SiteHeader() {
                 size={28}
               />
               <span className="hidden max-w-[10ch] truncate sm:inline">
-                {profile?.display_name ?? "Profile"}
+                {profile?.display_name ?? t.nav.account}
               </span>
             </Link>
           ) : (
@@ -237,17 +243,21 @@ async function SiteHeader() {
                 href="/login"
                 className="hidden text-sm text-zinc-600 transition hover:text-zinc-900 sm:inline dark:text-zinc-300 dark:hover:text-white"
               >
-                Log in
+                {t.common.logIn}
               </Link>
               <Link
                 href="/signup"
                 className="rounded-full bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
-                Sign up
+                {t.common.signUp}
               </Link>
             </>
           )}
-          <MobileMenu links={navLinks} account={accountLinks} />
+          <MobileMenu
+            links={navLinks}
+            account={accountLinks}
+            labels={{ open: t.nav.openMenu, close: t.nav.closeMenu }}
+          />
         </div>
       </div>
     </header>
@@ -257,7 +267,8 @@ async function SiteHeader() {
 const SPLITWHOM_FOOTER_URL =
   "https://splitwhom.com/?utm_source=shenzhen-buddies&utm_medium=referral&utm_campaign=og_banner&utm_content=footer";
 
-function SplitWhomNote() {
+async function SplitWhomNote() {
+  const { t } = await getI18n();
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-6 sm:px-6">
       <a
@@ -274,18 +285,17 @@ function SplitWhomNote() {
         </span>
         <div className="flex flex-1 flex-col gap-1">
           <span className="inline-flex items-center justify-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-zinc-400 sm:justify-start">
-            From a friend
+            {t.partner.kicker}
           </span>
           <span className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
-            SplitWhom
+            {t.partner.title}
           </span>
           <span className="text-sm text-zinc-600 dark:text-zinc-400">
-            BBQs, parties &amp; trips — buy together, then track who paid what
-            and settle up automatically.
+            {t.partner.body}
           </span>
         </div>
         <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition group-hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:group-hover:bg-zinc-200">
-          Try it
+          {t.partner.cta}
           <span aria-hidden>→</span>
         </span>
       </a>
@@ -293,7 +303,8 @@ function SplitWhomNote() {
   );
 }
 
-function SiteFooter() {
+async function SiteFooter() {
+  const { locale, t } = await getI18n();
   const year = new Date().getFullYear();
   return (
     <footer className="border-t border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
@@ -309,9 +320,7 @@ function SiteFooter() {
             />
             Shenzhen Buddies
           </Link>
-          <p className="mt-3 max-w-xs text-xs text-zinc-500">
-            Match with a local buddy in Shenzhen who shares your interests.
-          </p>
+          <p className="mt-3 max-w-xs text-xs text-zinc-500">{t.footer.tagline}</p>
           {/* The one "seen on Instagram" surface (PRD R9) — site-wide via the
               footer rather than a per-page treatment. */}
           <a
@@ -336,40 +345,63 @@ function SiteFooter() {
             </svg>
             @{INSTAGRAM_HANDLE}
           </a>
+
+          {/* The switcher again, spelled out rather than behind a globe icon.
+              Someone who lands mid-page in a language they cannot read looks
+              for this at the bottom, not in a collapsed header control. */}
+          <div className="mt-6">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
+              {t.footer.languageNote}
+            </p>
+            <div className="mt-2">
+              <LanguageSwitcher
+                current={locale}
+                variant="inline"
+                labels={{
+                  label: t.language.label,
+                  choose: t.language.choose,
+                  switchTo: t.language.switchTo,
+                  note: t.language.note,
+                }}
+              />
+            </div>
+          </div>
         </div>
         <FooterColumn
-          title="Product"
+          title={t.footer.product}
           links={[
-            { href: "/welcome", label: "Get 10% off" },
-            { href: "/explore", label: "Explore" },
-            { href: "/gallery", label: "Gallery" },
-            { href: "/blog", label: "Blog" },
-            { href: "/browse", label: "Browse buddies" },
+            { href: "/tours", label: t.nav.tours },
+            { href: "/welcome", label: t.footer.discount },
+            { href: "/explore", label: t.nav.explore },
+            { href: "/gallery", label: t.nav.gallery },
+            { href: "/blog", label: t.nav.blog },
+            { href: "/browse", label: t.common.browseBuddies },
           ]}
         />
         <FooterColumn
-          title="Account"
+          title={t.footer.account}
           links={[
-            { href: "/signup", label: "Sign up" },
-            { href: "/login", label: "Log in" },
-            { href: "/profile", label: "Your profile" },
+            { href: "/signup", label: t.common.signUp },
+            { href: "/login", label: t.common.logIn },
+            { href: "/profile", label: t.common.yourProfile },
           ]}
         />
         <FooterColumn
-          title="Company"
+          title={t.footer.company}
           links={[
-            { href: "/about", label: "About" },
-            { href: "/contact", label: "Contact" },
-            { href: "/privacy", label: "Privacy" },
-            { href: "/terms", label: "Terms" },
-            { href: "/cancellation", label: "Cancellation policy" },
+            { href: "/about", label: t.footer.about },
+            { href: "/contact", label: t.footer.contact },
+            { href: "/pricing", label: "Premium" },
+            { href: "/privacy", label: t.footer.privacy },
+            { href: "/terms", label: t.footer.terms },
+            { href: "/cancellation", label: t.footer.cancellation },
           ]}
         />
       </div>
       <div className="border-t border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-zinc-500 sm:flex-row sm:px-6">
-          <p>© {year} Tensai Tech Inc.</p>
-          <p>Pilot release · Shenzhen 深圳</p>
+          <p>{t.footer.rights.replace("{year}", String(year))}</p>
+          <p>{t.footer.pilot}</p>
         </div>
       </div>
     </footer>
@@ -390,7 +422,7 @@ function FooterColumn({
       </p>
       <ul className="mt-3 space-y-2 text-sm">
         {links.map((l) => (
-          <li key={`${title}-${l.label}`}>
+          <li key={`${title}-${l.href}`}>
             <Link
               href={l.href}
               className="text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"

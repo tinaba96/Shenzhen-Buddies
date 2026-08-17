@@ -3,6 +3,16 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Brand accents. Amber→rose is the existing mark (the header dot, the hero
+     gradient); the other four exist so each tour package can own a colour
+     without four one-off hex values scattered through JSX. */
+  --sb-ember: #f59e0b;
+  --sb-coral: #f43f5e;
+  --sb-signal: #06b6d4;
+  --sb-jade: #10b981;
+  --sb-violet: #8b5cf6;
+  --sb-sky: #0ea5e9;
 }
 
 @theme inline {
@@ -10,6 +20,9 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* The editorial display face, loaded in layout.tsx. Used for headlines
+     only — it has one weight and no italic small sizes worth reading. */
+  --font-display: var(--font-display-serif);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +35,201 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Was a hardcoded Arial/Helvetica stack, which overrode the Geist face the
+     root layout goes to the trouble of loading — the whole site rendered in
+     Helvetica. The variable is the one layout.tsx sets, with a system stack
+     behind it for the moments before the webfont lands. */
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Cross-script typography. Chinese and Japanese text renders with a different
+   optical weight and line rhythm than Latin at the same size, so headings in
+   those locales get a touch more leading and slightly tighter tracking than
+   the Latin defaults would give them. Scoped by <html lang>, which the root
+   layout sets from the resolved locale. */
+html[lang^="zh"] body,
+html[lang^="ja"] body {
+  font-family:
+    var(--font-geist-sans), ui-sans-serif, system-ui, "Noto Sans CJK SC",
+    "Hiragino Sans", "Microsoft YaHei", sans-serif;
+}
+
+html[lang^="zh"] h1,
+html[lang^="zh"] h2,
+html[lang^="ja"] h1,
+html[lang^="ja"] h2 {
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+}
+
+/* The serif display face carries no CJK glyphs at all, so a Chinese or
+   Japanese headline set in it silently falls back to whatever the browser
+   picks — usually a mismatched system serif. Those locales get the sans
+   instead, on purpose. */
+html[lang^="zh"] .sb-display,
+html[lang^="ja"] .sb-display {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+}
+
+.sb-display {
+  font-family: var(--font-display-serif), ui-serif, Georgia, serif;
+  font-weight: 400;
+}
+
+/* ---------------------------------------------------------------------------
+   Effects
+   -------------------------------------------------------------------------*/
+
+/* A fine film grain over hero photography. Pure CSS rather than an image so it
+   costs no request and cannot 404. */
+.sb-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* Gradient text. Two rules rather than a utility string because the fallback
+   matters: if background-clip:text is unsupported the text must stay visible,
+   so the colour is only made transparent inside the @supports. */
+.sb-shine {
+  background-image: linear-gradient(
+    100deg,
+    var(--sb-ember),
+    var(--sb-coral) 55%,
+    var(--sb-violet)
+  );
+}
+
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+  .sb-shine {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+/* Section reveal on scroll. Uses scroll-driven animations where the browser
+   has them and does nothing at all where it does not — the @supports guard is
+   load-bearing, because without it every revealed section would sit at
+   opacity 0 forever in Safari and Firefox. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .sb-rise {
+      animation: sb-rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
+@keyframes sb-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Dropdown / popover entrance. */
+.sb-pop {
+  animation: sb-pop-in 160ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: top right;
+}
+
+@keyframes sb-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The place-name ticker under the hero. The track holds the list twice, so
+   translating by exactly -50% lands on an identical frame and the loop has no
+   visible seam. */
+.sb-marquee {
+  display: flex;
+  width: max-content;
+  animation: sb-marquee 42s linear infinite;
+}
+
+.sb-marquee-host:hover .sb-marquee {
+  animation-play-state: paused;
+}
+
+@keyframes sb-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* A slow drift on hero background art. Deliberately tiny — it should read as
+   the photograph breathing, not as a pan. */
+.sb-drift {
+  animation: sb-drift 28s ease-in-out infinite alternate;
+}
+
+@keyframes sb-drift {
+  from {
+    transform: scale(1.06) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.12) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+/* Card lift.
+   NEVER put .sb-lift and .sb-rise on the same element. A scroll-driven
+   animation holds `transform` for as long as it is attached, so the reveal
+   wins over this hover rule and the lift silently stops working — with no
+   error and nothing visibly wrong until you try to hover. Reveal on a
+   wrapper, lift on the card inside it. */
+.sb-lift {
+  transition:
+    transform 400ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 400ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 400ms ease;
+}
+
+.sb-lift:hover {
+  transform: translateY(-0.35rem);
+}
+
+/* Everything above is decoration. Someone who has asked their OS for less
+   motion gets the layout and none of it. */
+@media (prefers-reduced-motion: reduce) {
+  .sb-marquee,
+  .sb-drift,
+  .sb-pop,
+  .sb-rise {
+    animation: none !important;
+  }
+
+  .sb-lift:hover {
+    transform: none;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

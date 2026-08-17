@@ -11,9 +11,13 @@ type Item = { href: string; label: string }
 export function MobileMenu({
   links,
   account,
+  labels,
 }: {
   links: Item[]
   account: Item[]
+  // Passed in rather than looked up here: this is a client component, and the
+  // locale lives in a cookie the server already read for the header.
+  labels: { open: string; close: string }
 }) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
@@ -37,7 +41,7 @@ export function MobileMenu({
     <div className="md:hidden">
       <button
         type="button"
-        aria-label={open ? 'Close menu' : 'Open menu'}
+        aria-label={open ? labels.close : labels.open}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
