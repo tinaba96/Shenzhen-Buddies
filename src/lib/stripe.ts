@@ -12,27 +12,3 @@ export function stripe(): Stripe {
   return _stripe
 }
 
-export type SubscriptionRow = {
-  user_id: string
-  stripe_customer_id: string
-  stripe_subscription_id: string
-  status: string
-  price_id: string | null
-  current_period_end: string | null
-  trial_end: string | null
-  cancel_at_period_end: boolean
-}
-
-const ACTIVE_STATUSES = new Set([
-  'active',
-  'trialing',
-  'past_due', // grace period; still treat as entitled
-])
-
-export function isSubscriptionActive(row: SubscriptionRow | null | undefined): boolean {
-  if (!row) return false
-  if (!ACTIVE_STATUSES.has(row.status)) return false
-  // No period_end → treat as inactive. Safer default than assuming "forever active".
-  if (!row.current_period_end) return false
-  return new Date(row.current_period_end).getTime() > Date.now()
-}

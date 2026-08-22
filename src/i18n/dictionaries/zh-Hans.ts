@@ -36,7 +36,6 @@ export const zhHans: Dictionary = {
     signUp: '注册',
     exploreFirst: '先逛逛深圳',
     freeDuringPilot: '试运营期间免费',
-    freeTrial: 'Premium 会员 14 天免费试用',
   },
 
   nav: {

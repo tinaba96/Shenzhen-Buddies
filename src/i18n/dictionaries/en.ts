@@ -54,10 +54,6 @@ export const en = {
     signUp: 'Sign up',
     exploreFirst: 'Explore Shenzhen first',
     freeDuringPilot: 'Free during pilot',
-    // Carried over from the old hero trust strip. The Premium trial is a real
-    // offer on /pricing, so it stays reachable from the homepage — demoted to
-    // the fine print rather than dropped.
-    freeTrial: 'Free 14-day Premium trial',
   },
 
   nav: {

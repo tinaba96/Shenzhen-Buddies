@@ -29,7 +29,6 @@ const ROUTES: Array<{
   // canonicalise back to /blog. Individual posts are appended below.
   { path: '/blog', priority: 0.6, changeFrequency: 'weekly' },
   { path: '/about', priority: 0.5, changeFrequency: 'monthly' },
-  { path: '/pricing', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/contact', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/welcome', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' },

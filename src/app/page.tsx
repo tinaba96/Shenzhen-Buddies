@@ -127,10 +127,6 @@ function Hero({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
             ·{' '}
             <Link href="/login" className="underline hover:text-white">
               {t.common.alreadyHaveAccount}
-            </Link>{' '}
-            ·{' '}
-            <Link href="/pricing" className="underline hover:text-white">
-              {t.common.freeTrial}
             </Link>
           </p>
         )}

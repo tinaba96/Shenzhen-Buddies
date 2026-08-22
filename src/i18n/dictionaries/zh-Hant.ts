@@ -45,7 +45,6 @@ export const zhHant: Dictionary = {
     signUp: '註冊',
     exploreFirst: '先逛逛深圳',
     freeDuringPilot: '試營運期間免費',
-    freeTrial: 'Premium 會員 14 天免費試用',
   },
 
   nav: {

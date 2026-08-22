@@ -113,10 +113,6 @@ export default function PrivacyPage() {
                 payment identifiers and status. Card numbers stay with Stripe.
               </li>
               <li>
-                <strong>Subscription</strong> — Stripe customer ID, status,
-                renewal/trial dates. Card numbers stay with Stripe.
-              </li>
-              <li>
                 <strong>Consent &amp; audit records</strong> — when you book, we
                 record that you agreed to our{' '}
                 <Link href="/terms" className="underline">Terms</Link> and{' '}
@@ -140,7 +136,6 @@ export default function PrivacyPage() {
               <li>
                 To take bookings and process payments and refunds via Stripe.
               </li>
-              <li>To process subscription payments via Stripe.</li>
               <li>
                 To keep an audit record that you agreed to our Terms and
                 Cancellation Policy (a legal basis for the booking contract).
@@ -187,9 +182,8 @@ export default function PrivacyPage() {
                 <strong>Vercel</strong> — application hosting and edge delivery.
               </li>
               <li>
-                <strong>Stripe</strong> — payments for bookings and
-                subscriptions, and refunds. Stripe handles all payment-card
-                data. (
+                <strong>Stripe</strong> — payments for bookings, and refunds.
+                Stripe handles all payment-card data. (
                 <a
                   href="https://stripe.com/privacy"
                   target="_blank"
@@ -220,10 +214,6 @@ export default function PrivacyPage() {
                 required to keep them (for example, tax, accounting, and
                 fraud-prevention obligations), then delete them when no longer
                 needed.
-              </li>
-              <li>
-                <strong>Cancel subscription</strong> — use the billing portal
-                from <Link href="/pricing" className="underline">/pricing</Link>.
               </li>
             </ul>
           </Section>

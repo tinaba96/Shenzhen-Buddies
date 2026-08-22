@@ -36,7 +36,6 @@ export const ja: Dictionary = {
     signUp: '新規登録',
     exploreFirst: 'まず深圳を眺めてみる',
     freeDuringPilot: 'パイロット期間は無料',
-    freeTrial: 'Premium 14日間の無料トライアル',
   },
 
   nav: {

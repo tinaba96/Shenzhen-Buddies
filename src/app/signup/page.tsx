@@ -110,7 +110,7 @@ export default async function SignupPage({ searchParams }: Props) {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-emerald-300">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
-                Free 14-day premium trial
+                Free during the pilot
               </li>
               <li className="flex items-center gap-2">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-emerald-300">

@@ -391,7 +391,6 @@ async function SiteFooter() {
           links={[
             { href: "/about", label: t.footer.about },
             { href: "/contact", label: t.footer.contact },
-            { href: "/pricing", label: "Premium" },
             { href: "/privacy", label: t.footer.privacy },
             { href: "/terms", label: t.footer.terms },
             { href: "/cancellation", label: t.footer.cancellation },
