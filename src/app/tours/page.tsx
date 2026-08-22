@@ -70,8 +70,8 @@ export default async function ToursPage() {
         <div className="absolute inset-0 overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/hero/night-market-skewers-stall.webp"
-            alt="A Shenzhen night market stall laid with trays of skewers under strip lighting"
+            src="/hero/skyline-bay-dusk-reflections.webp"
+            alt="The Shenzhen Bay skyline at dusk, its lit towers reflected in the water"
             className="sb-drift h-full w-full object-cover"
           />
         </div>
