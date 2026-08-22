@@ -4,19 +4,19 @@ import { Avatar } from '@/components/Avatar'
 import { PromoCode } from '@/components/PromoCode'
 import { DEFAULT_OG_IMAGE } from '@/lib/config'
 
-const PROMO = 'WELCOME10'
+const PROMO = 'VIP50'
 
 export const metadata: Metadata = {
-  title: 'Get 10% off your Shenzhen day — Shenzhen Buddies',
+  title: 'Get 50% off your Shenzhen day — Shenzhen Buddies',
   description:
-    'Book a local guide in Shenzhen for a day out. Use code WELCOME10 for 10% off your first booking. CA$10/hour, 4–8 hours, fully refunded if we can’t confirm.',
+    'Book a local guide in Shenzhen for a day out. Use code VIP50 for 50% off your first booking. CA$10/hour, 4–8 hours, fully refunded if we can’t confirm.',
   alternates: { canonical: '/welcome' },
   // Declared explicitly: the root layout sets an openGraph block, and
   // metadata merges per key — so a page that omits this inherits the site's
   // generic title, description and an og:url pointing at the homepage.
   openGraph: {
-    title: 'Get 10% off your Shenzhen day — Shenzhen Buddies',
-    description: 'Book a local guide in Shenzhen for a day out. Use code WELCOME10 for 10% off your first booking. CA$10/hour, 4–8 hours, fully refunded if we can’t confirm.',
+    title: 'Get 50% off your Shenzhen day — Shenzhen Buddies',
+    description: 'Book a local guide in Shenzhen for a day out. Use code VIP50 for 50% off your first booking. CA$10/hour, 4–8 hours, fully refunded if we can’t confirm.',
     url: '/welcome',
     // Required alongside any openGraph object — see the note in about/page.tsx.
     // This page is the promo-code landing page pasted into Instagram, so a
@@ -73,7 +73,7 @@ function Hero() {
         <h1 className="mt-7 max-w-4xl text-balance text-5xl font-semibold leading-[1.05] tracking-tight drop-shadow-xl sm:text-7xl">
           Your first day in Shenzhen,{' '}
           <span className="bg-gradient-to-r from-amber-300 via-orange-300 to-rose-300 bg-clip-text text-transparent">
-            10% off.
+            50% off.
           </span>
         </h1>
 
@@ -99,7 +99,7 @@ function Hero() {
                 />
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold leading-none">10%</p>
+                <p className="text-3xl font-bold leading-none">50%</p>
                 <p className="text-[11px] uppercase tracking-wider text-white/60">
                   off
                 </p>
@@ -116,7 +116,7 @@ function Hero() {
             href="/signup?as=tourist"
             className="rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:bg-zinc-100"
           >
-            Claim my 10% →
+            Claim my 50% →
           </Link>
           <Link
             href="/guide"
@@ -168,7 +168,7 @@ function DealStrip() {
             <p className="mt-4 max-w-md text-zinc-600 dark:text-zinc-400">
               Every booking is a flat CA$10 an hour — pick anywhere from 4 to 8
               hours. Add <span className="font-semibold text-zinc-900 dark:text-zinc-100">{PROMO}</span> at
-              checkout and 10% comes straight off. If we can’t confirm your day,
+              checkout and 50% comes straight off. If we can’t confirm your day,
               you’re refunded in full.
             </p>
             <Link
@@ -191,16 +191,16 @@ function DealStrip() {
             <div className="mt-4 flex items-end gap-3">
               <span className="text-2xl text-zinc-400 line-through">CA$80</span>
               <span className="bg-gradient-to-r from-amber-500 to-rose-500 bg-clip-text text-5xl font-bold tracking-tight text-transparent">
-                CA$72
+                CA$40
               </span>
             </div>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              8 hours × CA$10 − 10% with {PROMO}
+              8 hours × CA$10 − 50% with {PROMO}
             </p>
             <dl className="mt-6 space-y-2 border-t border-zinc-200/70 pt-4 text-sm dark:border-zinc-700/70">
               <Row label="Hourly rate" value="CA$10" />
               <Row label="Day length" value="4–8 hours" />
-              <Row label="Welcome discount" value="−10%" highlight />
+              <Row label="Welcome discount" value="−50%" highlight />
               <Row label="Payment" value="Card · Apple Pay · Link" />
             </dl>
           </div>
@@ -247,7 +247,7 @@ function HowItWorks() {
     {
       n: '02',
       title: `Pay with ${PROMO}`,
-      body: 'Enter the code at checkout for 10% off. Card, Apple Pay, or Link.',
+      body: 'Enter the code at checkout for 50% off. Card, Apple Pay, or Link.',
     },
     {
       n: '03',
@@ -388,14 +388,14 @@ function Testimonials() {
   const reviews = [
     {
       quote:
-        'Best CA$72 I spent in Shenzhen. A whole day of food and back streets I’d never have found. Used the welcome code without even thinking.',
+        'Best CA$40 I spent in Shenzhen. A whole day of food and back streets I’d never have found. Used the welcome code without even thinking.',
       name: 'Sarah K.',
       role: 'Visiting from London',
       photo: 'https://i.pravatar.cc/120?img=47',
     },
     {
       quote:
-        'Booking took two minutes, the code knocked off 10%, and confirmation came the next morning. Felt like meeting a friend.',
+        'Booking took two minutes, the welcome code worked first try, and confirmation came the next morning. Felt like meeting a friend.',
       name: 'Marco R.',
       role: 'Visiting from Milan',
       photo: 'https://i.pravatar.cc/120?img=33',
@@ -462,7 +462,7 @@ function Faq() {
   const faqs = [
     {
       q: `How do I use ${PROMO}?`,
-      a: 'Pick your day and continue to payment. On the secure checkout page, tap “Add promotion code”, paste WELCOME10, and the 10% comes off instantly.',
+      a: 'Pick your day and continue to payment. On the secure checkout page, tap “Add promotion code”, paste VIP50, and the 50% comes off instantly.',
     },
     {
       q: 'When am I charged?',
@@ -525,7 +525,7 @@ function FinalCta() {
           Shenzhen is better with a friend.
         </h2>
         <p className="mx-auto mt-4 max-w-md text-white/90 drop-shadow">
-          Grab your welcome code and book your first day out — 10% off, fully
+          Grab your welcome code and book your first day out — 50% off, fully
           refundable.
         </p>
 
@@ -541,7 +541,7 @@ function FinalCta() {
             href="/signup?as=tourist"
             className="rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-zinc-100"
           >
-            Claim my 10% →
+            Claim my 50% →
           </Link>
           <Link
             href="/login"
