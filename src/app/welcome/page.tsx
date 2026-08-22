@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 }
 
 const HERO_PHOTO =
-  '/hero/night-market-skewers-stall.webp'
+  '/hero/skyline-bay-dusk-reflections.webp'
 
 export default function WelcomePage() {
   return (
