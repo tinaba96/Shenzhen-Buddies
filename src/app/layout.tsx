@@ -375,7 +375,12 @@ async function SiteFooter() {
             { href: "/explore", label: t.nav.explore },
             { href: "/gallery", label: t.nav.gallery },
             { href: "/blog", label: t.nav.blog },
-            { href: "/browse", label: t.common.browseBuddies },
+            // Beta: while the single operator-managed guide is configured,
+            // the marketplace stays hidden (not removed) — same rule as the
+            // header nav and /browse's own redirect.
+            ...(isSingleGuideMode()
+              ? [{ href: "/guide", label: t.nav.bookAGuide }]
+              : [{ href: "/browse", label: t.common.browseBuddies }]),
           ]}
         />
         <FooterColumn

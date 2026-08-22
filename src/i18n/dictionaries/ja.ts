@@ -176,6 +176,7 @@ export const ja: Dictionary = {
       titleAnon: '一緒に出かける準備はできましたか？',
       titleLoggedIn: '次のバディを見つける。',
       bodyAnon: 'パイロット期間中の登録は無料。1分もかかりません。',
+      bodySingleGuide: '日にちを選んで、あなたの4時間を予約しましょう。',
       bodyLoggedIn: '公開プロフィールを見て、会話を始めましょう。',
     },
   },

@@ -10,6 +10,7 @@ import {
 import { publishedPosts } from '@/content/posts'
 import type { Dictionary } from '@/i18n'
 import { getI18n } from '@/i18n/server'
+import { isSingleGuideMode } from '@/lib/config'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { Locale } from '@/i18n/config'
 
@@ -873,6 +874,10 @@ function PartnerBanner({ t }: { t: Dictionary }) {
 }
 
 function FinalCTA({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
+  // Beta: in single-guide mode a logged-in visitor has no marketplace to
+  // browse, so the CTA books the guide instead of advertising profiles.
+  // Same rule as the header nav, the footer, and /browse's own redirect.
+  const marketplace = !isSingleGuideMode()
   return (
     <section className="relative overflow-hidden bg-zinc-950 text-white">
       <div
@@ -885,17 +890,27 @@ function FinalCTA({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
       />
       <div className="relative mx-auto max-w-3xl px-6 py-24 text-center sm:py-32">
         <h2 className="sb-display text-4xl leading-tight tracking-tight sm:text-6xl">
-          {loggedIn ? t.home.finalCta.titleLoggedIn : t.home.finalCta.titleAnon}
+          {loggedIn && marketplace
+            ? t.home.finalCta.titleLoggedIn
+            : t.home.finalCta.titleAnon}
         </h2>
         <p className="mt-4 text-zinc-400">
-          {loggedIn ? t.home.finalCta.bodyLoggedIn : t.home.finalCta.bodyAnon}
+          {loggedIn
+            ? marketplace
+              ? t.home.finalCta.bodyLoggedIn
+              : t.home.finalCta.bodySingleGuide
+            : t.home.finalCta.bodyAnon}
         </p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href={loggedIn ? '/browse' : '/signup'}
+            href={loggedIn ? (marketplace ? '/browse' : '/guide') : '/signup'}
             className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-zinc-900 shadow-lg transition hover:bg-zinc-100"
           >
-            {loggedIn ? t.common.browseBuddies : t.common.getStarted}
+            {loggedIn
+              ? marketplace
+                ? t.common.browseBuddies
+                : t.nav.bookAGuide
+              : t.common.getStarted}
             <span aria-hidden>→</span>
           </Link>
           <Link

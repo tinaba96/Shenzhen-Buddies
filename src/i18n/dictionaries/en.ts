@@ -195,6 +195,9 @@ export const en = {
       titleLoggedIn: 'Find your next buddy.',
       bodyAnon: 'Free to join during the pilot. Takes under a minute.',
       bodyLoggedIn: 'Browse public profiles and start a conversation.',
+      // Shown instead of bodyLoggedIn while single-guide mode hides the
+      // marketplace: there are no profiles to browse, only a day to book.
+      bodySingleGuide: 'Pick a day and book your four hours with a local.',
     },
   },
 

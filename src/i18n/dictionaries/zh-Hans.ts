@@ -176,6 +176,7 @@ export const zhHans: Dictionary = {
       titleAnon: '准备好一起出发了吗？',
       titleLoggedIn: '找下一位伙伴。',
       bodyAnon: '试运营期间免费加入，一分钟不到。',
+      bodySingleGuide: '选个日子，预订属于你的四小时。',
       bodyLoggedIn: '浏览公开资料，直接开聊。',
     },
   },

@@ -185,6 +185,7 @@ export const zhHant: Dictionary = {
       titleAnon: '準備好一起出發了嗎？',
       titleLoggedIn: '找下一位夥伴。',
       bodyAnon: '試營運期間免費加入，一分鐘不到。',
+      bodySingleGuide: '選個日子，預訂屬於你的四小時。',
       bodyLoggedIn: '瀏覽公開資料，直接開聊。',
     },
   },
