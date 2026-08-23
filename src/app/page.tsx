@@ -102,12 +102,21 @@ function Hero({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
               >
                 {t.home.hero.primaryCta}
               </Link>
-              <Link
-                href="/signup?as=guide"
-                className="rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
-              >
-                {t.home.hero.secondaryCta}
-              </Link>
+              {/* Beta: hidden, not removed — same rule as the marketplace.
+                  Recruiting guides is the whole point of this button, but in
+                  single-guide mode there is nothing behind it: signup ignores
+                  ?as=guide, profile/actions.ts hands every new account the
+                  'tourist' role, and /browse redirects to /guide, so a second
+                  guide would have no page anyone could reach. It comes back
+                  the moment OFFICIAL_GUIDE_ID is unset. */}
+              {!isSingleGuideMode() && (
+                <Link
+                  href="/signup?as=guide"
+                  className="rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-sm font-medium text-white backdrop-blur transition hover:bg-white/20"
+                >
+                  {t.home.hero.secondaryCta}
+                </Link>
+              )}
             </>
           )}
         </div>

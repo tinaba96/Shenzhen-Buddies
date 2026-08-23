@@ -1,18 +1,18 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { DEFAULT_OG_IMAGE } from '@/lib/config'
+import { DEFAULT_OG_IMAGE, isSingleGuideMode } from '@/lib/config'
 
 export const metadata: Metadata = {
   title: 'Contact — Shenzhen Buddies',
   description:
-    'Get in touch with the Shenzhen Buddies team — feedback, partnerships, press, or guide applications.',
+    'Get in touch with the Shenzhen Buddies team — feedback, partnerships, press, or trust and safety.',
   alternates: { canonical: '/contact' },
   // Declared explicitly: the root layout sets an openGraph block, and
   // metadata merges per key — so a page that omits this inherits the site's
   // generic title, description and an og:url pointing at the homepage.
   openGraph: {
     title: 'Contact — Shenzhen Buddies',
-    description: 'Get in touch with the Shenzhen Buddies team — feedback, partnerships, press, or guide applications.',
+    description: 'Get in touch with the Shenzhen Buddies team — feedback, partnerships, press, or trust and safety.',
     url: '/contact',
     // Required alongside any openGraph object — see the note in about/page.tsx.
     images: [DEFAULT_OG_IMAGE],
@@ -79,6 +79,14 @@ const FACTS = [
 ]
 
 export default function ContactPage() {
+  // Beta: hidden, not removed — same rule as the marketplace and the homepage
+  // hero's guide CTA. The card says "Apply", but there is no application:
+  // signup ignores ?as=guide and profile/actions.ts hands every new account
+  // the 'tourist' role, so the only way to become a guide is by hand in the
+  // database. Unset OFFICIAL_GUIDE_ID and the card returns untouched.
+  const channels = isSingleGuideMode()
+    ? CHANNELS.filter((c) => c.icon !== 'guide')
+    : CHANNELS
   return (
     <main className="flex flex-1 flex-col">
       <section className="relative overflow-hidden">
@@ -116,7 +124,7 @@ export default function ContactPage() {
 
       <section className="border-b border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto grid max-w-5xl gap-5 px-6 py-20 sm:grid-cols-2">
-          {CHANNELS.map((c) => (
+          {channels.map((c) => (
             <article
               key={c.title}
               className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
