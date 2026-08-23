@@ -49,8 +49,8 @@ function Hero({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
       <div className="absolute inset-0 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/hero/skyline-tower-walkway-night.webp"
-          alt="A Shenzhen tower lit white against the night sky, seen past a raised pedestrian walkway"
+          src="/hero/skyline-bay-tower-night.webp"
+          alt="Nanshan's skyline lit up at night across Shenzhen Bay, the towers mirrored in still water"
           className="sb-drift h-full w-full object-cover"
         />
       </div>
