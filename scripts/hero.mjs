@@ -54,6 +54,18 @@ const flag = (k, d) => {
   return f ? f.slice(k.length + 3) : d
 }
 const only = flag('only', '').split(',').filter(Boolean)
+// Per-variant size override, e.g. --size-sp=1450x3222. The homepage hero needs
+// a taller, narrower phone crop than the rest of the site: its box is 0.43-0.45
+// where other heroes are 0.65-0.87, and it is the only one carrying .sb-drift,
+// which magnifies it a further 1.12. The default 1320x2030 would be upscaled
+// 1.44x there.
+for (const [name, v] of Object.entries(VARIANTS)) {
+  const o = flag(`size-${name}`, '')
+  if (!o) continue
+  const [w, h] = o.split('x').map(Number)
+  if (!w || !h) { console.error(`bad --size-${name}=${o}`); process.exit(1) }
+  v.w = w; v.h = h
+}
 const stem = path.basename(src, path.extname(src))
 
 const meta = await sharp(src).metadata()
