@@ -2,13 +2,12 @@ import Link from 'next/link'
 import { SubmitButton } from '@/components/SubmitButton'
 import { safeNextPath } from '@/lib/redirects'
 import { signup } from './actions'
+import { HeroImage } from '@/components/HeroImage'
 
 type Props = {
   searchParams: Promise<{ error?: string; check_email?: string; next?: string }>
 }
 
-const SIDE_PHOTO =
-  '/hero/night-market-skewers-stall.webp'
 
 export default async function SignupPage({ searchParams }: Props) {
   const { error, check_email, next } = await searchParams
@@ -89,11 +88,11 @@ export default async function SignupPage({ searchParams }: Props) {
 
       {/* Photo panel */}
       <aside className="relative hidden lg:flex lg:flex-1">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={SIDE_PHOTO}
-          alt="Vibrant city scene"
+        <HeroImage
+          name="night-market-skewers-stall"
+          alt="Skewers grilling at a Shenzhen night-market stall"
           className="absolute inset-0 h-full w-full object-cover"
+          shape="panel"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-rose-500/30 via-amber-500/30 to-black/60" />
         <div className="relative flex items-end p-12">

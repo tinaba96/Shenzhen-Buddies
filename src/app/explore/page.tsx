@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { DEFAULT_OG_IMAGE, isSingleGuideMode } from '@/lib/config'
+import { HeroImage } from '@/components/HeroImage'
 
 const TITLE = 'Explore Shenzhen by district — Shenzhen Buddies'
 const DESCRIPTION =
@@ -61,7 +62,6 @@ type District = {
   }
 }
 
-const HERO_PHOTO = '/hero/skyline-blue-towers-night.webp'
 
 const districts: District[] = [
   {
@@ -189,9 +189,8 @@ export default function ExplorePage() {
     <main className="flex flex-1 flex-col">
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={HERO_PHOTO}
+        <HeroImage
+          name="skyline-blue-towers-night"
           alt="Shenzhen towers lit blue at night, seen from street level"
           className="absolute inset-0 h-full w-full object-cover"
         />

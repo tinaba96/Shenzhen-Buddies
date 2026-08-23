@@ -2,13 +2,12 @@ import Link from 'next/link'
 import { SubmitButton } from '@/components/SubmitButton'
 import { safeNextPath } from '@/lib/redirects'
 import { login } from './actions'
+import { HeroImage } from '@/components/HeroImage'
 
 type Props = {
   searchParams: Promise<{ error?: string; next?: string }>
 }
 
-const SIDE_PHOTO =
-  '/hero/skyline-blue-towers-night.webp'
 
 const SPLITWHOM_URL =
   'https://splitwhom.com/?utm_source=shenzhen-buddies&utm_medium=referral&utm_campaign=og_banner&utm_content=login'
@@ -113,11 +112,11 @@ export default async function LoginPage({ searchParams }: Props) {
 
       {/* Photo panel */}
       <aside className="relative hidden lg:flex lg:flex-1">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={SIDE_PHOTO}
+        <HeroImage
+          name="skyline-blue-towers-night"
           alt="Shenzhen at night"
           className="absolute inset-0 h-full w-full object-cover"
+          shape="panel"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/30 via-rose-500/30 to-black/60" />
         <div className="relative flex items-end p-12">

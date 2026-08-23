@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { DEFAULT_OG_IMAGE } from '@/lib/config'
+import { HeroImage } from '@/components/HeroImage'
 
 export const metadata: Metadata = {
   title: 'About — Shenzhen Buddies',
@@ -22,8 +23,6 @@ export const metadata: Metadata = {
   },
 }
 
-const HERO_PHOTO =
-  '/hero/crayfish-noodles-lift.webp'
 
 
 const PILLARS: {
@@ -84,10 +83,9 @@ export default function AboutPage() {
   return (
     <main className="flex flex-1 flex-col">
       <section className="relative overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={HERO_PHOTO}
-          alt="Shenzhen at dusk"
+        <HeroImage
+          name="crayfish-noodles-lift"
+          alt="A bowl of crayfish and a lift of noodles on a Shenzhen table"
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/45 to-black/80" />

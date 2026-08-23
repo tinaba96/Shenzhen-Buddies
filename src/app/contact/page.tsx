@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { DEFAULT_OG_IMAGE, isSingleGuideMode } from '@/lib/config'
+import { HeroImage } from '@/components/HeroImage'
 
 export const metadata: Metadata = {
   title: 'Contact — Shenzhen Buddies',
@@ -19,8 +20,6 @@ export const metadata: Metadata = {
   },
 }
 
-const HERO_PHOTO =
-  '/hero/skyline-blue-towers-night.webp'
 
 const CONTACT_EMAIL = 'hello@shenzhen-buddies.com'
 const PRESS_EMAIL = 'press@shenzhen-buddies.com'
@@ -90,9 +89,8 @@ export default function ContactPage() {
   return (
     <main className="flex flex-1 flex-col">
       <section className="relative overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={HERO_PHOTO}
+        <HeroImage
+          name="skyline-blue-towers-night"
           alt="Shenzhen at night"
           className="absolute inset-0 h-full w-full object-cover"
         />
