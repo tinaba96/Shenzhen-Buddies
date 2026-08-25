@@ -88,7 +88,7 @@ function Hero({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
           {t.home.hero.badge}
         </p>
 
-        <h1 className="sb-display mt-7 max-w-4xl text-balance text-5xl leading-[1.05] tracking-tight drop-shadow-xl sm:text-7xl lg:text-8xl">
+        <h1 className="sb-display mt-7 max-w-4xl text-balance text-5xl leading-[1.05] drop-shadow-xl sm:text-7xl lg:text-8xl">
           {t.home.hero.titleLead}{' '}
           <span className="sb-shine italic">{t.home.hero.titleAccent}</span>
         </h1>
@@ -275,7 +275,7 @@ async function Packages({ locale, t }: { locale: Locale; t: Dictionary }) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
             {t.home.packages.kicker}
           </p>
-          <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+          <h2 className="sb-display mt-3 text-4xl leading-tight sm:text-5xl">
             {t.home.packages.title}
           </h2>
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
@@ -359,7 +359,7 @@ function Promise_({ t }: { t: Dictionary }) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
             {t.home.promise.kicker}
           </p>
-          <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+          <h2 className="sb-display mt-3 text-4xl leading-tight sm:text-5xl">
             {t.home.promise.title}
           </h2>
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
@@ -421,7 +421,7 @@ function Districts({ t }: { t: Dictionary }) {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
               {t.home.districts.kicker}
             </p>
-            <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+            <h2 className="sb-display mt-3 text-4xl leading-tight sm:text-5xl">
               {t.home.districts.title}
             </h2>
             <p className="mt-4 text-base text-zinc-400">{t.home.districts.body}</p>
@@ -445,7 +445,7 @@ function Districts({ t }: { t: Dictionary }) {
                 <span className="w-8 shrink-0 font-mono text-xs tabular-nums text-zinc-600">
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <span className="sb-display flex-1 text-3xl tracking-tight transition group-hover:translate-x-2 sm:text-4xl">
+                <span className="sb-display flex-1 text-3xl transition group-hover:translate-x-2 sm:text-4xl">
                   {d.name}
                 </span>
                 <span className="text-lg text-zinc-500 transition group-hover:text-amber-400 sm:text-2xl">
@@ -490,7 +490,7 @@ function HowItWorks({ t }: { t: Dictionary }) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
             {t.home.howItWorks.kicker}
           </p>
-          <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+          <h2 className="sb-display mt-3 text-4xl leading-tight sm:text-5xl">
             {t.home.howItWorks.title}
           </h2>
         </div>
@@ -629,7 +629,7 @@ function AudienceCard({
         <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
           {subtitle}
         </p>
-        <h3 className="sb-display mt-1 text-3xl tracking-tight">{title}</h3>
+        <h3 className="sb-display mt-1 text-3xl">{title}</h3>
         <ul className="mt-5 space-y-2.5 text-sm text-zinc-700 dark:text-zinc-300">
           {points.map((p) => (
             <li key={p} className="flex items-start gap-2.5">
@@ -692,7 +692,7 @@ function Testimonials({ t }: { t: Dictionary }) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
             {t.home.testimonials.kicker}
           </p>
-          <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+          <h2 className="sb-display mt-3 text-4xl leading-tight sm:text-5xl">
             {t.home.testimonials.title}
           </h2>
         </div>
@@ -755,7 +755,7 @@ function Journal({ t }: { t: Dictionary }) {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
               {t.home.journal.kicker}
             </p>
-            <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+            <h2 className="sb-display mt-3 text-4xl leading-tight sm:text-5xl">
               {t.home.journal.title}
             </h2>
             <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
@@ -797,7 +797,7 @@ function Journal({ t }: { t: Dictionary }) {
                     <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
                       {post.publishedAt}
                     </p>
-                    <h3 className="sb-display mt-2 text-2xl leading-snug tracking-tight">
+                    <h3 className="sb-display mt-2 text-2xl leading-snug">
                       {post.title}
                     </h3>
                     <p className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400">
@@ -828,7 +828,7 @@ function Moments({ t }: { t: Dictionary }) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
             {t.home.moments.kicker}
           </p>
-          <h2 className="sb-display mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+          <h2 className="sb-display mt-3 text-4xl leading-tight sm:text-5xl">
             {t.home.moments.title}
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-zinc-600 dark:text-zinc-400">
@@ -917,7 +917,7 @@ function FinalCTA({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
         }}
       />
       <div className="relative mx-auto max-w-3xl px-6 py-24 text-center sm:py-32">
-        <h2 className="sb-display text-4xl leading-tight tracking-tight sm:text-6xl">
+        <h2 className="sb-display text-4xl leading-tight sm:text-6xl">
           {loggedIn && marketplace
             ? t.home.finalCta.titleLoggedIn
             : t.home.finalCta.titleAnon}

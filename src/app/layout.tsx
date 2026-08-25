@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Geist, Geist_Mono, Newsreader } from "next/font/google";
 import Link from "next/link";
 import { Analytics } from "@/components/Analytics";
 import { Avatar } from "@/components/Avatar";
@@ -28,14 +28,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// The editorial display face for headlines. One weight, Latin only — CJK
-// locales are switched back to the sans in globals.css, because this family
-// has no Chinese or Japanese glyphs and would fall back to a mismatched
-// system serif mid-headline.
-const displaySerif = Instrument_Serif({
+// The editorial display face for headlines. Latin only — CJK locales are
+// switched back to the sans in globals.css, because this family has no Chinese
+// or Japanese glyphs and would fall back to a mismatched system serif
+// mid-headline.
+//
+// Newsreader replaced Instrument Serif, which is a condensed high-contrast
+// display face: narrow by design, and every heading also carried Tailwind's
+// tracking-tight, so a narrow face was being squeezed further. At 36px its
+// hairlines went frail and it shared no proportions with Geist in the body
+// text directly beneath. Newsreader is a screen-first editorial serif, wider
+// and lower contrast, and it carries a real italic — .sb-shine in the hero was
+// previously being synthesised by the browser.
+//
+// Variable on both axes: opsz lets one file serve a 20px card heading and an
+// 96px hero without the large sizes looking soft or the small ones spindly.
+const displaySerif = Newsreader({
   variable: "--font-display-serif",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 

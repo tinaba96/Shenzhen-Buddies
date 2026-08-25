@@ -122,7 +122,7 @@ export default async function TourDetailPage({ params }: Props) {
           <p className="mt-8 text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
             {pkg.kicker}
           </p>
-          <h1 className="sb-display mt-3 text-5xl leading-[1.05] tracking-tight drop-shadow-xl sm:text-7xl">
+          <h1 className="sb-display mt-3 text-5xl leading-[1.05] drop-shadow-xl sm:text-7xl">
             {pkg.title}
           </h1>
           <p className="mt-2 text-2xl text-white/60 sm:text-3xl">{pkg.cn}</p>
@@ -146,7 +146,7 @@ export default async function TourDetailPage({ params }: Props) {
 
           {/* ITINERARY */}
           <section className="mt-14">
-            <h2 className="sb-display text-3xl tracking-tight">
+            <h2 className="sb-display text-3xl">
               {t.tours.detail.itinerary}
             </h2>
             <p className="mt-2 text-sm text-zinc-500">
@@ -315,7 +315,7 @@ export default async function TourDetailPage({ params }: Props) {
       {/* RELATED */}
       <section className="border-t border-zinc-200 bg-zinc-50/60 dark:border-zinc-800 dark:bg-zinc-950/40">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <h2 className="sb-display text-3xl tracking-tight">
+          <h2 className="sb-display text-3xl">
             {t.tours.detail.otherExperiences}
           </h2>
           <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

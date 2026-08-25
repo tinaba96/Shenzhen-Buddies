@@ -119,7 +119,7 @@ export function PackageCard({
               </span>
             </div>
 
-            <h3 className="sb-display mt-5 text-3xl leading-tight tracking-tight sm:text-4xl">
+            <h3 className="sb-display mt-5 text-3xl leading-tight sm:text-4xl">
               {pkg.title}
             </h3>
             <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
@@ -195,7 +195,7 @@ export function PackageCard({
       </Link>
 
       <div className="flex flex-1 flex-col p-6">
-        <h3 className="sb-display text-2xl leading-snug tracking-tight">
+        <h3 className="sb-display text-2xl leading-snug">
           <Link href={href} className="transition hover:opacity-70">
             {pkg.title}
           </Link>

@@ -20,8 +20,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  /* The editorial display face, loaded in layout.tsx. Used for headlines
-     only — it has one weight and no italic small sizes worth reading. */
+  /* The editorial display face, loaded in layout.tsx. Headlines only. */
   --font-display: var(--font-display-serif);
 }
 
@@ -74,7 +73,20 @@ html[lang^="ja"] .sb-display {
 
 .sb-display {
   font-family: var(--font-display-serif), ui-serif, Georgia, serif;
-  font-weight: 400;
+  /* 500, not 400. Newsreader is lower contrast than the face it replaced, so
+     at 400 it reads lighter than the Geist semibolds around it and the
+     hierarchy inverts. */
+  font-weight: 500;
+  /* Headings used to carry Tailwind's tracking-tight (-0.025em). That is a
+     convention for tight geometric sans and it actively hurts a serif — it
+     was a large part of why titles like "Huaqiangbei Deep Dive" read as
+     cramped. A hair of negative tracking still steadies the big sizes. */
+  letter-spacing: -0.005em;
+  /* Optical sizing: ask for the display cut. Newsreader's opsz axis runs
+     6..72, and headings here run 20px to 96px, so the top of the range is the
+     right end to sit at — it thins the strokes and tightens the fit the way a
+     display cut should. */
+  font-variation-settings: "opsz" 72;
 }
 
 /* ---------------------------------------------------------------------------

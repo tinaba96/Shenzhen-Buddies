@@ -80,7 +80,7 @@ export default async function ToursPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
             {t.tours.index.kicker}
           </p>
-          <h1 className="sb-display mt-4 text-5xl leading-[1.05] tracking-tight drop-shadow-xl sm:text-7xl">
+          <h1 className="sb-display mt-4 text-5xl leading-[1.05] drop-shadow-xl sm:text-7xl">
             {t.tours.index.title}
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base text-white/85 sm:text-lg">
@@ -101,7 +101,7 @@ export default async function ToursPage() {
           under them. It is also the strongest thing we have to say. */}
       <section className="border-b border-zinc-200 bg-zinc-50/60 dark:border-zinc-800 dark:bg-zinc-950/40">
         <div className="mx-auto max-w-3xl px-6 py-12 text-center">
-          <h2 className="sb-display text-2xl tracking-tight sm:text-3xl">
+          <h2 className="sb-display text-2xl sm:text-3xl">
             {t.tours.index.notATour.title}
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
@@ -131,7 +131,7 @@ export default async function ToursPage() {
       {/* CLOSING */}
       <section className="border-t border-zinc-200 bg-zinc-950 text-white dark:border-zinc-800">
         <div className="mx-auto max-w-3xl px-6 py-20 text-center">
-          <h2 className="sb-display text-3xl leading-tight tracking-tight sm:text-4xl">
+          <h2 className="sb-display text-3xl leading-tight sm:text-4xl">
             {t.home.finalCta.titleAnon}
           </h2>
           <p className="mt-4 text-sm text-zinc-400">
