@@ -13,6 +13,7 @@ import { getI18n } from '@/i18n/server'
 import { isSingleGuideMode } from '@/lib/config'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { Locale } from '@/i18n/config'
+import { HeroImage } from '@/components/HeroImage'
 
 export default async function Home() {
   const [{ locale, t }, supabase] = await Promise.all([
@@ -47,31 +48,11 @@ function Hero({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
   return (
     <section className="sb-grain relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
-        {/* Two crops of one photo, because this box changes shape completely.
-            Measured: 375x869 (ratio 0.43) on an iPhone SE, 1920x888 (2.16) on
-            a desktop. Feeding the landscape crop to a phone made object-cover
-            keep ~20% of its width and magnify that sliver, which is what made
-            the hero look soft on mobile. Under 768px the portrait crop matches
-            the box instead.
-
-            The widths in srcset account for .sb-drift, which scales the image
-            1.06->1.12 — the browser cannot know that, so a 1512px retina laptop
-            asks for ~3024px and is served the 3400 file with margin to spare.
-            Both crops come from the same 4224x5632 original; regenerate them
-            together or they will drift apart. */}
-        <picture>
-          <source
-            media="(max-width: 767px)"
-            srcSet="/hero/skyline-bay-tower-night-sp.webp"
-          />
-          <img
-            src="/hero/skyline-bay-tower-night.webp"
-            srcSet="/hero/skyline-bay-tower-night.webp 2000w, /hero/skyline-bay-tower-night-3400.webp 3400w"
-            sizes="100vw"
-            alt="Nanshan's skyline lit up at night across Shenzhen Bay, the towers mirrored in still water"
-            className="sb-drift h-full w-full object-cover"
-          />
-        </picture>
+        <HeroImage
+          name="skyline-bay-tower-night"
+          alt="Nanshan's skyline lit up at night across Shenzhen Bay, the towers mirrored in still water"
+          className="sb-drift h-full w-full object-cover"
+        />
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/50 to-black/85" />
       <div

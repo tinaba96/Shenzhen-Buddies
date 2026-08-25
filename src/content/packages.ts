@@ -86,8 +86,8 @@ export const packages: TourPackage[] = [
       "The world's densest electronics market, walked with someone who actually buys here.",
     summary:
       "Huaqiangbei is forty city blocks of components, modules, drones, second-hand phones and board-level repair, stacked floor on floor. On your own it is an overwhelming wall of Chinese-language signage and stalls that quote you a tourist number. With a local next to you it is a shopping trip: they read the stall, ask the real price, and tell you when the thing in your hand is a rebrand of something you can get one floor down for a third of the money.",
-    photo: '/gallery/maker-desk-dev-boards.webp',
-    alt: 'Single-board computers, modules and jumper wires spread across a workbench',
+    photo: '/gallery/huaqiangbei-electronic-world-night.webp',
+    alt: 'The lit entrance of Huaqiang Electronic World at night, above the Huaqiangbei metro entrance',
     district: 'Futian',
     bestStart: 'Late morning — most stalls are properly open by 11:00',
     meetingPoint:

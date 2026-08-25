@@ -144,6 +144,26 @@ const CONSENT_ID = /^SBC-\d{4}-\d{2}-\d{3}$/
 // and location chips appear on their own once four items share one.
 export const galleryItems: GalleryItem[] = [
   {
+    id: 'huaqiangbei-electronic-world-night',
+    kind: 'image',
+    src: '/gallery/huaqiangbei-electronic-world-night.webp',
+    width: 1200,
+    height: 1600,
+    alt: 'The lit entrance of Huaqiang Electronic World at night, its LED-clad facade and screens above the Huaqiangbei metro entrance.',
+    title: 'Huaqiang Electronic World after dark',
+    caption: 'Forty blocks of components start here. The night-market signs on the metro entrance are the giveaway that the buying does not stop when the offices close.',
+    // Not a guess: the building names itself twice in the frame (华强电子世界)
+    // and the metro entrance below reads 华强北站. Verifiable from the photo,
+    // which is the bar the rest of this file holds itself to.
+    location: 'huaqiangbei',
+    themes: ['tech', 'street', 'nightlife'],
+    // Place shot, not a portrait. The handful of passers-by are distant and
+    // unresolved even magnified past the published 1200x1600 — the subject is
+    // the building. See the note on this field above.
+    people: 'none',
+    capturedAt: '2026-08',
+  },
+  {
     id: 'skyline-tower-walkway-night',
     kind: 'image',
     src: '/gallery/skyline-tower-walkway-night.webp',

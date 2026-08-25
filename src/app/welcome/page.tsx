@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Avatar } from '@/components/Avatar'
 import { PromoCode } from '@/components/PromoCode'
 import { DEFAULT_OG_IMAGE } from '@/lib/config'
+import { HeroImage } from '@/components/HeroImage'
 
 const PROMO = 'VIP50'
 
@@ -25,8 +26,6 @@ export const metadata: Metadata = {
   },
 }
 
-const HERO_PHOTO =
-  '/hero/skyline-bay-dusk-reflections.webp'
 
 export default function WelcomePage() {
   return (
@@ -47,9 +46,8 @@ export default function WelcomePage() {
 function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={HERO_PHOTO}
+      <HeroImage
+        name="skyline-bay-dusk-reflections"
         alt="Shenzhen skyline at dusk"
         className="absolute inset-0 h-full w-full object-cover"
       />

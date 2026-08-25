@@ -10,6 +10,7 @@ import {
 } from '@/content/packages-i18n'
 import { getI18n } from '@/i18n/server'
 import { DEFAULT_OG_IMAGE, siteUrl } from '@/lib/config'
+import { HeroImage } from '@/components/HeroImage'
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n()
@@ -68,9 +69,8 @@ export default async function ToursPage() {
       {/* HERO */}
       <section className="sb-grain relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
         <div className="absolute inset-0 overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/hero/skyline-bay-dusk-reflections.webp"
+          <HeroImage
+            name="skyline-bay-dusk-reflections"
             alt="The Shenzhen Bay skyline at dusk, its lit towers reflected in the water"
             className="sb-drift h-full w-full object-cover"
           />
