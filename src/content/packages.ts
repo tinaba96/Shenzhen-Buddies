@@ -85,51 +85,51 @@ export const packages: TourPackage[] = [
     tagline:
       "The world's densest electronics market, walked with someone who actually buys here.",
     summary:
-      "Huaqiangbei is forty city blocks of components, modules, drones, second-hand phones and board-level repair, stacked floor on floor. On your own it is an overwhelming wall of Chinese-language signage and stalls that quote you a tourist number. With a local next to you it is a shopping trip: they read the stall, ask the real price, and tell you when the thing in your hand is a rebrand of something you can get one floor down for a third of the money.",
+      'Huaqiangbei is thirty-odd market buildings packed around one long pedestrian street — components by the reel, drone counters, used iPhones moving by the crate, and this year a visible wall of AI glasses. Thousands of overseas buyers shop it every day with a calculator and patience, and the vendors are used to them. What your buddy changes is the arithmetic: which building, which floor, which counter is the maker and which is a reseller marking up the stall next door — and a negotiation that starts from the local number instead of the walk-in quote.',
     photo: '/gallery/huaqiangbei-electronic-world-night.webp',
     alt: 'The lit entrance of Huaqiang Electronic World at night, above the Huaqiangbei metro entrance',
     district: 'Futian',
-    bestStart: 'Late morning — most stalls are properly open by 11:00',
+    bestStart: 'Early afternoon — the market fills by 14:00 and buildings start closing at 18:30',
     meetingPoint:
-      'Huaqiangbei metro station — your buddy sends the exact exit the night before',
+      'Huaqiangbei metro station (Lines 2 and 7) — your buddy sends the exact exit the night before',
     itinerary: [
       {
         at: '0:00',
         title: 'Ground rules on the pedestrian street',
-        body: "Ten minutes above ground before we go in: how a stall works, what a realistic price looks like, why the same part has four prices in one building, and getting Alipay or WeChat Pay working on your phone if it isn't already. Almost nothing here takes a foreign card at the counter.",
+        body: 'Ten minutes above ground before any doors: which buildings do components and which do phones, and why the first quote to a walk-in opens high — custom, not an insult. Then a check that Alipay or WeChat Pay actually works on your phone. The counters read QR codes, take cash grudgingly, and foreign cards not at all.',
       },
       {
         at: '0:30',
         title: 'SEG Plaza — the component floors',
-        body: 'Passives, connectors, dev boards, sensors, tools. This is the floor where you find out that the part you have been paying eleven dollars for online is sold here by the reel. We talk minimum order quantities and what a stall will and will not break open for one person.',
+        body: 'Floors one and two: passives, connectors, dev boards, sensors, tools, with computers and peripherals stacked above. Parts sell by the reel and most conversations open with minimum order quantities. Your buddy knows which counters will break a reel for one person, and which are the maker rather than a reseller.',
       },
       {
         at: '1:20',
-        title: 'Huaqiang Electronic World — modules & finished gear',
-        body: 'Drones, LED, audio boards, batteries, cameras, cables in every flavour. Your buddy asks for a bench test before money moves, which is normal here and almost never offered to a foreigner who cannot ask for it.',
+        title: 'Huaqiang Electronic World — six floors of it',
+        body: 'The building in the photo, red sign over the door, directly above the metro. Components, ICs, LED, cables, second-hand gear, tools — and lately whole runs of AI-glasses and drone counters. When something tempts you, your buddy asks for a bench test in Mandarin. You could mime it; asking properly is faster.',
       },
       {
         at: '2:10',
-        title: 'Mingtong Digital City — the phone floors',
-        body: 'Second-hand and refurbished handsets, screens, batteries and the grading language the trade uses. What an honest refurb looks like, what to check before you pay, and why the cheapest listing in the building is cheap.',
+        title: 'The used-phone floors',
+        body: 'Where used iPhones, iPads and Watches get graded, priced and moved in volume. Your buddy picks the building on the day — this trade moves addresses faster than guidebooks update. The grading talk is its own dialect, and your buddy translates it: what an honest refurb looks like, what to check before you pay.',
       },
       {
         at: '2:50',
-        title: 'Repair alley',
-        body: 'Counter after counter of board-level repair under microscopes — chips lifted off logic boards with hot air in ninety seconds. Worth standing and watching even if you came to buy nothing at all.',
+        title: 'Watch a chip come off a board',
+        body: 'Board-level repair under microscopes — chips lifted off logic boards with hot air while you watch. The counters cluster through the market. Worth ten minutes of standing still even if you buy nothing all day.',
       },
       {
         at: '3:20',
         title: 'Ship it, then sit down',
-        body: 'A courier counter for anything too heavy or too battery-shaped to fly with, then a cold drink while your buddy writes out the stalls worth going back to — building, floor, and what they are actually good for.',
+        body: 'A logistics counter inside the market for anything too heavy or too battery-shaped to fly with, then a cold drink while your buddy writes your shortlist — building, floor, counter, what each one is actually good for. Tomorrow you can come back alone.',
       },
     ],
     includes: [
       'Four hours one-on-one with a Shenzhen local, no group',
-      'Live Mandarin translation while you shop and while you ask for a test',
-      'Bargaining done for you, in the room, at local prices',
-      'Alipay / WeChat Pay set up on your phone if you need it',
-      'A written shortlist of stalls at the end — building, floor, what they are good for',
+      'Live Mandarin translation at the counter — prices, specs, bench tests',
+      'Bargaining done in the room, starting from the local number, not the walk-in quote',
+      'Alipay / WeChat Pay checked and working on your phone before you need it',
+      'A written shortlist at the end — building, floor, what each counter is good for',
     ],
     notIncluded: [
       'Anything you buy — you pay stalls directly, we never take a cut',
@@ -144,7 +144,7 @@ export const packages: TourPackage[] = [
       'Anyone who has watched a Huaqiangbei video and wanted to go',
     ],
     insiderTip:
-      'Link a card to Alipay or WeChat Pay before you fly. Stall counters take a QR code, not plastic, and "I will come back with cash" is how a good price disappears.',
+      'Link your Visa or Mastercard to Alipay or WeChat Pay before you fly — binding sometimes takes hours and sometimes just fails. The counters take a QR code, not plastic, and "I will come back with cash" is how a good price disappears.',
     accent: 'signal',
     featured: true,
   },
