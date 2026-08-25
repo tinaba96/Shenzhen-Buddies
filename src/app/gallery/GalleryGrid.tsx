@@ -154,6 +154,9 @@ export function GalleryGrid({
                     sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
                     loading={i < EAGER_ITEMS ? 'eager' : 'lazy'}
                     fetchPriority={i < EAGER_ITEMS ? 'high' : 'auto'}
+                    // 4:3 box, 3:4 source — object-cover keeps about half the
+                    // frame's height. `focus` says which half matters.
+                    style={item.focus ? { objectPosition: item.focus } : undefined}
                     className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                   />
                   {item.kind === 'video' && (

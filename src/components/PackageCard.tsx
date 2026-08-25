@@ -1,5 +1,6 @@
 import Link from 'next/link'
 
+import { focusFor } from '@/content/gallery'
 import type { PackageAccent, TourPackage } from '@/content/packages'
 import type { Dictionary } from '@/i18n'
 
@@ -73,6 +74,9 @@ export function PackageCard({
   eager = false,
 }: Props) {
   const accent = ACCENT[pkg.accent]
+  // Both layouts crop this photo into a landscape box; the photo says which
+  // part of itself to keep. See `focus` in gallery.ts.
+  const focus = focusFor(pkg.photo)
   const href = `/tours/${pkg.slug}`
 
   if (variant === 'featured') {
@@ -87,6 +91,7 @@ export function PackageCard({
               src={pkg.photo}
               alt={pkg.alt}
               loading={eager ? 'eager' : 'lazy'}
+              style={focus ? { objectPosition: focus } : undefined}
               className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
             />
             <div
@@ -178,6 +183,7 @@ export function PackageCard({
           src={pkg.photo}
           alt={pkg.alt}
           loading={eager ? 'eager' : 'lazy'}
+          style={focus ? { objectPosition: focus } : undefined}
           className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
         />
         <div

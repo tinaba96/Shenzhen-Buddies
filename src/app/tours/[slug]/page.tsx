@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { PackageCard } from '@/components/PackageCard'
+import { focusFor } from '@/content/gallery'
 import {
   bookHref,
   CURRENCY_FOR_PACKAGES,
@@ -55,6 +56,7 @@ export default async function TourDetailPage({ params }: Props) {
   const { locale, t } = await getI18n()
   const pkg = localizedPackage(slug, locale)
   if (!pkg) notFound()
+  const photoFocus = focusFor(pkg.photo)
 
   const price = packagePrice()
   const others = localizedPackages(locale).filter((p) => p.slug !== pkg.slug)
@@ -106,6 +108,9 @@ export default async function TourDetailPage({ params }: Props) {
           <img
             src={pkg.photo}
             alt={pkg.alt}
+            // The widest crop on the site: this box keeps about a third of a
+            // 3:4 frame's height, so where that third sits matters most here.
+            style={photoFocus ? { objectPosition: photoFocus } : undefined}
             className="sb-drift h-full w-full object-cover"
           />
         </div>

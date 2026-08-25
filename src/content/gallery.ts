@@ -69,6 +69,15 @@ export type GalleryItem = {
   consentRef?: string
   // 'YYYY-MM'
   capturedAt?: string
+  // CSS object-position for the surfaces that crop this photo, e.g. '50% 65%'.
+  // Four of them do — the two PackageCard layouts, the /tours/[slug] hero and
+  // the /gallery tile — and every one is a landscape box holding a 3:4
+  // portrait, so object-cover keeps a horizontal band and discards the rest.
+  // Centred, that band is often the least interesting part of the frame: the
+  // Huaqiangbei shot lost both the lit sign above and the entrance below,
+  // leaving an anonymous facade. Omit for photos whose subject really is
+  // centred; the default stays '50% 50%'.
+  focus?: string
   credit?: string
   relatedPostSlug?: string
   // Eligible for the landing-page strip.
@@ -116,6 +125,11 @@ export const CHIP_MIN_ITEMS = 4
 // exists; nothing in a type system can. That half is process.
 const CONSENT_ID = /^SBC-\d{4}-\d{2}-\d{3}$/
 
+// `focus` is interpolated into a style attribute, so keep it to the shape we
+// actually use: two percentages. Authored content, not user input — this is a
+// typo guard, not a security boundary.
+const FOCUS = /^\d{1,3}% \d{1,3}%$/
+
 // The library. See the "Gallery photos" section of README.md for the
 // conversion command and the fields to paste in.
 //
@@ -157,6 +171,11 @@ export const galleryItems: GalleryItem[] = [
     // which is the bar the rest of this file holds itself to.
     location: 'huaqiangbei',
     themes: ['tech', 'street', 'nightlife'],
+    // Middle-to-lower. The frame runs dark sky, then the lit 华强电子世界 sign,
+    // the screens, and the metro entrance with the night-market neon at the
+    // bottom. A centred crop landed between the sign and the entrance and
+    // showed neither; 65% keeps the half that says where this is.
+    focus: '50% 65%',
     // Place shot, not a portrait. The handful of passers-by are distant and
     // unresolved even magnified past the published 1200x1600 — the subject is
     // the building. See the note on this field above.
@@ -385,6 +404,13 @@ export function assertGalleryValid(
     if (seen.has(item.id)) fail(item.id, 'has a duplicate id')
     seen.add(item.id)
 
+    if (item.focus !== undefined && !FOCUS.test(item.focus)) {
+      fail(
+        item.id,
+        `has focus "${item.focus}", which is not two percentages (e.g. '50% 65%')`,
+      )
+    }
+
     if (!item.alt.trim()) {
       fail(item.id, 'has an empty alt — it is required for a11y and image SEO')
     }
@@ -482,6 +508,8 @@ export type PublicGalleryItem = Pick<
   | 'title'
   | 'caption'
   | 'location'
+  // Safe to publish: a CSS object-position, no more revealing than the photo.
+  | 'focus'
 >
 
 export function toPublicItem(item: GalleryItem): PublicGalleryItem {
@@ -496,6 +524,7 @@ export function toPublicItem(item: GalleryItem): PublicGalleryItem {
     title: item.title,
     caption: item.caption,
     location: item.location,
+    focus: item.focus,
   }
 }
 
@@ -505,6 +534,14 @@ export function toPublicItem(item: GalleryItem): PublicGalleryItem {
 // render WebP, and a 3:4 portrait is outside the aspect a large-summary card
 // accepts, so a shared link previews cropped or blank. Path is derived, so any
 // item is shareable the moment the script has run over it.
+// The focal point for a photo referenced by its public path. Packages store
+// `photo: '/gallery/<id>.webp'` rather than a gallery id, so this bridges the
+// two without duplicating the focal point in packages.ts. Unknown paths get
+// the CSS default, which is what an uncropped surface would do anyway.
+export function focusFor(src: string): string | undefined {
+  return galleryItems.find((i) => i.src === src)?.focus
+}
+
 export function ogImageSrc(item: Pick<GalleryItem, 'id'>): string {
   return `/gallery/og/${item.id}.jpg`
 }
