@@ -181,6 +181,7 @@ export const galleryItems: GalleryItem[] = [
     // the building. See the note on this field above.
     people: 'none',
     capturedAt: '2026-08',
+    relatedPostSlug: 'huaqiangbei-guide',
   },
   {
     id: 'skyline-tower-walkway-night',
