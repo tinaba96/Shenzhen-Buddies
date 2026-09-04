@@ -228,6 +228,31 @@ export const galleryItems: GalleryItem[] = [
     featured: true,
   },
   {
+    id: 'dongmen-pagoda-street-night',
+    kind: 'image',
+    src: '/gallery/dongmen-pagoda-street-night.webp',
+    width: 1200,
+    height: 1600,
+    alt: 'The Dongmen pedestrian street at night, its pagoda-roofed buildings outlined in lights above a crowd of shoppers, with the McDonald’s pagoda building glowing on the right.',
+    title: 'Dongmen after dark',
+    caption: 'The old downtown dresses its towers in eaves and fairy lights. Even the McDonald’s got a pagoda.',
+    // Not a guess: the pagoda-roofed McDonald's on the right is the Dongmen
+    // pedestrian street landmark, and the founder shot the frame there.
+    location: 'dongmen',
+    themes: ['street', 'nightlife'],
+    // The frame runs dark sky at the top, the lit eaves in the middle and the
+    // crowded street at the bottom. The package card fits only ~40% of the
+    // frame's height, and anything above bottom-anchored cuts off before the
+    // street — facade and sky, no crowd, no storefronts. Anchored to the
+    // bottom it keeps the rooflines, the pagoda McDonald's and the crowd,
+    // which is the part that says night market rather than office block.
+    focus: '50% 100%',
+    // Place shot, not a portrait. The pedestrians are at the bottom edge of a
+    // wide frame, distant and unresolved at the published 1200x1600 — the
+    // subject is the street. See the note on this field above.
+    people: 'none',
+  },
+  {
     id: 'crayfish-noodles-lift',
     kind: 'image',
     src: '/gallery/crayfish-noodles-lift.webp',

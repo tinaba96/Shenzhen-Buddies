@@ -83,9 +83,9 @@ export const packages: TourPackage[] = [
     cn: '华强北',
     kicker: 'Electronics & makers',
     tagline:
-      "The world's densest electronics market, walked with someone who actually buys here.",
+      "The world's largest electronics market, walked with someone who knows where to go.",
     summary:
-      'Huaqiangbei is thirty-odd market buildings packed around one long pedestrian street — components by the reel, drone counters, used iPhones moving by the crate, and this year a visible wall of AI glasses. Thousands of overseas buyers shop it every day with a calculator and patience, and the vendors are used to them. What your buddy changes is the arithmetic: which building, which floor, which counter is the maker and which is a reseller marking up the stall next door — and a negotiation that starts from the local number instead of the walk-in quote.',
+      'Huaqiangbei is Shenzhen’s legendary tech paradise, where thousands of shops sell everything from smart gadgets to robots, drones, and electronic parts. Walk through the crowded markets and discover the future of technology at your fingertips. Whether you love tech or just want a unique Shenzhen experience, this place is worth exploring.',
     photo: '/gallery/huaqiangbei-electronic-world-night.webp',
     alt: 'The lit entrance of Huaqiang Electronic World at night, above the Huaqiangbei metro entrance',
     district: 'Futian',
@@ -157,8 +157,8 @@ export const packages: TourPackage[] = [
       'The old downtown after dark, eaten one small plate at a time.',
     summary:
       'Dongmen is where Shenzhen existed before the towers went up, and it still eats like it. This is a walking dinner rather than a restaurant booking: skewers off the grill, tofu skin, sugar-glazed fruit, Hakka snacks, whatever the queue is longest for. Your buddy orders, explains what arrived, and steers you past the stalls that exist for people who will only come once.',
-    photo: '/gallery/night-market-skewers-stall.webp',
-    alt: 'A Shenzhen night market stall laid with trays of skewers under strip lighting',
+    photo: '/gallery/dongmen-pagoda-street-night.webp',
+    alt: 'The Dongmen pedestrian street at night, pagoda-roofed buildings lit above the crowd',
     district: 'Luohu',
     bestStart: 'Early evening — the grills come out around 17:00',
     meetingPoint: 'Laojie station, on the Dongmen pedestrian street side',
