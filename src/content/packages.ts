@@ -85,7 +85,7 @@ export const packages: TourPackage[] = [
     tagline:
       "The world's largest electronics market, walked with someone who knows where to go.",
     summary:
-      'Huaqiangbei is Shenzhen’s legendary tech paradise, where thousands of shops sell everything from smart gadgets to robots, drones, and electronic parts. Walk through the crowded markets and discover the future of technology at your fingertips. Whether you love tech or just want a unique Shenzhen experience, this place is worth exploring.',
+      'Huaqiangbei is where the world comes to buy electronics: block after block of market towers stacked with phone parts, drones, robot kits and gadgets that will not reach your country for another year. You do not have to be an engineer to enjoy it — it is loud, cheap, and strangely addictive to browse. The catch is that it is enormous and almost none of it is in English, which is exactly what your buddy is for: they know which buildings are worth your time and what things should actually cost.',
     photo: '/gallery/huaqiangbei-electronic-world-night.webp',
     alt: 'The lit entrance of Huaqiang Electronic World at night, above the Huaqiangbei metro entrance',
     district: 'Futian',

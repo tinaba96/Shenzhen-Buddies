@@ -175,8 +175,9 @@ export const en = {
       ],
     },
     testimonials: {
-      kicker: 'From our pilot community',
-      title: 'Real stories from buddies.',
+      kicker: 'Reviews',
+      title: 'No reviews yet — we only just opened.',
+      body: 'Every review on this site will come from a completed booking. We do not write them ourselves and we do not buy them. Book a day during the pilot, and the first words here could be yours — good or bad.',
     },
     journal: {
       kicker: 'The journal',

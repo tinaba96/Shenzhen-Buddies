@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { Avatar } from '@/components/Avatar'
 import { PromoCode } from '@/components/PromoCode'
 import { DEFAULT_OG_IMAGE } from '@/lib/config'
 import { HeroImage } from '@/components/HeroImage'
@@ -320,7 +319,7 @@ function Why() {
       <div className="mx-auto max-w-5xl px-6 py-24">
         <div className="text-center">
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-            Why explorers love it
+            Why book a buddy
           </p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
             The opposite of a tour bus.
@@ -382,75 +381,28 @@ function WhyIcon({ name }: { name: 'people' | 'tag' | 'shield' }) {
 
 /* ---------------------------- Testimonials ----------------------------- */
 
+// No fabricated reviews. The quote cards that used to sit here were invented
+// for the mockup with pravatar.cc placeholder faces; on a promo page pasted
+// into Instagram bios, fake social proof is the fastest way to look like a
+// scam. Saying "no reviews yet" out loud is the more convincing pitch, and
+// real quotes replace this block once real bookings produce them.
 function Testimonials() {
-  const reviews = [
-    {
-      quote:
-        'Best CA$40 I spent in Shenzhen. A whole day of food and back streets I’d never have found. Used the welcome code without even thinking.',
-      name: 'Sarah K.',
-      role: 'Visiting from London',
-      photo: 'https://i.pravatar.cc/120?img=47',
-    },
-    {
-      quote:
-        'Booking took two minutes, the welcome code worked first try, and confirmation came the next morning. Felt like meeting a friend.',
-      name: 'Marco R.',
-      role: 'Visiting from Milan',
-      photo: 'https://i.pravatar.cc/120?img=33',
-    },
-    {
-      quote:
-        'I was nervous about the language. By hour three we were laughing over street noodles. Worth every dollar.',
-      name: 'Aisha N.',
-      role: 'Visiting from Dubai',
-      photo: 'https://i.pravatar.cc/120?img=45',
-    },
-  ]
   return (
     <section className="border-b border-zinc-200 dark:border-zinc-800">
-      <div className="mx-auto max-w-5xl px-6 py-24">
-        <div className="text-center">
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-            From our explorers
-          </p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Days people don’t forget.
-          </h2>
-        </div>
-        <ul className="mt-12 grid gap-5 md:grid-cols-3">
-          {reviews.map((r) => (
-            <li
-              key={r.name}
-              className="flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <Stars />
-              <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
-                &ldquo;{r.quote}&rdquo;
-              </blockquote>
-              <figcaption className="mt-5 flex items-center gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-                <Avatar src={r.photo} name={r.name} size={40} />
-                <div>
-                  <p className="text-sm font-medium">{r.name}</p>
-                  <p className="text-xs text-zinc-500">{r.role}</p>
-                </div>
-              </figcaption>
-            </li>
-          ))}
-        </ul>
+      <div className="mx-auto max-w-3xl px-6 py-24 text-center">
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+          The honest part
+        </p>
+        <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+          No reviews yet.
+        </h2>
+        <p className="mx-auto mt-4 max-w-xl text-zinc-600 dark:text-zinc-400">
+          We only just opened, and reviews here will only ever come from real,
+          completed bookings — we don&apos;t write our own. Book a day and be
+          the first to say how it actually went.
+        </p>
       </div>
     </section>
-  )
-}
-
-function Stars() {
-  return (
-    <span aria-label="5 out of 5 stars" className="inline-flex gap-0.5">
-      {[0, 1, 2, 3, 4].map((i) => (
-        <svg key={i} viewBox="0 0 24 24" aria-hidden className="h-4 w-4 fill-amber-400">
-          <path d="M12 2.5l2.92 6.01 6.58.95-4.76 4.65 1.12 6.55L12 17.77l-5.86 3.09 1.12-6.55L2.5 9.46l6.58-.95L12 2.5z" />
-        </svg>
-      ))}
-    </span>
   )
 }
 
@@ -483,7 +435,7 @@ function Faq() {
             Good to know
           </p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Questions, answered.
+            Before you book
           </h2>
         </div>
         <dl className="mt-12 space-y-4">

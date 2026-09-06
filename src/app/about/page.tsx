@@ -62,7 +62,7 @@ const FOUNDERS = [
     name: 'Takahiro Inaba',
     role: 'CTO · Toronto',
     photo: '/team/taka.jpg',
-    bio: 'Japanese engineer with 10+ years in the tech industry 🇯🇵💻 Currently working as a CTO, building and scaling products across North America and Asia 🌏🚀 Originally from Japan, now operating internationally and focused on shipping real-world impact ⚙️✨',
+    bio: 'Engineer from Japan, based in Toronto after ten-plus years in software. I build and look after everything technical here — the bookings, the payments, the page you are reading 💻',
   },
 ]
 
@@ -246,7 +246,9 @@ export default function AboutPage() {
             <path d="M9.5 6a4.5 4.5 0 0 0 0 9V18a8 8 0 0 1-8-8 8 8 0 0 1 8-8v4zm14 0a4.5 4.5 0 0 0 0 9V18a8 8 0 0 1-8-8 8 8 0 0 1 8-8v4z" />
           </svg>
           <blockquote className="mt-6 text-balance text-3xl font-medium leading-snug tracking-tight sm:text-4xl">
-            The best travel memories aren&apos;t made of itineraries. They&apos;re made of people.
+            Every good day we&apos;ve had in a new city started the same way:
+            someone who lived there said, &ldquo;come on, I&apos;ll show
+            you.&rdquo;
           </blockquote>
         </div>
       </section>

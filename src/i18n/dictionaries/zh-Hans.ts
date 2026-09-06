@@ -157,8 +157,9 @@ export const zhHans: Dictionary = {
       ],
     },
     testimonials: {
-      kicker: '来自试运营社区',
-      title: '伙伴们的真实故事。',
+      kicker: '评价',
+      title: '还没有评价——我们才刚开始。',
+      body: '这个网站上的每一条评价，都只会来自真实完成的预订。我们不会自己写，也不会花钱买。在试运营期间预订，这里的第一句话可能就出自你——好话坏话都算。',
     },
     journal: {
       kicker: '专栏',

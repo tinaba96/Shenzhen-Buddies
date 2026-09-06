@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Avatar } from '@/components/Avatar'
 import { PackageCard } from '@/components/PackageCard'
 import { galleryItems, requireGalleryItem } from '@/content/gallery'
 import { packagePrice } from '@/content/packages'
@@ -636,91 +635,26 @@ function AudienceCard({
   )
 }
 
+// No reviews exist yet, and this section says so instead of inventing any.
+// The three quotes that used to sit here were invented for the mockup, with
+// placeholder faces from pravatar.cc — fabricated social proof on a site whose
+// whole pitch is honesty. The empty state is the trust signal until real
+// completed bookings produce real quotes; the cards come back with those.
 function Testimonials({ t }: { t: Dictionary }) {
-  // Left in the language they were given in. A quote translated by the company
-  // that is quoting it stops being a quote.
-  const reviews = [
-    {
-      stars: 5,
-      quote:
-        'Lin took me to a tea house in Futian I never would have found. We ended up talking for three hours. Felt like meeting a friend, not booking a tour.',
-      name: 'Sarah K.',
-      role: 'Tourist, visiting from London',
-      photo: 'https://i.pravatar.cc/120?img=47',
-    },
-    {
-      stars: 5,
-      quote:
-        'I joined as a guide because I love showing people my city. Met a photographer from Mexico who taught me about light. We are still chatting.',
-      name: 'Wei H.',
-      role: 'Guide, Shenzhen local',
-      photo: 'https://i.pravatar.cc/120?img=12',
-    },
-    {
-      stars: 5,
-      quote:
-        'My Mandarin is awful and I was nervous about the trip. Daniel speaks Italian and took me to the best street food. Game-changer.',
-      name: 'Marco R.',
-      role: 'Tourist, visiting from Milan',
-      photo: 'https://i.pravatar.cc/120?img=33',
-    },
-  ]
-
   return (
     <section className="border-b border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-950/30">
-      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-        <div className="sb-rise text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-            {t.home.testimonials.kicker}
-          </p>
-          <h2 className="sb-display mt-3 text-4xl leading-tight sm:text-5xl">
-            {t.home.testimonials.title}
-          </h2>
-        </div>
-
-        <ul className="mt-12 grid gap-5 md:grid-cols-3">
-          {reviews.map((r) => (
-            <li
-              key={r.name}
-              className="sb-rise flex flex-col rounded-3xl border border-zinc-200 bg-white p-7 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <StaticStars value={r.stars} />
-              <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
-                &ldquo;{r.quote}&rdquo;
-              </blockquote>
-              <figcaption className="mt-6 flex items-center gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-                <Avatar src={r.photo} name={r.name} size={40} />
-                <div>
-                  <p className="text-sm font-medium">{r.name}</p>
-                  <p className="text-xs text-zinc-500">{r.role}</p>
-                </div>
-              </figcaption>
-            </li>
-          ))}
-        </ul>
+      <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+          {t.home.testimonials.kicker}
+        </p>
+        <h2 className="sb-display mt-3 text-4xl leading-tight sm:text-5xl">
+          {t.home.testimonials.title}
+        </h2>
+        <p className="mx-auto mt-4 max-w-xl text-base text-zinc-600 dark:text-zinc-400">
+          {t.home.testimonials.body}
+        </p>
       </div>
     </section>
-  )
-}
-
-function StaticStars({ value }: { value: number }) {
-  return (
-    <span aria-label={`${value} out of 5 stars`} className="inline-flex gap-0.5">
-      {[0, 1, 2, 3, 4].map((i) => (
-        <svg
-          key={i}
-          viewBox="0 0 24 24"
-          aria-hidden
-          className={
-            i < value
-              ? 'h-4 w-4 fill-amber-400'
-              : 'h-4 w-4 fill-zinc-200 dark:fill-zinc-700'
-          }
-        >
-          <path d="M12 2.5l2.92 6.01 6.58.95-4.76 4.65 1.12 6.55L12 17.77l-5.86 3.09 1.12-6.55L2.5 9.46l6.58-.95L12 2.5z" />
-        </svg>
-      ))}
-    </span>
   )
 }
 

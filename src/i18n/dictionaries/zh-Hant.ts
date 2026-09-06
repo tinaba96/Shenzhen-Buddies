@@ -166,8 +166,9 @@ export const zhHant: Dictionary = {
       ],
     },
     testimonials: {
-      kicker: '來自試營運社群',
-      title: '夥伴們的真實故事。',
+      kicker: '評價',
+      title: '還沒有評價——我們才剛開始。',
+      body: '這個網站上的每一條評價，都只會來自真實完成的預訂。我們不會自己寫，也不會花錢買。在試營運期間預訂，這裡的第一句話可能就出自你——好話壞話都算。',
     },
     journal: {
       kicker: '專欄',
