@@ -12,7 +12,6 @@ import {
   bookableSegments,
   cancellationRefundPercent,
   formatDay,
-  formatHour,
   formatHourRange,
   formatMoney,
   hoursUntilTourStart,
@@ -33,13 +32,13 @@ import { DEFAULT_OG_IMAGE, isSingleGuideMode, officialGuideId } from '@/lib/conf
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import {
-  addGuideAvailability,
   approveGuideBooking,
   cancelOwnBooking,
   deleteGuideAvailability,
   rejectGuideBooking,
   requestBooking,
 } from './actions'
+import { AvailabilityEditor } from './AvailabilityEditor'
 
 // This page declared no metadata at all, which is not the same as declaring
 // nothing: it inherited the root layout's, including `alternates.canonical:
@@ -981,80 +980,45 @@ function GuideAvailability({
     <section className="mt-8">
       <h2 className="text-xl font-semibold">Your availability</h2>
       <p className="mt-1 text-sm text-zinc-500">
-        Add the days and hours you can guide. Tourists can book any{' '}
+        Open the days and hours you can guide. Tourists can book any{' '}
         {MIN_BOOKING_HOURS}–{MAX_BOOKING_HOURS} hour slot inside a window.
       </p>
 
-      <form
-        action={addGuideAvailability}
-        className="mt-3 flex flex-wrap items-end gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-      >
-        <label className="block">
-          <span className="text-xs font-medium text-zinc-500">Day</span>
-          <input
-            type="date"
-            name="day"
-            required
-            min={today}
-            className="mt-1 block rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
-          />
-        </label>
-        <label className="block">
-          <span className="text-xs font-medium text-zinc-500">From</span>
-          <select
-            name="start_hour"
-            defaultValue={9}
-            className="mt-1 block rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
-          >
-            {Array.from({ length: 24 }, (_, h) => (
-              <option key={h} value={h}>
-                {formatHour(h)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className="text-xs font-medium text-zinc-500">Until</span>
-          <select
-            name="end_hour"
-            defaultValue={22}
-            className="mt-1 block rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
-          >
-            {Array.from({ length: 24 }, (_, i) => i + 1).map((h) => (
-              <option key={h} value={h}>
-                {formatHour(h)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <SubmitButton
-          pendingLabel="Adding…"
-          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-        >
-          Add window
-        </SubmitButton>
-      </form>
+      <AvailabilityEditor
+        openDays={windows.map((w) => w.day)}
+        today={today}
+      />
 
+      <h3 className="mt-6 text-sm font-semibold">
+        {windows.length === 0
+          ? 'Open windows'
+          : `Open windows (${windows.length})`}
+      </h3>
       {windows.length === 0 ? (
-        <p className="mt-3 rounded-lg border border-dashed border-zinc-300 px-6 py-8 text-center text-sm text-zinc-500 dark:border-zinc-700">
+        <p className="mt-2 rounded-lg border border-dashed border-zinc-300 px-6 py-8 text-center text-sm text-zinc-500 dark:border-zinc-700">
           No upcoming availability yet — tourists can&apos;t book until you add a
           window.
         </p>
       ) : (
-        <ul className="mt-3 space-y-2">
+        <ul className="mt-2 space-y-2">
           {windows.map((w) => (
             <li
               key={w.id}
-              className="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+              className="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
             >
               <span>
-                {formatDay(w.day)} · {formatHourRange(w.start_hour, w.end_hour)}
+                <span className="font-medium">{formatDay(w.day)}</span>
+                <span className="text-zinc-500">
+                  {' '}
+                  · {formatHourRange(w.start_hour, w.end_hour)} (
+                  {w.end_hour - w.start_hour}h)
+                </span>
               </span>
               <form action={deleteGuideAvailability}>
                 <input type="hidden" name="id" value={w.id} />
                 <SubmitButton
                   pendingLabel="Removing…"
-                  className="text-xs text-zinc-500 underline underline-offset-2 hover:text-red-600"
+                  className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-600 transition hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-red-900 dark:hover:bg-red-950 dark:hover:text-red-400"
                 >
                   Remove
                 </SubmitButton>
