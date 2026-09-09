@@ -27,14 +27,14 @@ export const en = {
     siteTitle: 'Shenzhen Buddies',
     siteDescription:
       'Match with a local buddy in Shenzhen who shares your interests. Casual, affordable, personal.',
-    toursTitle: 'Four-hour experiences in Shenzhen — Shenzhen Buddies',
+    toursTitle: 'Free local experiences in Shenzhen — Shenzhen Buddies',
     toursDescription:
-      'Six one-on-one, four-hour experiences in Shenzhen — the Huaqiangbei electronics market, Dongmen street food, the skyline after dark, and the first four hours from Hong Kong.',
+      'Six one-on-one experiences in Shenzhen, free during our pilot — the Huaqiangbei electronics market, Dongmen street food, the skyline after dark, and your first hours from Hong Kong.',
   },
 
   common: {
     hours: '{n} hours',
-    fourHours: '4 hours',
+    free: 'Free',
     oneOnOne: 'One-on-one',
     perPerson: 'per person',
     from: 'from',
@@ -84,24 +84,24 @@ export const en = {
       badge: 'Now matching in Shenzhen',
       titleLead: 'See Shenzhen with someone',
       titleAccent: 'who gets you.',
-      body: 'Skip the tour bus. Four hours, one local who shares what you are into — electronics, food, skylines, mornings — and a city that finally makes sense.',
-      primaryCta: 'See the four-hour experiences',
+      body: 'Skip the tour bus. A few free hours with a local who shares what you are into — electronics, food, skylines, mornings — and a city that finally makes sense.',
+      primaryCta: 'See the free experiences',
       secondaryCta: 'Become a guide',
       scroll: 'Scroll',
     },
     trust: {
       verified: 'ID-verified locals',
-      refund: 'Full refund if we cannot confirm',
+      refund: 'Free during the pilot',
       reviewed: 'Reviewed by the community',
       noGroups: 'Never a group tour',
     },
     packages: {
-      kicker: 'Four hours, one local',
-      title: 'Pick your four hours.',
-      body: 'Every experience below is exactly four hours, one-on-one, and built around one thing done properly rather than six things glimpsed from a coach window.',
+      kicker: 'A few hours, one local',
+      title: 'Pick your three hours.',
+      body: 'Every experience below is one-on-one and free while we pilot — two or three hours built around one thing done properly rather than six things glimpsed from a coach window.',
       featuredLabel: 'Most booked',
       allLink: 'All experiences',
-      priceNote: '{price} for the full four hours — that is the guide, not a ticket price.',
+      priceNote: '{price} during the pilot — your buddy’s time costs nothing, and what you eat or ride you pay at local prices.',
     },
     districts: {
       kicker: 'The map',
@@ -151,8 +151,8 @@ export const en = {
           body: 'Tell them at hour two that you would rather do something else, and the rest of the day changes. Try that on a coach.',
         },
         {
-          title: 'Money back',
-          body: 'You pay to hold the day. If we cannot confirm it, you are refunded in full — no argument, no form.',
+          title: 'Free, honestly',
+          body: 'Booking costs nothing during the pilot — no card, no deposit. If we cannot confirm your day, we tell you straight away, and nothing was ever charged.',
         },
       ],
     },
@@ -161,12 +161,12 @@ export const en = {
       title: 'Three small steps.',
       steps: [
         {
-          title: 'Pick your four hours',
+          title: 'Pick your experience',
           body: 'Choose an experience, or say what you are into and let your buddy build the day around it.',
         },
         {
           title: 'Pick your day',
-          body: 'Open days are listed live. You pay to hold one, and we confirm within three business days.',
+          body: 'Open days are listed live. Request one for free — 2 or 3 hours — and we confirm within three business days.',
         },
         {
           title: 'Meet and go',
@@ -198,25 +198,25 @@ export const en = {
       bodyLoggedIn: 'Browse public profiles and start a conversation.',
       // Shown instead of bodyLoggedIn while single-guide mode hides the
       // marketplace: there are no profiles to browse, only a day to book.
-      bodySingleGuide: 'Pick a day and book your four hours with a local.',
+      bodySingleGuide: 'Pick a day and book a free few hours with a local.',
     },
   },
 
   tours: {
     index: {
       kicker: 'Experiences',
-      title: 'Four hours, done properly.',
-      body: 'Six one-on-one experiences, each exactly four hours long. You are booking a local’s afternoon, not a seat on a bus — so the route bends to you on the day.',
-      priceLine: '{price} for four hours, one-on-one',
+      title: 'A few hours, done properly.',
+      body: 'Six one-on-one experiences, free while we pilot — two or three hours each. You are booking a local’s afternoon, not a seat on a bus, so the route bends to you on the day.',
+      priceLine: '{price} · 2 or 3 hours, one-on-one',
       countLine: '{n} experiences',
       notATour: {
         title: 'This is not a tour company.',
-        body: 'There is no coach, no group, no flag and no commission. You book four hours of a Shenzhen local’s time, and everything you eat, ride or buy that day you pay for directly at local prices.',
+        body: 'There is no coach, no group, no flag and no commission. You book a few hours of a Shenzhen local’s time — free during our pilot — and everything you eat, ride or buy that day you pay for directly at local prices.',
       },
     },
     detail: {
-      itinerary: 'How the four hours run',
-      itineraryNote: 'Times are elapsed from your meeting point, not clock times — you pick the start hour at checkout.',
+      itinerary: 'How the day runs',
+      itineraryNote: 'Times are elapsed from your meeting point, not clock times — you pick the start hour when you book.',
       includes: 'What is included',
       notIncluded: 'What is not',
       goodFor: 'Good for',
@@ -228,11 +228,11 @@ export const en = {
       groupSize: 'Group size',
       groupSizeValue: 'Just you (and anyone you bring)',
       price: 'Price',
-      priceNote: 'Paid when you book, to hold the day. Refunded in full if we cannot confirm it.',
+      priceNote: 'Free during the pilot — you pay nothing to book. What you eat, ride or buy on the day is yours, at local prices.',
       readMore: 'Read the full guide',
-      otherExperiences: 'Other four-hour experiences',
-      bookCta: 'Book these four hours',
-      bookNote: 'Next you pick a day and a start time. Nothing is charged until you confirm.',
+      otherExperiences: 'Other experiences',
+      bookCta: 'Book this day — it’s free',
+      bookNote: 'Next you pick a day, a length — 2 or 3 hours — and a start time. Nothing to pay.',
       backToAll: 'All experiences',
     },
   },
@@ -240,7 +240,7 @@ export const en = {
   guide: {
     selectedPackage: {
       label: 'Selected experience',
-      note: 'We have added it to your booking note — your buddy will see it. Change or clear it below before you pay.',
+      note: 'We have added it to your booking note — your buddy will see it. Change or clear it below before you send your request.',
       clear: 'Clear selection',
       change: 'Pick a different experience',
     },
@@ -251,7 +251,8 @@ export const en = {
     product: 'Product',
     account: 'Account',
     company: 'Company',
-    discount: 'Get 10% off',
+    discount: 'Free tours (pilot)',
+    donate: 'Support us',
     about: 'About',
     contact: 'Contact',
     privacy: 'Privacy',

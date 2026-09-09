@@ -151,10 +151,13 @@ export default function CancellationPage() {
 
           <Section title="8. Currency &amp; pricing">
             <p>
-              All bookings and refunds are processed in Canadian dollars (CAD).
-              Tours are priced at a flat rate per hour shown at checkout. Your
-              card issuer may apply its own currency conversion or fees, which
-              are outside our control.
+              During our free pilot, tours are offered at no charge — a
+              cancellation simply frees the day, and there is nothing to
+              refund. When tours are paid: all bookings and refunds are
+              processed in Canadian dollars (CAD), tours are priced at a flat
+              rate per hour shown at checkout, and your card issuer may apply
+              its own currency conversion or fees, which are outside our
+              control.
             </p>
           </Section>
 

@@ -37,11 +37,18 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        // Only booking payments flow through here — they carry a booking_id.
+        // Booking payments carry a booking_id; tips and donations (created in
+        // lib/support.ts) carry a `kind` instead and never touch the bookings
+        // table — the Stripe dashboard is their ledger, this email their ping.
         // (The Premium subscription this endpoint once synced was removed;
         // see git history if it ever returns.)
         if (session.metadata?.booking_id) {
           await markBookingPaid(session)
+        } else if (
+          session.metadata?.kind === 'tip' ||
+          session.metadata?.kind === 'donation'
+        ) {
+          await notifySupportPayment(session)
         }
         break
       }
@@ -73,6 +80,46 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ received: true })
+}
+
+// A tip or donation came through — let the operators (and the guide, for a
+// tip) know. Purely informational: the money already moved, and there is no
+// database row to update.
+async function notifySupportPayment(session: Stripe.Checkout.Session) {
+  const kind = session.metadata?.kind as 'tip' | 'donation'
+  const amount =
+    session.amount_total != null
+      ? formatMoney(session.amount_total, session.currency ?? undefined)
+      : 'an unknown amount'
+  const from = session.customer_details?.email ?? 'someone (no email)'
+  const label = kind === 'tip' ? 'Tip' : 'Donation'
+
+  await sendEmail({
+    to: adminEmails(),
+    subject: `${label} received — ${amount}`,
+    text: [
+      `A ${kind} of ${amount} just came through Stripe.`,
+      `From: ${from}`,
+      session.metadata?.tip_booking_id
+        ? `Booking: ${session.metadata.tip_booking_id}`
+        : '',
+      '',
+      'Details are in the Stripe dashboard (Payments).',
+    ]
+      .filter(Boolean)
+      .join('\n'),
+  })
+
+  if (kind === 'tip') {
+    await notifyGuide(
+      `You received a tip — ${amount}`,
+      [
+        `A tourist left you a ${amount} tip after their tour. Nice work!`,
+        '',
+        'The operators will settle it with you.',
+      ].join('\n'),
+    )
+  }
 }
 
 // Payment cleared: flip the hold to a paid 'pending' booking awaiting admin

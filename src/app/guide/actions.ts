@@ -19,6 +19,8 @@ import {
   fitsInSegments,
   formatDay,
   formatHourRange,
+  FREE_TOUR_LENGTHS,
+  FREE_TOURS,
   HOLD_EXPIRY_MINUTES,
   MAX_BOOKING_HOURS,
   MIN_BOOKING_HOURS,
@@ -176,6 +178,13 @@ export async function requestBooking(formData: FormData) {
       day,
     )
   }
+  // Free pilot: only the fixed package lengths, not any value in the range.
+  if (FREE_TOURS && !FREE_TOUR_LENGTHS.includes(duration)) {
+    fail(
+      `Pick one of the free tour lengths: ${FREE_TOUR_LENGTHS.join(' or ')} hours.`,
+      day,
+    )
+  }
   const endHour = startHour + duration
   // Amount is computed server-side and never trusted from the client.
   const amountCents = amountCentsForHours(duration)
@@ -270,9 +279,10 @@ export async function requestBooking(formData: FormData) {
     userAgent: h.get('user-agent'),
   })
 
-  // Pilot fallback: with no Stripe key, skip payment and behave like before
-  // (mark paid-equivalent 'pending' and notify admins).
-  if (!process.env.STRIPE_SECRET_KEY) {
+  // Free pilot (or no Stripe key): skip payment entirely — flip the hold to a
+  // reviewable 'pending' request and notify everyone, same as the paid path
+  // does after checkout.
+  if (FREE_TOURS || !process.env.STRIPE_SECRET_KEY) {
     await admin
       .from('bookings')
       .update({ status: 'pending' })
@@ -281,7 +291,9 @@ export async function requestBooking(formData: FormData) {
       to: adminEmails(),
       subject: `New booking request — ${formatDay(day)}, ${formatHourRange(startHour, endHour)}`,
       text: [
-        'A new booking request is waiting for review. (Payment is disabled — no Stripe key configured.)',
+        FREE_TOURS
+          ? 'A new booking request is waiting for review. (Free pilot — no payment taken.)'
+          : 'A new booking request is waiting for review. (Payment is disabled — no Stripe key configured.)',
         '',
         `Tourist: ${myProfile.display_name} (${user.email ?? 'no email'})`,
         `Day: ${formatDay(day)}`,
@@ -315,7 +327,9 @@ export async function requestBooking(formData: FormData) {
           `Time: ${formatHourRange(startHour, endHour)} (${duration} hours)`,
           note ? `Your note: ${note}` : '',
           '',
-          'We’ll confirm your day by email within 3 business days. If we can’t confirm it, you’ll be refunded in full.',
+          FREE_TOURS
+            ? 'We’ll confirm your day by email within 3 business days. The tour is free — there’s nothing to pay.'
+            : 'We’ll confirm your day by email within 3 business days. If we can’t confirm it, you’ll be refunded in full.',
           `Cancellation policy: ${siteUrl()}/cancellation`,
           '',
           `View your booking anytime: ${siteUrl()}/guide`,

@@ -9,6 +9,7 @@ import {
   localizedPackages,
 } from '@/content/packages-i18n'
 import { getI18n } from '@/i18n/server'
+import { FREE_TOURS } from '@/lib/booking'
 import { DEFAULT_OG_IMAGE, siteUrl } from '@/lib/config'
 import { HeroImage } from '@/components/HeroImage'
 
@@ -36,7 +37,8 @@ export default async function ToursPage() {
   const featured = localizedFeaturedPackage(locale)
   const rest = localizedOtherPackages(locale)
   const all = localizedPackages(locale)
-  const price = packagePrice()
+  // Free pilot: a localized "Free" instead of a money amount.
+  const price = FREE_TOURS ? t.common.free : packagePrice()
   const base = siteUrl()
 
   // An ItemList of the experiences, so a search engine can see this page is a

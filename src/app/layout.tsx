@@ -407,6 +407,8 @@ async function SiteFooter() {
           title={t.footer.company}
           links={[
             { href: "/about", label: t.footer.about },
+            // Free pilot: tours cost nothing, donations keep them running.
+            { href: "/donate", label: t.footer.donate },
             { href: "/contact", label: t.footer.contact },
             { href: "/privacy", label: t.footer.privacy },
             { href: "/terms", label: t.footer.terms },

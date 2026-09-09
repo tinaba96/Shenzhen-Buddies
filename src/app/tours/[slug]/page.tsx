@@ -15,6 +15,7 @@ import {
 import { localizedPackage, localizedPackages } from '@/content/packages-i18n'
 import { getPublishedPost } from '@/content/posts'
 import { getI18n } from '@/i18n/server'
+import { FREE_TOURS } from '@/lib/booking'
 import { DEFAULT_OG_IMAGE, siteUrl } from '@/lib/config'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -58,7 +59,10 @@ export default async function TourDetailPage({ params }: Props) {
   if (!pkg) notFound()
   const photoFocus = focusFor(pkg.photo)
 
-  const price = packagePrice()
+  // Free pilot: a localized "Free" instead of a money amount. The JSON-LD
+  // offer below prices itself from packagePriceCents(), which is 0 while
+  // FREE_TOURS is on — same source, same answer.
+  const price = FREE_TOURS ? t.common.free : packagePrice()
   const others = localizedPackages(locale).filter((p) => p.slug !== pkg.slug)
   const related = others.slice(0, 3)
   const post = pkg.readMoreSlug ? getPublishedPost(pkg.readMoreSlug) : undefined
@@ -134,7 +138,7 @@ export default async function TourDetailPage({ params }: Props) {
           <p className="mt-6 max-w-2xl text-lg text-white/90">{pkg.tagline}</p>
 
           <div className="mt-8 flex flex-wrap gap-2 text-sm">
-            <Pill>{t.common.fourHours}</Pill>
+            <Pill>{t.common.hours.replace('{n}', String(PACKAGE_HOURS))}</Pill>
             <Pill>{t.common.oneOnOne}</Pill>
             <Pill>{pkg.district}</Pill>
             <Pill>{price}</Pill>

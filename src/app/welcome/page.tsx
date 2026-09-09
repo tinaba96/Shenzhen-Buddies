@@ -1,26 +1,30 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { PromoCode } from '@/components/PromoCode'
 import { DEFAULT_OG_IMAGE } from '@/lib/config'
 import { HeroImage } from '@/components/HeroImage'
 
-const PROMO = 'VIP50'
+// This URL is pasted into Instagram/X/Threads bios, so it stays put — but the
+// offer on it moved with the free pilot: no promo code, the whole tour is
+// free. The VIP50 flow it replaced is in git history if paid tours return.
+
+const TITLE = 'Your first day in Shenzhen, free — Shenzhen Buddies'
+const DESCRIPTION =
+  'Book a local buddy in Shenzhen for a free 2 or 3 hour day out while we pilot. No card, no deposit — request a day and we confirm by email.'
 
 export const metadata: Metadata = {
-  title: 'Get 50% off your Shenzhen day — Shenzhen Buddies',
-  description:
-    'Book a local guide in Shenzhen for a day out. Use code VIP50 for 50% off your first booking. CA$10/hour, 4–8 hours, fully refunded if we can’t confirm.',
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: '/welcome' },
   // Declared explicitly: the root layout sets an openGraph block, and
   // metadata merges per key — so a page that omits this inherits the site's
   // generic title, description and an og:url pointing at the homepage.
   openGraph: {
-    title: 'Get 50% off your Shenzhen day — Shenzhen Buddies',
-    description: 'Book a local guide in Shenzhen for a day out. Use code VIP50 for 50% off your first booking. CA$10/hour, 4–8 hours, fully refunded if we can’t confirm.',
+    title: TITLE,
+    description: DESCRIPTION,
     url: '/welcome',
     // Required alongside any openGraph object — see the note in about/page.tsx.
-    // This page is the promo-code landing page pasted into Instagram, so a
-    // missing card here costs more than on any other route.
+    // This page is the landing page pasted into Instagram, so a missing card
+    // here costs more than on any other route.
     images: [DEFAULT_OG_IMAGE],
   },
 }
@@ -64,22 +68,23 @@ function Hero() {
       <div className="relative mx-auto flex max-w-5xl flex-col items-center px-6 py-28 text-center text-white sm:py-36">
         <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium uppercase tracking-wider backdrop-blur">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-          New explorers · limited welcome offer
+          Pilot season · every tour is free
         </p>
 
         <h1 className="mt-7 max-w-4xl text-balance text-5xl font-semibold leading-[1.05] tracking-tight drop-shadow-xl sm:text-7xl">
           Your first day in Shenzhen,{' '}
           <span className="bg-gradient-to-r from-amber-300 via-orange-300 to-rose-300 bg-clip-text text-transparent">
-            50% off.
+            free.
           </span>
         </h1>
 
         <p className="mt-6 max-w-xl text-pretty text-lg text-white/90 drop-shadow sm:text-xl">
-          Skip the tour bus. Spend a whole day with a real local who shows you
-          the food, streets, and corners you’d never find alone.
+          Skip the tour bus. Spend 2 or 3 hours with a real local who shows you
+          the food, streets, and corners you’d never find alone — and while
+          we’re piloting, it costs you nothing.
         </p>
 
-        {/* Promo ticket */}
+        {/* The free "ticket" — same shape the promo code used to sit in */}
         <div className="mt-10 w-full max-w-md">
           <div className="relative rounded-2xl bg-gradient-to-r from-amber-400 via-orange-400 to-rose-500 p-[2px] shadow-2xl shadow-rose-500/30">
             <div className="relative flex items-center justify-between gap-4 rounded-[15px] bg-zinc-950/90 px-6 py-5 backdrop-blur">
@@ -88,45 +93,44 @@ function Hero() {
               <span className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-black/85" aria-hidden />
               <div className="text-left">
                 <p className="text-[11px] font-medium uppercase tracking-wider text-white/60">
-                  Welcome code
+                  Pilot price
                 </p>
-                <PromoCode
-                  code={PROMO}
-                  className="mt-1 bg-gradient-to-r from-amber-300 to-rose-300 bg-clip-text text-transparent"
-                />
+                <p className="mt-1 bg-gradient-to-r from-amber-300 to-rose-300 bg-clip-text text-2xl font-bold tracking-wide text-transparent">
+                  FREE
+                </p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold leading-none">50%</p>
+                <p className="text-3xl font-bold leading-none">CA$0</p>
                 <p className="text-[11px] uppercase tracking-wider text-white/60">
-                  off
+                  no code needed
                 </p>
               </div>
             </div>
           </div>
           <p className="mt-2 text-xs text-white/60">
-            Tap the code to copy · paste it at checkout
+            No card, no deposit, no checkout — just pick a day
           </p>
         </div>
 
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/signup?as=tourist"
+            href="/guide"
             className="rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:bg-zinc-100"
           >
-            Claim my 50% →
+            Book my free day →
           </Link>
           <Link
-            href="/guide"
+            href="/tours"
             className="rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-sm font-semibold backdrop-blur transition hover:bg-white/20"
           >
-            Meet your guide
+            See the experiences
           </Link>
         </div>
 
         <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs uppercase tracking-wider text-white/60">
-          <TrustItem>CA$10 / hour</TrustItem>
-          <TrustItem>4–8 hour days</TrustItem>
-          <TrustItem>Fully refunded if not confirmed</TrustItem>
+          <TrustItem>Free 2 or 3 hour tours</TrustItem>
+          <TrustItem>No card, no deposit</TrustItem>
+          <TrustItem>Confirmed by email</TrustItem>
         </div>
       </div>
     </section>
@@ -154,25 +158,25 @@ function DealStrip() {
         <div className="grid items-center gap-10 md:grid-cols-2">
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-              The welcome deal
+              The pilot deal
             </p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-              A full day out, for{' '}
+              A day out, for{' '}
               <span className="bg-gradient-to-r from-amber-500 to-rose-500 bg-clip-text text-transparent">
-                less.
+                nothing.
               </span>
             </h2>
             <p className="mt-4 max-w-md text-zinc-600 dark:text-zinc-400">
-              Every booking is a flat CA$10 an hour — pick anywhere from 4 to 8
-              hours. Add <span className="font-semibold text-zinc-900 dark:text-zinc-100">{PROMO}</span> at
-              checkout and 50% comes straight off. If we can’t confirm your day,
-              you’re refunded in full.
+              While we get Shenzhen Buddies off the ground, every tour is
+              free — pick a 2 or 3 hour day with a local buddy. There is no
+              payment step at all: request a day, and we confirm by email
+              within three business days.
             </p>
             <Link
-              href="/signup?as=tourist"
+              href="/guide"
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
-              Start booking
+              Pick a day
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
@@ -183,22 +187,22 @@ function DealStrip() {
           {/* Price example card */}
           <div className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-gradient-to-br from-amber-50 to-rose-50 p-8 shadow-sm dark:border-zinc-800 dark:from-amber-950/30 dark:to-rose-950/30">
             <p className="text-sm font-medium text-zinc-500">
-              Example · an 8-hour day
+              Example · a 3-hour tour
             </p>
             <div className="mt-4 flex items-end gap-3">
-              <span className="text-2xl text-zinc-400 line-through">CA$80</span>
+              <span className="text-2xl text-zinc-400 line-through">CA$30</span>
               <span className="bg-gradient-to-r from-amber-500 to-rose-500 bg-clip-text text-5xl font-bold tracking-tight text-transparent">
-                CA$40
+                CA$0
               </span>
             </div>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              8 hours × CA$10 − 50% with {PROMO}
+              The usual CA$10/hour rate is off during the pilot
             </p>
             <dl className="mt-6 space-y-2 border-t border-zinc-200/70 pt-4 text-sm dark:border-zinc-700/70">
-              <Row label="Hourly rate" value="CA$10" />
-              <Row label="Day length" value="4–8 hours" />
-              <Row label="Welcome discount" value="−50%" highlight />
-              <Row label="Payment" value="Card · Apple Pay · Link" />
+              <Row label="Tour length" value="2 or 3 hours" />
+              <Row label="Your buddy’s time" value="Free" highlight />
+              <Row label="What you eat & ride" value="Local prices, paid direct" />
+              <Row label="Payment step" value="None" />
             </dl>
           </div>
         </div>
@@ -239,17 +243,17 @@ function HowItWorks() {
     {
       n: '01',
       title: 'Pick your day',
-      body: 'Choose an open date and how many hours you want — 4 to 8.',
+      body: 'Choose an open date, then a 2 or 3 hour tour — your pick.',
     },
     {
       n: '02',
-      title: `Pay with ${PROMO}`,
-      body: 'Enter the code at checkout for 50% off. Card, Apple Pay, or Link.',
+      title: 'Request it, free',
+      body: 'No card, no checkout. Your request goes straight to your buddy.',
     },
     {
       n: '03',
       title: 'Get confirmed',
-      body: 'We confirm by email within 3 business days. Not confirmed? Full refund.',
+      body: 'We confirm by email within 3 business days. Then just show up.',
     },
   ]
   return (
@@ -302,14 +306,14 @@ function Why() {
       tone: 'amber' as const,
     },
     {
-      title: 'One simple price',
-      body: 'CA$10 an hour, no hidden fees. You see the total before you pay.',
+      title: 'Completely free',
+      body: 'The pilot costs you nothing. If the day deserved it, you can tip your buddy afterwards — that part is up to you.',
       icon: 'tag' as const,
       tone: 'rose' as const,
     },
     {
-      title: 'Risk-free',
-      body: 'If we can’t confirm your day, you’re refunded in full — automatically.',
+      title: 'Nothing at stake',
+      body: 'No payment means nothing to refund. If we can’t confirm your day, we tell you straight away and you’ve lost nothing.',
       icon: 'shield' as const,
       tone: 'emerald' as const,
     },
@@ -411,20 +415,20 @@ function Testimonials() {
 function Faq() {
   const faqs = [
     {
-      q: `How do I use ${PROMO}?`,
-      a: 'Pick your day and continue to payment. On the secure checkout page, tap “Add promotion code”, paste VIP50, and the 50% comes off instantly.',
+      q: 'Is it really free?',
+      a: 'Yes. While we pilot the service, your buddy’s time costs nothing — no card, no deposit, no checkout page. Anything you eat, ride or buy on the day you pay for directly, at local prices.',
     },
     {
-      q: 'When am I charged?',
-      a: 'You pay when you book, which holds the day for you. If we can’t confirm, you’re refunded in full — automatically.',
+      q: 'What’s the catch?',
+      a: 'There isn’t one. We’re new and we’d rather earn reviews than revenue right now. If you loved your day, you can leave a tip or a donation — both optional.',
     },
     {
-      q: 'How long is a day?',
-      a: 'Anywhere from 4 to 8 hours, your choice. It’s a flat CA$10 per hour before the discount.',
+      q: 'How long is a tour?',
+      a: '2 or 3 hours, your choice, one-on-one with your buddy.',
     },
     {
       q: 'When will I know it’s confirmed?',
-      a: 'We confirm by email within 3 business days of your booking.',
+      a: 'We confirm by email within 3 business days of your request.',
     },
   ]
   return (
@@ -475,23 +479,16 @@ function FinalCta() {
           Shenzhen is better with a friend.
         </h2>
         <p className="mx-auto mt-4 max-w-md text-white/90 drop-shadow">
-          Grab your welcome code and book your first day out — 50% off, fully
-          refundable.
+          Pick a date and book your first day out — completely free while we
+          pilot.
         </p>
-
-        <div className="mx-auto mt-8 inline-flex items-center gap-3 rounded-2xl bg-white/15 px-5 py-3 backdrop-blur">
-          <span className="text-xs font-medium uppercase tracking-wider text-white/70">
-            Code
-          </span>
-          <PromoCode code={PROMO} className="text-white" />
-        </div>
 
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/signup?as=tourist"
+            href="/guide"
             className="rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-zinc-100"
           >
-            Claim my 50% →
+            Book my free day →
           </Link>
           <Link
             href="/login"

@@ -31,6 +31,7 @@ const ROUTES: Array<{
   { path: '/about', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/contact', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/welcome', priority: 0.4, changeFrequency: 'monthly' },
+  { path: '/donate', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/terms', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/cancellation', priority: 0.3, changeFrequency: 'yearly' },

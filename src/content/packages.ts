@@ -1,4 +1,4 @@
-// The four-hour, one-on-one experiences the site sells. Same typed-module
+// The one-on-one experiences the site offers. Same typed-module
 // pattern as src/content/gallery.ts and src/content/posts: the content ships
 // with the code, the type is the schema, and assertPackagesValid() runs at
 // module load so a broken entry fails `npm run build` instead of production.
@@ -23,10 +23,13 @@ import { amountCentsForHours, CURRENCY, MIN_BOOKING_HOURS } from '@/lib/booking'
 // Stripe bills another.
 export const CURRENCY_FOR_PACKAGES = CURRENCY.toUpperCase()
 
-// Every package is exactly four hours. That is not an arbitrary round number:
-// MIN_BOOKING_HOURS is the shortest day the booking engine will sell, so a
-// four-hour package is the entry point a visitor can actually check out with.
-export const PACKAGE_HOURS = 4
+// The tour length shown on cards and detail pages. During the free pilot
+// (FREE_TOURS in lib/booking) tourists pick a free 2 or 3 hour tour, so the
+// packages advertise the 3-hour default. The itinerary prose below still
+// describes the original four-hour shape — deliberately left as-is for now
+// (see ITINERARY_HOURS in the invariants) — and gets rewritten when the
+// pilot's shape settles.
+export const PACKAGE_HOURS = 3
 
 export type PackageAccent =
   | 'signal'
@@ -512,9 +515,11 @@ export function bookHref(pkg: TourPackage): string {
 }
 
 // The line dropped into the booking note. Kept here so the card, the detail
-// page and /guide cannot drift apart on the wording.
+// page and /guide cannot drift apart on the wording. No hour count on
+// purpose: the tourist picks the length (2 or 3 hours) on the booking form,
+// and a "3 hours" here would contradict a 2-hour booking.
 export function bookingNoteFor(pkg: TourPackage): string {
-  return `Package: ${pkg.title} (${pkg.cn}) — ${PACKAGE_HOURS} hours.`
+  return `Package: ${pkg.title} (${pkg.cn}).`
 }
 
 // ---------------------------------------------------------------------------
@@ -524,6 +529,13 @@ export function bookingNoteFor(pkg: TourPackage): string {
 function fail(slug: string, problem: string): never {
   throw new Error(`packages: "${slug}" ${problem}`)
 }
+
+// The hour budget the WRITTEN itineraries are checked against. They were
+// authored as four-hour timelines and the user-facing length moved to 3 hours
+// for the free pilot without rewriting them, so validating beats against
+// PACKAGE_HOURS would fail every package at build. When the itineraries are
+// rewritten to the pilot's length, fold this back into PACKAGE_HOURS.
+const ITINERARY_HOURS = 4
 
 export function assertPackagesValid(
   all: readonly TourPackage[] = packages,
@@ -549,10 +561,10 @@ export function assertPackagesValid(
     if (pkg.featured) featured++
 
     // A package with one beat is a paragraph pretending to be an itinerary,
-    // and a traveller deciding where four hours of their trip goes deserves
-    // to see how those hours are actually spent.
+    // and a traveller deciding where hours of their trip go deserves to see
+    // how those hours are actually spent.
     if (pkg.itinerary.length < 4) {
-      fail(slug, `has only ${pkg.itinerary.length} itinerary beats; four hours needs at least 4`)
+      fail(slug, `has only ${pkg.itinerary.length} itinerary beats; an itinerary needs at least 4`)
     }
     for (const beat of pkg.itinerary) {
       if (!/^\d{1,2}:\d{2}$/.test(beat.at)) {
@@ -569,11 +581,12 @@ export function assertPackagesValid(
         fail(slug, `has itinerary beats out of order at "${pkg.itinerary[i].at}"`)
       }
     }
-    // The last beat has to leave time to happen inside the four hours sold.
-    if (minutes[minutes.length - 1] >= PACKAGE_HOURS * 60) {
+    // The last beat has to leave time to happen inside the hours the
+    // itinerary was written for.
+    if (minutes[minutes.length - 1] >= ITINERARY_HOURS * 60) {
       fail(
         slug,
-        `has a final beat at ${pkg.itinerary[pkg.itinerary.length - 1].at}, which is outside the ${PACKAGE_HOURS} hours being sold`,
+        `has a final beat at ${pkg.itinerary[pkg.itinerary.length - 1].at}, which is outside the ${ITINERARY_HOURS}-hour itinerary`,
       )
     }
 

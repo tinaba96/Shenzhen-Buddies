@@ -112,6 +112,11 @@ export async function resolveBookingById(
           '',
           `See your bookings: ${siteUrl()}/guide`,
           '',
+          // A durable link they can come back to once the tour is over — the
+          // page itself refuses reviews until then.
+          `After your tour, tell us how it went (and tip ${guideName} if you like):`,
+          `${siteUrl()}/guide/review/${booking.id}`,
+          '',
           'See you in Shenzhen!',
         ].join('\n'),
       })
@@ -236,7 +241,9 @@ export async function cancelBookingByTourist(
   const refundText =
     refundCents > 0
       ? `Refund: ${formatMoney(refundCents, booking.currency ?? undefined)} (${refundPercent}%).`
-      : 'No refund applies under the cancellation policy.'
+      : !booking.amount_cents
+        ? 'This was a free booking — nothing was charged.'
+        : 'No refund applies under the cancellation policy.'
 
   const { data: touristAuth } = await admin.auth.admin.getUserById(touristId)
   if (touristAuth?.user?.email) {

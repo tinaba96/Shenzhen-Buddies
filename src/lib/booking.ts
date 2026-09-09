@@ -1,10 +1,23 @@
 // Shared types and pure helpers for the beta booking flow.
 // All hours are whole-hour wall-clock times in Shenzhen (0–24).
 
-export const MIN_BOOKING_HOURS = 4
-export const MAX_BOOKING_HOURS = 8
+// Free-pilot mode. While true, tours cost nothing and come only in the fixed
+// lengths below — the paid flow (Stripe/PayPal checkout, hourly pricing,
+// refunds) stays in the codebase untouched and comes back by flipping this
+// to false. Nothing else needs to change: every constant below derives from it.
+export const FREE_TOURS = true
 
-// Pricing: a flat CA$10/hour, charged once at booking time.
+// The only lengths a tourist can pick while the pilot is free. Whole hours
+// because start_hour/end_hour are integer columns; 3 is the default the form
+// preselects.
+export const FREE_TOUR_LENGTHS = [2, 3]
+export const DEFAULT_FREE_TOUR_LENGTH = 3
+
+export const MIN_BOOKING_HOURS = FREE_TOURS ? 2 : 4
+export const MAX_BOOKING_HOURS = FREE_TOURS ? 3 : 8
+
+// Pricing: a flat CA$10/hour, charged once at booking time (paid mode only —
+// amountCentsForHours() returns 0 while FREE_TOURS is on).
 export const HOURLY_RATE_CENTS = 1000
 export const CURRENCY = 'cad'
 
@@ -58,6 +71,7 @@ export function cancellationRefundPercent(
 }
 
 export function amountCentsForHours(hours: number): number {
+  if (FREE_TOURS) return 0
   return hours * HOURLY_RATE_CENTS
 }
 

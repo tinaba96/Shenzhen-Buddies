@@ -9,6 +9,7 @@ import {
 import { publishedPosts } from '@/content/posts'
 import type { Dictionary } from '@/i18n'
 import { getI18n } from '@/i18n/server'
+import { FREE_TOURS } from '@/lib/booking'
 import { isSingleGuideMode } from '@/lib/config'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { Locale } from '@/i18n/config'
@@ -238,7 +239,8 @@ function Ticker() {
 async function Packages({ locale, t }: { locale: Locale; t: Dictionary }) {
   const featured = localizedFeaturedPackage(locale)
   const rest = localizedOtherPackages(locale)
-  const price = packagePrice()
+  // Free pilot: the cards show a localized "Free" instead of a money amount.
+  const price = FREE_TOURS ? t.common.free : packagePrice()
 
   return (
     <section className="relative border-b border-zinc-200 dark:border-zinc-800">

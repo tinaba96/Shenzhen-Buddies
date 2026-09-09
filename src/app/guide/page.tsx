@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
 import { BookingFields } from '@/components/BookingFields'
+import { FreeBookingFields } from '@/components/FreeBookingFields'
 import { StarRating } from '@/components/StarRating'
 import { SubmitButton } from '@/components/SubmitButton'
 import { avatarPublicUrl } from '@/lib/avatars'
@@ -14,6 +15,7 @@ import {
   formatDay,
   formatHourRange,
   formatMoney,
+  FREE_TOURS,
   hoursUntilTourStart,
   HOURLY_RATE_CENTS,
   isHoldExpired,
@@ -47,9 +49,9 @@ import { AvailabilityEditor } from './AvailabilityEditor'
 // its real address, and a <title> identical to the homepage's. A self-referential
 // canonical is the whole point of the tag; pointing it elsewhere is an explicit
 // instruction to index that page instead of this one.
-const TITLE = 'Book a day with a local in Shenzhen — Shenzhen Buddies'
+const TITLE = 'Book a free tour with a local in Shenzhen — Shenzhen Buddies'
 const DESCRIPTION =
-  'Pick your day and your hours, then spend them with someone who actually lives here — no coach, no script, no fixed route. Four to eight hours, booked direct.'
+  'Pick a day and spend two or three hours with someone who actually lives here — no coach, no script, no fixed route. Free during our pilot, booked direct.'
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -467,8 +469,12 @@ export default async function GuidePage({ searchParams }: Props) {
             />
             <Highlight
               icon="🛟"
-              title="Risk-free"
-              body="Full refund if we can’t confirm your day."
+              title={FREE_TOURS ? 'Free right now' : 'Risk-free'}
+              body={
+                FREE_TOURS
+                  ? 'Tours cost nothing during our pilot. Really.'
+                  : 'Full refund if we can’t confirm your day.'
+              }
             />
           </div>
         )}
@@ -504,7 +510,9 @@ export default async function GuidePage({ searchParams }: Props) {
             Booking cancelled.{' '}
             {Number(sp.refund_cents) > 0
               ? `${formatMoney(Number(sp.refund_cents))} will be refunded within a few business days.`
-              : 'No refund applies under the cancellation policy.'}
+              : FREE_TOURS
+                ? 'The day is open again if you change your mind.'
+                : 'No refund applies under the cancellation policy.'}
           </p>
         )}
         {sp.error && (
@@ -618,11 +626,21 @@ export default async function GuidePage({ searchParams }: Props) {
 
           <h2 className="text-xl font-semibold">Book a day together</h2>
           <p className="mt-1 text-sm text-zinc-500">
-            Tours run from {MIN_BOOKING_HOURS} to {MAX_BOOKING_HOURS} hours at{' '}
-            {formatMoney(HOURLY_RATE_CENTS)}/hour (
-            {formatMoney(amountCentsForHours(MIN_BOOKING_HOURS))}–
-            {formatMoney(amountCentsForHours(MAX_BOOKING_HOURS))}). You pay when
-            you book; if we can&apos;t confirm, you&apos;re fully refunded.
+            {FREE_TOURS ? (
+              <>
+                Tours are free during our pilot — pick a 2 or 3 hour tour, no
+                payment, no card. Request a day and we confirm by email.
+              </>
+            ) : (
+              <>
+                Tours run from {MIN_BOOKING_HOURS} to {MAX_BOOKING_HOURS} hours
+                at {formatMoney(HOURLY_RATE_CENTS)}/hour (
+                {formatMoney(amountCentsForHours(MIN_BOOKING_HOURS))}–
+                {formatMoney(amountCentsForHours(MAX_BOOKING_HOURS))}). You pay
+                when you book; if we can&apos;t confirm, you&apos;re fully
+                refunded.
+              </>
+            )}
           </p>
 
           {user && !isTourist ? (
@@ -679,11 +697,15 @@ export default async function GuidePage({ searchParams }: Props) {
                   ) : (
                   <form action={requestBooking} className="mt-4 space-y-4">
                     <input type="hidden" name="day" value={selectedDay.day} />
-                    <BookingFields
-                      startOptions={startOptions}
-                      minHours={MIN_BOOKING_HOURS}
-                      maxHours={MAX_BOOKING_HOURS}
-                    />
+                    {FREE_TOURS ? (
+                      <FreeBookingFields startOptions={startOptions} />
+                    ) : (
+                      <BookingFields
+                        startOptions={startOptions}
+                        minHours={MIN_BOOKING_HOURS}
+                        maxHours={MAX_BOOKING_HOURS}
+                      />
+                    )}
                     <label className="block">
                       <span className="text-sm font-medium">
                         Anything {guide.display_name} should know?
@@ -708,22 +730,30 @@ export default async function GuidePage({ searchParams }: Props) {
                         className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
                       />
                     </label>
-                    {/* Cancellation policy, visible before paying */}
+                    {/* Cancellation policy, visible before booking */}
                     <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
                       <p className="font-medium text-zinc-700 dark:text-zinc-300">
                         Cancellation policy
                       </p>
-                      <ul className="mt-1 space-y-0.5">
-                        <li>
-                          • Before we confirm: <strong>full refund</strong>,
-                          anytime
-                        </li>
-                        <li>
-                          • 72h+ before the tour: <strong>full refund</strong>
-                        </li>
-                        <li>• 72–24h before: 90% refund (10% fee)</li>
-                        <li>• Under 24h before: 20% refund (80% fee)</li>
-                      </ul>
+                      {FREE_TOURS ? (
+                        <p className="mt-1">
+                          The tour is free, and so is cancelling — just do it
+                          before the tour starts so the day opens up for
+                          someone else.
+                        </p>
+                      ) : (
+                        <ul className="mt-1 space-y-0.5">
+                          <li>
+                            • Before we confirm: <strong>full refund</strong>,
+                            anytime
+                          </li>
+                          <li>
+                            • 72h+ before the tour: <strong>full refund</strong>
+                          </li>
+                          <li>• 72–24h before: 90% refund (10% fee)</li>
+                          <li>• Under 24h before: 20% refund (80% fee)</li>
+                        </ul>
+                      )}
                       <Link
                         href="/cancellation"
                         className="mt-1 inline-block underline underline-offset-2 hover:text-zinc-800 dark:hover:text-zinc-200"
@@ -733,16 +763,20 @@ export default async function GuidePage({ searchParams }: Props) {
                     </div>
 
                     <SubmitButton
-                      pendingLabel="Going to payment…"
+                      pendingLabel={
+                        FREE_TOURS ? 'Sending request…' : 'Going to payment…'
+                      }
                       className="w-full rounded-full bg-zinc-900 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
                     >
-                      Continue to payment
+                      {FREE_TOURS
+                        ? 'Request this day — it’s free'
+                        : 'Continue to payment'}
                     </SubmitButton>
                     <p className="text-center text-xs text-zinc-500">
-                      You pay {formatMoney(HOURLY_RATE_CENTS)}/hour now to hold
-                      the day. We confirm within 3 business days — if we
-                      can&apos;t, you&apos;re fully refunded. By booking you
-                      agree to our{' '}
+                      {FREE_TOURS
+                        ? 'Nothing to pay — we confirm by email within 3 business days.'
+                        : `You pay ${formatMoney(HOURLY_RATE_CENTS)}/hour now to hold the day. We confirm within 3 business days — if we can’t, you’re fully refunded.`}{' '}
+                      By booking you agree to our{' '}
                       <Link
                         href="/terms"
                         className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
@@ -767,6 +801,24 @@ export default async function GuidePage({ searchParams }: Props) {
         </section>
         )}
 
+        {/* Free pilot: the one quiet ask. Tours cost nothing, donations keep
+            them running — anyone can give, any time, booking or not. */}
+        {FREE_TOURS && !isOfficialGuide && (
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-rose-50 px-5 py-4 dark:border-amber-900/40 dark:from-amber-950/20 dark:to-rose-950/20">
+            <p className="text-sm text-zinc-700 dark:text-zinc-300">
+              <span className="font-semibold">The tours are free.</span> If you
+              like what we&apos;re building, you can chip in to keep the pilot
+              running.
+            </p>
+            <Link
+              href="/donate"
+              className="rounded-full border border-zinc-900/20 bg-white px-4 py-2 text-sm font-medium text-zinc-900 shadow-sm transition hover:bg-zinc-50 dark:border-white/20 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800"
+            >
+              Support the pilot →
+            </Link>
+          </div>
+        )}
+
         {/* Guide's own schedule + availability management */}
         {isOfficialGuide && (
           <>
@@ -780,9 +832,15 @@ export default async function GuidePage({ searchParams }: Props) {
           <section className="mt-8">
             <h2 className="text-xl font-semibold">Your requests</h2>
             <p className="mt-1 text-xs text-zinc-500">
-              Cancellation: free up to 72h before · 10% fee within 72h · 80% fee
-              within 24h. Before it&apos;s confirmed, you&apos;re always fully
-              refunded.{' '}
+              {FREE_TOURS ? (
+                <>Cancelling is free, any time before the tour starts. </>
+              ) : (
+                <>
+                  Cancellation: free up to 72h before · 10% fee within 72h ·
+                  80% fee within 24h. Before it&apos;s confirmed, you&apos;re
+                  always fully refunded.{' '}
+                </>
+              )}
               <Link
                 href="/cancellation"
                 className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
@@ -799,6 +857,12 @@ export default async function GuidePage({ searchParams }: Props) {
                   (b.status === 'pending' || b.status === 'approved') &&
                   hrs > 0
                 const pct = cancellationRefundPercent(b.status, hrs)
+                const wasFree = !b.amount_cents
+                // A confirmed tour whose end time has passed can be reviewed
+                // (and tipped) — same gate the review page enforces.
+                const finished =
+                  b.status === 'approved' &&
+                  hoursUntilTourStart(b.day, b.end_hour, nowMs) <= 0
                 return (
                   <li
                     key={b.id}
@@ -810,9 +874,11 @@ export default async function GuidePage({ searchParams }: Props) {
                         {formatHourRange(b.start_hour, b.end_hour)}
                         {b.amount_cents != null && (
                           <span className="ml-2 font-normal text-zinc-500">
-                            {b.status === 'rejected'
-                              ? `${formatMoney(b.amount_cents, b.currency ?? undefined)} refunded`
-                              : formatMoney(b.amount_cents, b.currency ?? undefined)}
+                            {b.amount_cents === 0
+                              ? 'Free'
+                              : b.status === 'rejected'
+                                ? `${formatMoney(b.amount_cents, b.currency ?? undefined)} refunded`
+                                : formatMoney(b.amount_cents, b.currency ?? undefined)}
                           </span>
                         )}
                       </p>
@@ -828,6 +894,14 @@ export default async function GuidePage({ searchParams }: Props) {
                       >
                         {status.label}
                       </span>
+                      {finished && (
+                        <Link
+                          href={`/guide/review/${b.id}`}
+                          className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800 transition hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:hover:bg-amber-900"
+                        >
+                          How was it? 👍👎
+                        </Link>
+                      )}
                       {canCancel && (
                         <form action={cancelOwnBooking}>
                           <input type="hidden" name="id" value={b.id} />
@@ -835,11 +909,13 @@ export default async function GuidePage({ searchParams }: Props) {
                             pendingLabel="Cancelling…"
                             className="text-xs text-zinc-500 underline underline-offset-2 hover:text-red-600"
                           >
-                            {pct === 100
-                              ? 'Cancel (full refund)'
-                              : pct > 0
-                                ? `Cancel (${100 - pct}% fee)`
-                                : 'Cancel (no refund)'}
+                            {wasFree
+                              ? 'Cancel'
+                              : pct === 100
+                                ? 'Cancel (full refund)'
+                                : pct > 0
+                                  ? `Cancel (${100 - pct}% fee)`
+                                  : 'Cancel (no refund)'}
                           </SubmitButton>
                         </form>
                       )}
@@ -882,8 +958,10 @@ function AnonBookingCta({
         >
           Log in
         </Link>
-        . This day stays open while you do — and if {firstName}&apos;s day
-        can&apos;t be confirmed, you&apos;re fully refunded.
+        . This day stays open while you do
+        {FREE_TOURS
+          ? ' — and the tour itself is free during our pilot.'
+          : ` — and if ${firstName}'s day can't be confirmed, you're fully refunded.`}
       </p>
     </div>
   )
@@ -980,8 +1058,11 @@ function GuideAvailability({
     <section className="mt-8">
       <h2 className="text-xl font-semibold">Your availability</h2>
       <p className="mt-1 text-sm text-zinc-500">
-        Open the days and hours you can guide. Tourists can book any{' '}
-        {MIN_BOOKING_HOURS}–{MAX_BOOKING_HOURS} hour slot inside a window.
+        Open the days and hours you can guide. Tourists book a{' '}
+        {FREE_TOURS
+          ? `free ${MIN_BOOKING_HOURS} or ${MAX_BOOKING_HOURS} hour tour`
+          : `${MIN_BOOKING_HOURS}–${MAX_BOOKING_HOURS} hour slot`}{' '}
+        inside a window.
       </p>
 
       <AvailabilityEditor

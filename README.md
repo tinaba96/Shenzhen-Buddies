@@ -88,8 +88,14 @@ Vercel.
      Copy its signing secret (`whsec_...`).
    - Paste into `.env.local`: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
      `NEXT_PUBLIC_STRIPE_PRICE_ID` (price ID only needed for subscriptions).
-   - Booking pricing is a flat CA$10/hour (5–15h), set in `src/lib/booking.ts`
-     (`HOURLY_RATE_CENTS`, `CURRENCY`). Declining a paid booking auto-refunds.
+   - **Free pilot (current):** `FREE_TOURS` in `src/lib/booking.ts` is on, so
+     tours are free and come in fixed lengths (`FREE_TOUR_LENGTHS`, 2 or 3
+     hours) with no payment step; flip it to false to restore paid bookings.
+     Tips and donations still use Stripe (`src/lib/support.ts`, `/donate`,
+     `/guide/review/[id]`).
+   - Paid booking pricing is a flat CA$10/hour (4–8h), set in
+     `src/lib/booking.ts` (`HOURLY_RATE_CENTS`, `CURRENCY`). Declining a paid
+     booking auto-refunds.
    - Promo codes are managed in the Stripe dashboard (Coupons → Promotion
      codes). They're validated via Stripe and applied to **both** card and
      PayPal from a single field on the payment page. A 100%-off code makes a

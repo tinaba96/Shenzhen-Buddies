@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { focusFor } from '@/content/gallery'
-import type { PackageAccent, TourPackage } from '@/content/packages'
+import { PACKAGE_HOURS, type PackageAccent, type TourPackage } from '@/content/packages'
 import type { Dictionary } from '@/i18n'
 
 // Per-package accent colours.
@@ -117,7 +117,7 @@ export function PackageCard({
                 {pkg.kicker}
               </span>
               <span className="rounded-full border border-zinc-200 px-2.5 py-1 text-[11px] font-medium text-zinc-500 dark:border-zinc-700">
-                {t.common.fourHours}
+                {t.common.hours.replace('{n}', String(PACKAGE_HOURS))}
               </span>
               <span className="rounded-full border border-zinc-200 px-2.5 py-1 text-[11px] font-medium text-zinc-500 dark:border-zinc-700">
                 {t.common.oneOnOne}
@@ -212,7 +212,7 @@ export function PackageCard({
 
         <div className="mt-5 flex items-center gap-2 text-[11px] text-zinc-500">
           <ClockIcon />
-          <span>{t.common.fourHours}</span>
+          <span>{t.common.hours.replace('{n}', String(PACKAGE_HOURS))}</span>
           <span aria-hidden>·</span>
           <span>{t.common.oneOnOne}</span>
           <span aria-hidden>·</span>

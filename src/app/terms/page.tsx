@@ -104,6 +104,12 @@ export default function TermsPage() {
           <Section title="5. Bookings and payments">
             <ul className="ml-5 list-disc space-y-1">
               <li>
+                <strong>Free pilot:</strong> during our pilot period, tours are
+                offered at no charge and no payment is collected at booking.
+                The payment terms below apply only when a price is shown and
+                charged.
+              </li>
+              <li>
                 Tours are priced at a flat hourly rate, shown at checkout, in{' '}
                 <strong>Canadian dollars (CAD)</strong>. A booking covers a
                 whole-day block within the duration limits shown in the app.
