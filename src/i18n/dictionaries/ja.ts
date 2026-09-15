@@ -197,6 +197,8 @@ export const ja: Dictionary = {
     detail: {
       itinerary: '一日の進み方',
       itineraryNote: '時刻は待ち合わせからの経過時間で、実際の時計の時刻ではありません。開始時刻は予約時にご自身で選べます。',
+      tourLength: 'ツアーの長さ',
+      customizable: 'ツアーは一人ひとりの希望に合わせてカスタマイズできます。予約の際に、やってみたいことを気軽にお知らせください。',
       includes: '含まれるもの',
       notIncluded: '含まれないもの',
       goodFor: 'こんな方に',
@@ -206,7 +208,7 @@ export const ja: Dictionary = {
       district: 'エリア',
       duration: '所要時間',
       groupSize: '人数',
-      groupSizeValue: 'あなただけ（同行者がいればその方も）',
+      groupSizeValue: '1〜2名',
       price: '料金',
       priceNote: 'パイロット期間中は無料——予約時の支払いはありません。当日に食べるもの・乗るもの・買うものは地元価格でご自身で支払います。',
       readMore: '詳しいガイドを読む',

@@ -50,12 +50,17 @@ export function localizePackage(
     notIncluded: tr.notIncluded,
     goodFor: tr.goodFor,
     insiderTip: tr.insiderTip,
-    // `at` stays from the base: the timeline is structure, not prose, and it
-    // is validated there.
-    itinerary: pkg.itinerary.map((beat, i) => ({
-      at: beat.at,
-      title: tr.itinerary[i]?.title ?? beat.title,
-      body: tr.itinerary[i]?.body ?? beat.body,
+    itineraryTitle: tr.itineraryTitle ?? pkg.itineraryTitle,
+    // `hours` and `at` stay from the base: the timeline is structure, not
+    // prose, and it is validated there.
+    itineraries: pkg.itineraries.map((variant, v) => ({
+      hours: variant.hours,
+      title: tr.itineraries[v]?.title ?? variant.title,
+      beats: variant.beats.map((beat, i) => ({
+        at: beat.at,
+        title: tr.itineraries[v]?.beats[i]?.title ?? beat.title,
+        body: tr.itineraries[v]?.beats[i]?.body ?? beat.body,
+      })),
     })),
   }
 }
@@ -102,9 +107,30 @@ export function assertPackageTranslationsValid(): void {
         problems.push(`${locale} is missing "${pkg.slug}"`)
         continue
       }
-      if (tr.itinerary.length !== pkg.itinerary.length) {
+      if (tr.itineraries.length !== pkg.itineraries.length) {
         problems.push(
-          `${locale}.${pkg.slug} has ${tr.itinerary.length} itinerary beats but the English original has ${pkg.itinerary.length}`,
+          `${locale}.${pkg.slug} has ${tr.itineraries.length} itineraries but the English original has ${pkg.itineraries.length}`,
+        )
+      }
+      for (const [v, variant] of pkg.itineraries.entries()) {
+        const trv = tr.itineraries[v]
+        if (!trv) continue
+        if (trv.beats.length !== variant.beats.length) {
+          problems.push(
+            `${locale}.${pkg.slug} itinerary ${v + 1} has ${trv.beats.length} beats but the English original has ${variant.beats.length}`,
+          )
+        }
+        // A named variant that loses its name in translation renders an
+        // empty line under the length toggle.
+        if (!!variant.title !== !!trv.title?.trim()) {
+          problems.push(
+            `${locale}.${pkg.slug} itinerary ${v + 1} ${variant.title ? 'is missing its title' : 'has a title the English original does not'}`,
+          )
+        }
+      }
+      if (!!pkg.itineraryTitle !== !!tr.itineraryTitle?.trim()) {
+        problems.push(
+          `${locale}.${pkg.slug} ${pkg.itineraryTitle ? 'is missing itineraryTitle' : 'has an itineraryTitle the English original does not'}`,
         )
       }
       // A short list here is how a translated card silently loses the line

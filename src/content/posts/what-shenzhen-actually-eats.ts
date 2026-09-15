@@ -66,7 +66,7 @@ export const whatShenzhenActuallyEats: Post = {
     },
     {
       k: 'p',
-      text: 'The other Cantonese institution is breakfast, taken seriously: congee cooked long enough to lose the shape of the rice, and chángfěn — rice noodle rolls steamed to order and folded around egg or beef under sweet soy. Morning food here is its own culture with its own pace, which is exactly why we built [a four-hour morning](/tours/breakfast-shift) around nothing else.',
+      text: 'The other Cantonese institution is breakfast, taken seriously: congee cooked long enough to lose the shape of the rice, and chángfěn — rice noodle rolls steamed to order and folded around egg or beef under sweet soy. Morning food here is its own culture with its own pace, which is exactly why we built [a morning with a buddy](/tours/breakfast-shift) around nothing else.',
     },
 
     { k: 'h2', text: 'Then the whole country moved in' },
@@ -113,7 +113,7 @@ export const whatShenzhenActuallyEats: Post = {
     },
     {
       k: 'p',
-      text: 'A crayfish table is a social format as much as a meal — slow, messy, and impossible to do while looking at your phone, which is why groups of friends default to it. It is also the single best table in the city to be a guest at, which is why [one of our four-hour evenings](/tours/crayfish-night-table) ends at one.',
+      text: 'A crayfish table is a social format as much as a meal — slow, messy, and impossible to do while looking at your phone, which is why groups of friends default to it. It is also the single best table in the city to be a guest at, which is why [one of our evenings](/tours/crayfish-night-table) ends at one.',
     },
 
     { k: 'h2', text: 'How to read a night market' },
@@ -215,7 +215,7 @@ export const whatShenzhenActuallyEats: Post = {
     {
       k: 'cta',
       label: 'Bring an appetite, borrow a local',
-      sub: 'Four hours with a Shenzhen buddy covers more tables than four days of guessing.',
+      sub: 'A few hours with a Shenzhen buddy covers more tables than four days of guessing.',
     },
   ],
   faq: [

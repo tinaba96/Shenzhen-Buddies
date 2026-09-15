@@ -29,9 +29,12 @@ export type LocalizedPackage = Pick<
   | 'goodFor'
   | 'insiderTip'
 > & {
-  // Same length and order as the English itinerary. `at` is not translated —
-  // "1:20" is "1:20" in every locale this site ships.
-  itinerary: { title: string; body: string }[]
+  // Present exactly when the English record names its itinerary section.
+  itineraryTitle?: string
+  // Same count and order as the English itineraries, and inside each the same
+  // count and order of beats. `hours` and `at` are not translated — "1:20" is
+  // "1:20" in every locale this site ships, so they stay on the base record.
+  itineraries: { title?: string; beats: { title: string; body: string }[] }[]
 }
 
 // Keyed by package slug. Typed as a full record so a package added to

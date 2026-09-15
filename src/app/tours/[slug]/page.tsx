@@ -2,11 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { ItinerarySwitcher } from '@/components/ItinerarySwitcher'
 import { PackageCard } from '@/components/PackageCard'
 import { focusFor } from '@/content/gallery'
 import {
   bookHref,
   CURRENCY_FOR_PACKAGES,
+  defaultItinerary,
   packagePrice,
   packagePriceCents,
   PACKAGE_HOURS,
@@ -67,6 +69,9 @@ export default async function TourDetailPage({ params }: Props) {
   const related = others.slice(0, 3)
   const post = pkg.readMoreSlug ? getPublishedPost(pkg.readMoreSlug) : undefined
   const base = siteUrl()
+  // The timeline for the advertised length is what the structured data
+  // describes and what the toggle starts on; the others are a click away.
+  const itinerary = defaultItinerary(pkg)
 
   const tripJsonLd = {
     '@context': 'https://schema.org',
@@ -75,11 +80,12 @@ export default async function TourDetailPage({ params }: Props) {
     description: pkg.summary,
     url: `${base}/tours/${pkg.slug}`,
     image: `${base}${pkg.photo}`,
-    touristType: pkg.goodFor,
+    // goodFor may lead with an emoji for the page; structured data gets words.
+    touristType: pkg.goodFor.map(stripLeadingEmoji),
     itinerary: {
       '@type': 'ItemList',
-      numberOfItems: pkg.itinerary.length,
-      itemListElement: pkg.itinerary.map((beat, i) => ({
+      numberOfItems: itinerary.beats.length,
+      itemListElement: itinerary.beats.map((beat, i) => ({
         '@type': 'ListItem',
         position: i + 1,
         name: beat.title,
@@ -156,39 +162,24 @@ export default async function TourDetailPage({ params }: Props) {
           {/* ITINERARY */}
           <section className="mt-14">
             <h2 className="sb-display text-3xl">
-              {t.tours.detail.itinerary}
+              {pkg.itineraryTitle ?? t.tours.detail.itinerary}
             </h2>
             <p className="mt-2 text-sm text-zinc-500">
               {t.tours.detail.itineraryNote}
             </p>
 
-            <ol className="mt-8">
-              {pkg.itinerary.map((beat, i) => (
-                <li key={beat.at} className="relative flex gap-5 pb-8 last:pb-0">
-                  {/* The connector. Absolute so it runs behind the dot and
-                      stops at the last beat rather than trailing into space. */}
-                  {i < pkg.itinerary.length - 1 && (
-                    <span
-                      aria-hidden
-                      className="absolute bottom-0 left-[0.4375rem] top-6 w-px bg-gradient-to-b from-amber-400/60 to-rose-400/20"
-                    />
-                  )}
-                  <span
-                    aria-hidden
-                    className="relative mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full bg-gradient-to-br from-amber-400 to-rose-500 ring-4 ring-white dark:ring-black"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="font-mono text-xs tabular-nums text-zinc-400">
-                      {beat.at}
-                    </p>
-                    <h3 className="mt-1 text-lg font-semibold">{beat.title}</h3>
-                    <p className="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                      {beat.body}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <ItinerarySwitcher
+              variants={pkg.itineraries}
+              labels={pkg.itineraries.map((v) =>
+                t.common.hours.replace('{n}', String(v.hours)),
+              )}
+              groupLabel={t.tours.detail.tourLength}
+              initialIndex={pkg.itineraries.indexOf(itinerary)}
+            />
+
+            <p className="mt-8 rounded-2xl border border-dashed border-zinc-300 px-5 py-4 text-sm leading-relaxed text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+              {t.tours.detail.customizable}
+            </p>
           </section>
 
           {/* INCLUDES / EXCLUDES */}
@@ -338,6 +329,12 @@ export default async function TourDetailPage({ params }: Props) {
       </section>
     </main>
   )
+}
+
+// "🏙️ First-time visitors" → "First-time visitors". Extended pictographic
+// covers emoji; the variation selector and ZWJ cover their composed forms.
+function stripLeadingEmoji(s: string): string {
+  return s.replace(/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u, '')
 }
 
 function Pill({ children }: { children: React.ReactNode }) {

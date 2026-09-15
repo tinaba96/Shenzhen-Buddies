@@ -206,6 +206,8 @@ export const zhHant: Dictionary = {
     detail: {
       itinerary: '這一天怎麼走',
       itineraryNote: '時間由見面那一刻開始算，不是實際鐘點——出發時間你下單時自己選。',
+      tourLength: '行程時長',
+      customizable: '行程可以按每位旅客的需要調整——預訂時隨時告訴我們你的想法。',
       includes: '包含什麼',
       notIncluded: '不包含什麼',
       goodFor: '適合誰',
@@ -215,7 +217,7 @@ export const zhHant: Dictionary = {
       district: '所在區',
       duration: '時長',
       groupSize: '人數',
-      groupSizeValue: '就你（和你帶來的人）',
+      groupSizeValue: '1–2 人',
       price: '價錢',
       priceNote: '試營運期間免費——預訂時不付一分錢。當天你吃的、搭的、買的按本地價自己付。',
       readMore: '讀完整指南',

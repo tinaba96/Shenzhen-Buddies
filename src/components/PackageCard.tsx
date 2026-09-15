@@ -1,7 +1,12 @@
 import Link from 'next/link'
 
 import { focusFor } from '@/content/gallery'
-import { PACKAGE_HOURS, type PackageAccent, type TourPackage } from '@/content/packages'
+import {
+  defaultItinerary,
+  PACKAGE_HOURS,
+  type PackageAccent,
+  type TourPackage,
+} from '@/content/packages'
 import type { Dictionary } from '@/i18n'
 
 // Per-package accent colours.
@@ -132,7 +137,7 @@ export function PackageCard({
             </p>
 
             <ul className="mt-6 space-y-2.5 border-t border-zinc-100 pt-5 dark:border-zinc-800">
-              {pkg.itinerary.slice(0, 3).map((beat) => (
+              {defaultItinerary(pkg).beats.slice(0, 3).map((beat) => (
                 <li key={beat.at} className="flex gap-3 text-sm">
                   <span className="w-10 shrink-0 pt-px font-mono text-xs tabular-nums text-zinc-400">
                     {beat.at}
@@ -145,7 +150,7 @@ export function PackageCard({
               <li className="flex gap-3 text-sm text-zinc-400">
                 <span className="w-10 shrink-0 font-mono text-xs">…</span>
                 <span>
-                  +{pkg.itinerary.length - 3} {t.tours.detail.itinerary.toLowerCase()}
+                  +{defaultItinerary(pkg).beats.length - 3} {t.tours.detail.itinerary.toLowerCase()}
                 </span>
               </li>
             </ul>
