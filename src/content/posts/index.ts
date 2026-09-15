@@ -5,6 +5,7 @@
 import { requireGalleryItem } from '@/content/gallery'
 
 import { AUTHORS, PILLARS, type Pillar, type Post } from './types'
+import { dongmenOldDowntown } from './dongmen-old-downtown'
 import { shenzhenAfterDark } from './shenzhen-after-dark'
 import { shenzhenFromHongKongDayTrip } from './shenzhen-from-hong-kong-day-trip'
 import { whatShenzhenActuallyEats } from './what-shenzhen-actually-eats'
@@ -14,6 +15,7 @@ export * from './types'
 // Registration order does not matter — everything reads through the sorted
 // accessors below.
 export const posts: Post[] = [
+  dongmenOldDowntown,
   shenzhenAfterDark,
   shenzhenFromHongKongDayTrip,
   whatShenzhenActuallyEats,
