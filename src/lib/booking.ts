@@ -75,7 +75,7 @@ export function amountCentsForHours(hours: number): number {
   return hours * HOURLY_RATE_CENTS
 }
 
-// 5000 -> "CA$50.00"
+// 5000 -> "$50.00" (en-CA renders CAD as a bare "$"; packages.ts uses en-US where "CA$" is wanted)
 export function formatMoney(cents: number, currency: string = CURRENCY): string {
   return new Intl.NumberFormat('en-CA', {
     style: 'currency',
