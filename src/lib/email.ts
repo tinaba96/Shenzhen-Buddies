@@ -25,9 +25,18 @@ function resolveFrom(user: string): string {
   return configured
 }
 
-export async function sendEmail({ to, subject, text }: SendEmailInput) {
+// Never throws: the booking flow must not fail because a mail did. The
+// result carries the reason instead, so the admin dashboard's test button
+// can show "535 Username and Password not accepted" rather than nothing.
+export type SendEmailResult = { ok: true } | { ok: false; error: string }
+
+export async function sendEmail({
+  to,
+  subject,
+  text,
+}: SendEmailInput): Promise<SendEmailResult> {
   const recipients = (Array.isArray(to) ? to : [to]).filter(Boolean)
-  if (recipients.length === 0) return
+  if (recipients.length === 0) return { ok: false, error: 'no recipient address' }
 
   const user = process.env.GMAIL_USER
   const pass = process.env.GMAIL_APP_PASSWORD
@@ -36,7 +45,7 @@ export async function sendEmail({ to, subject, text }: SendEmailInput) {
     console.log(
       `[email skipped — GMAIL_USER/GMAIL_APP_PASSWORD not set] to=${recipients.join(', ')} subject="${subject}"\n${text}`,
     )
-    return
+    return { ok: false, error: 'GMAIL_USER / GMAIL_APP_PASSWORD not set on the server' }
   }
 
   try {
@@ -50,8 +59,20 @@ export async function sendEmail({ to, subject, text }: SendEmailInput) {
       subject,
       text,
     })
+    return { ok: true }
   } catch (err) {
     // Email failures must never break the booking flow — log and move on.
     console.error('Email send failed:', err)
+    return { ok: false, error: describeSmtpError(err) }
   }
+}
+
+// Gmail's rejection text is the useful part ("535-5.7.8 Username and Password
+// not accepted") — surface it, without the multi-line boilerplate around it.
+function describeSmtpError(err: unknown): string {
+  const e = err as { response?: string; code?: string; message?: string }
+  const line =
+    (e?.response ?? e?.message ?? String(err)).split('\n')[0].trim() ||
+    'unknown error'
+  return e?.code && !line.includes(e.code) ? `${e.code}: ${line}` : line
 }

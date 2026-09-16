@@ -35,7 +35,7 @@ import {
   siteUrl,
 } from '@/lib/config'
 import { sendEmail } from '@/lib/email'
-import { notifyGuide } from '@/lib/notify'
+import { describeGuideNotify, notifyGuide } from '@/lib/notify'
 import { validatePromoCode } from '@/lib/promo'
 import { stripe } from '@/lib/stripe'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
@@ -287,6 +287,20 @@ export async function requestBooking(formData: FormData) {
       .from('bookings')
       .update({ status: 'pending' })
       .eq('id', booking.id)
+    // Guide first, so the admin email can say whether the guide was reached.
+    const guideNotified = await notifyGuide(
+      `New booking request — ${formatDay(day)}, ${formatHourRange(startHour, endHour)}`,
+      [
+        'A new booking request just came in for you.',
+        '',
+        `Day: ${formatDay(day)}`,
+        `Time: ${formatHourRange(startHour, endHour)} (${duration} hours)`,
+        note ? `Note: ${note}` : 'Note: —',
+        '',
+        'Approve or decline it on your dashboard:',
+        `${siteUrl()}/guide`,
+      ].join('\n'),
+    )
     await sendEmail({
       to: adminEmails(),
       subject: `New booking request — ${formatDay(day)}, ${formatHourRange(startHour, endHour)}`,
@@ -300,22 +314,11 @@ export async function requestBooking(formData: FormData) {
         `Time: ${formatHourRange(startHour, endHour)} (${duration} hours)`,
         note ? `Note: ${note}` : 'Note: —',
         '',
+        describeGuideNotify(guideNotified),
+        '',
         `Approve or decline it here: ${siteUrl()}/admin`,
       ].join('\n'),
     })
-    await notifyGuide(
-      `New booking request — ${formatDay(day)}, ${formatHourRange(startHour, endHour)}`,
-      [
-        'A new booking request just came in for you.',
-        '',
-        `Day: ${formatDay(day)}`,
-        `Time: ${formatHourRange(startHour, endHour)} (${duration} hours)`,
-        note ? `Note: ${note}` : 'Note: —',
-        '',
-        'Approve or decline it on your dashboard:',
-        `${siteUrl()}/guide`,
-      ].join('\n'),
-    )
     if (user.email) {
       await sendEmail({
         to: user.email,

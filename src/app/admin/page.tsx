@@ -11,9 +11,16 @@ import {
   type BookingStatus,
 } from '@/lib/booking'
 import { isAdminEmail } from '@/lib/config'
+import { emailHealth } from '@/lib/email-health'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { addAvailability, approveBooking, deleteAvailability, rejectBooking } from './actions'
+import {
+  addAvailability,
+  approveBooking,
+  deleteAvailability,
+  rejectBooking,
+  sendTestEmail,
+} from './actions'
 
 type Props = {
   searchParams: Promise<{
@@ -22,6 +29,7 @@ type Props = {
     approved?: string
     rejected?: string
     error?: string
+    emailtest?: string
   }>
 }
 
@@ -53,7 +61,7 @@ export default async function AdminPage({ searchParams }: Props) {
   const admin = createSupabaseAdminClient()
   const today = todayInShenzhen()
 
-  const [{ data: windows }, { data: bookings }] = await Promise.all([
+  const [{ data: windows }, { data: bookings }, mail] = await Promise.all([
     admin
       .from('availability_windows')
       .select('id, day, start_hour, end_hour')
@@ -70,7 +78,15 @@ export default async function AdminPage({ searchParams }: Props) {
       .order('created_at', { ascending: false })
       .limit(100)
       .returns<BookingRow[]>(),
+    emailHealth(),
   ])
+  const mailProblems = [
+    !mail.smtpConfigured &&
+      'GMAIL_USER / GMAIL_APP_PASSWORD are not set on the server — NO emails are being sent to anyone.',
+    mail.adminRecipients.length === 0 &&
+      'ADMIN_EMAILS is empty — nobody is notified of new bookings.',
+    mail.guideProblem && `Guide emails cannot be sent: ${mail.guideProblem}`,
+  ].filter((p): p is string => typeof p === 'string' && p.length > 0)
 
   // Unpaid holds ('pending_payment') are filtered out in SQL — admins only act
   // on paid bookings. 'pending' here means paid & awaiting review.
@@ -120,6 +136,59 @@ export default async function AdminPage({ searchParams }: Props) {
         </Banner>
       )}
       {sp.error && <Banner tone="error">{sp.error}</Banner>}
+      {sp.emailtest && (
+        <Banner tone={sp.emailtest.includes('NOT sent') ? 'error' : 'ok'}>
+          Test email — {sp.emailtest}
+        </Banner>
+      )}
+
+      {/* Email status — the booking flow never throws on a failed email, so
+          this is where a dead app password or a wrong guide id gets noticed. */}
+      <section
+        className={`mt-8 rounded-xl border p-4 text-sm ${
+          mailProblems.length
+            ? 'border-red-300 bg-red-50 dark:border-red-900 dark:bg-red-950/40'
+            : 'border-zinc-200 dark:border-zinc-800'
+        }`}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-semibold">
+            Email notifications{' '}
+            <span
+              className={`ml-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+                mailProblems.length
+                  ? 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400'
+                  : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+              }`}
+            >
+              {mailProblems.length ? 'not working' : 'configured'}
+            </span>
+          </h2>
+          <form action={sendTestEmail}>
+            <SubmitButton
+              pendingLabel="Sending…"
+              className="rounded-md border border-zinc-300 px-3 py-1.5 text-xs font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+            >
+              Send test email
+            </SubmitButton>
+          </form>
+        </div>
+        {mailProblems.length > 0 && (
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-red-700 dark:text-red-400">
+            {mailProblems.map((p) => (
+              <li key={p}>{p}</li>
+            ))}
+          </ul>
+        )}
+        <dl className="mt-3 grid gap-1 text-zinc-600 dark:text-zinc-400 sm:grid-cols-[8rem_1fr]">
+          <dt>Sends from</dt>
+          <dd>{mail.smtpUser ?? '—'}</dd>
+          <dt>Admins</dt>
+          <dd>{mail.adminRecipients.join(', ') || '—'}</dd>
+          <dt>Guide</dt>
+          <dd>{mail.guideEmail ?? '—'}</dd>
+        </dl>
+      </section>
 
       {/* Pending requests */}
       <section className="mt-8">

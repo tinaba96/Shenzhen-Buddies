@@ -7,7 +7,9 @@ import {
   removeAvailabilityWindow,
 } from '@/lib/availability'
 import { resolveBookingById } from '@/lib/bookings'
-import { isAdminEmail } from '@/lib/config'
+import { isAdminEmail, siteUrl } from '@/lib/config'
+import { sendEmail } from '@/lib/email'
+import { notifyGuide } from '@/lib/notify'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 async function requireAdmin() {
@@ -65,4 +67,42 @@ export async function approveBooking(formData: FormData) {
 
 export async function rejectBooking(formData: FormData) {
   await resolveBooking(formData, 'rejected')
+}
+
+// "Send test email" on the admin dashboard: one mail to the admin pressing
+// the button and one to the guide, through the exact same code the booking
+// flow uses, so a dead Gmail app password or a wrong OFFICIAL_GUIDE_ID shows
+// up here instead of on the first real booking.
+export async function sendTestEmail() {
+  const user = await requireAdmin()
+  const stamp = new Date().toISOString()
+  const adminResult = user.email
+    ? await sendEmail({
+        to: user.email,
+        subject: 'Shenzhen Buddies — test email',
+        text: [
+          `This is a test sent from the admin dashboard at ${stamp}.`,
+          'If you are reading it, booking emails to admins are working.',
+          '',
+          `Dashboard: ${siteUrl()}/admin`,
+        ].join('\n'),
+      })
+    : { ok: false as const, error: 'your admin account has no email address' }
+  const guide = await notifyGuide(
+    'Shenzhen Buddies — test email',
+    [
+      `This is a test sent from the admin dashboard at ${stamp}.`,
+      'If you are reading it, booking emails to the guide are working.',
+      '',
+      `Your dashboard: ${siteUrl()}/guide`,
+    ].join('\n'),
+  )
+  revalidatePath('/admin')
+  const parts = [
+    adminResult.ok
+      ? `Admin: sent to ${user.email}`
+      : `Admin: NOT sent — ${adminResult.error}`,
+    guide.sent ? `Guide: sent to ${guide.to}` : `Guide: NOT sent — ${guide.reason}`,
+  ]
+  redirect(`/admin?emailtest=${encodeURIComponent(parts.join(' · '))}`)
 }

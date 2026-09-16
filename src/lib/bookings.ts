@@ -13,7 +13,7 @@ import {
 } from '@/lib/booking'
 import { adminEmails, officialGuideId, siteUrl } from '@/lib/config'
 import { sendEmail } from '@/lib/email'
-import { notifyGuide } from '@/lib/notify'
+import { describeGuideNotify, notifyGuide } from '@/lib/notify'
 import { refundPaypalCapture } from '@/lib/paypal'
 import { stripe } from '@/lib/stripe'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
@@ -262,17 +262,7 @@ export async function cancelBookingByTourist(
     })
   }
 
-  await sendEmail({
-    to: adminEmails(),
-    subject: `Booking cancelled by tourist — ${when}`,
-    text: [
-      `A tourist cancelled their booking for ${when}.`,
-      refundText,
-      'The day is free again.',
-    ].join('\n'),
-  })
-
-  await notifyGuide(
+  const guideNotified = await notifyGuide(
     `Booking cancelled — ${when}`,
     [
       `A tourist cancelled their booking for ${when}.`,
@@ -281,6 +271,18 @@ export async function cancelBookingByTourist(
       `See your bookings: ${siteUrl()}/guide`,
     ].join('\n'),
   )
+
+  await sendEmail({
+    to: adminEmails(),
+    subject: `Booking cancelled by tourist — ${when}`,
+    text: [
+      `A tourist cancelled their booking for ${when}.`,
+      refundText,
+      'The day is free again.',
+      '',
+      describeGuideNotify(guideNotified),
+    ].join('\n'),
+  })
 
   return { refundCents, refundPercent }
 }
@@ -336,6 +338,20 @@ export async function finalizePaypalBooking(params: {
       : '—'
   const when = `${formatDay(booking.day)}, ${formatHourRange(booking.start_hour, booking.end_hour)}`
 
+  const guideNotified = await notifyGuide(
+    `New booking request — ${when}`,
+    [
+      'A new booking request just came in for you.',
+      '',
+      `Day: ${formatDay(booking.day)}`,
+      `Time: ${formatHourRange(booking.start_hour, booking.end_hour)} (${booking.end_hour - booking.start_hour} hours)`,
+      booking.note ? `Note: ${booking.note}` : 'Note: —',
+      '',
+      'Approve or decline it on your dashboard:',
+      `${siteUrl()}/guide`,
+    ].join('\n'),
+  )
+
   await sendEmail({
     to: adminEmails(),
     subject: `New paid booking — ${when}`,
@@ -349,6 +365,7 @@ export async function finalizePaypalBooking(params: {
       booking.note ? `Note: ${booking.note}` : 'Note: —',
       '',
       'If you decline, the tourist is automatically refunded.',
+      describeGuideNotify(guideNotified),
       `Approve or decline it here: ${siteUrl()}/admin`,
     ].join('\n'),
   })
@@ -377,19 +394,6 @@ export async function finalizePaypalBooking(params: {
     })
   }
 
-  await notifyGuide(
-    `New booking request — ${when}`,
-    [
-      'A new booking request just came in for you.',
-      '',
-      `Day: ${formatDay(booking.day)}`,
-      `Time: ${formatHourRange(booking.start_hour, booking.end_hour)} (${booking.end_hour - booking.start_hour} hours)`,
-      booking.note ? `Note: ${booking.note}` : 'Note: —',
-      '',
-      'Approve or decline it on your dashboard:',
-      `${siteUrl()}/guide`,
-    ].join('\n'),
-  )
 
   return true
 }
