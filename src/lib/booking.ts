@@ -97,7 +97,8 @@ export type BookingStatus =
   | 'rejected'
   | 'cancelled'
 
-// Statuses that hold the day (block other tourists from booking it).
+// Statuses that hold their hours (block other tourists from booking them or
+// anything within BOOKING_GAP_HOURS of them).
 export const ACTIVE_BOOKING_STATUSES: BookingStatus[] = [
   'pending_payment',
   'pending',
@@ -148,12 +149,41 @@ export function todayInShenzhen(): string {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Shanghai' })
 }
 
-// Bookable segments of an availability window: the whole window, if it can
-// fit a minimum-length tour. (Days with an active booking are excluded
-// entirely upstream — one booking blocks the whole day.)
-export function bookableSegments(window: TimeRange): FreeSegment[] {
-  if (window.end_hour - window.start_hour < MIN_BOOKING_HOURS) return []
-  return [{ start: window.start_hour, end: window.end_hour }]
+// Minimum free time between two tours on the same day, so the guide can wrap
+// up, travel, and prepare for the next tourist. A 13:00 end followed by a
+// 15:00 start is allowed; 14:00 is not. Mirrored by the
+// bookings_no_overlap_with_gap exclusion constraint (migration 0018) — keep
+// the two in sync.
+export const BOOKING_GAP_HOURS = 2
+
+// Bookable segments of an availability window once the day's active bookings
+// are carved out, each padded by BOOKING_GAP_HOURS on both sides. `booked` is
+// every active booking on the window's day (from any window); ones that don't
+// touch this window are ignored. Only segments that still fit a
+// minimum-length tour are returned, sorted by start.
+export function bookableSegments(
+  window: TimeRange,
+  booked: TimeRange[],
+): FreeSegment[] {
+  const blocked = booked
+    .map((b) => ({
+      start: b.start_hour - BOOKING_GAP_HOURS,
+      end: b.end_hour + BOOKING_GAP_HOURS,
+    }))
+    .sort((a, b) => a.start - b.start)
+
+  const segments: FreeSegment[] = []
+  let cursor = window.start_hour
+  for (const b of blocked) {
+    if (b.end <= cursor) continue // entirely before the free cursor
+    if (b.start >= window.end_hour) break // entirely after the window
+    if (b.start > cursor) segments.push({ start: cursor, end: b.start })
+    cursor = Math.max(cursor, b.end)
+  }
+  if (cursor < window.end_hour) {
+    segments.push({ start: cursor, end: window.end_hour })
+  }
+  return segments.filter((s) => s.end - s.start >= MIN_BOOKING_HOURS)
 }
 
 // True if [start, end) fits entirely inside one of the free segments.

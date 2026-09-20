@@ -26,6 +26,7 @@ import {
   type BookingRow,
   type BookingStatus,
   type FreeSegment,
+  type TimeRange,
 } from '@/lib/booking'
 import { bookingNoteFor } from '@/content/packages'
 import { localizedPackage } from '@/content/packages-i18n'
@@ -232,17 +233,20 @@ export default async function GuidePage({ searchParams }: Props) {
         .order('start_hour')
         .returns<AvailabilityWindow[]>(),
       // Tourists can only read their own bookings through RLS, but the picker
-      // needs to know which days are taken — any active booking (incl. one
-      // mid-checkout) holds the whole day. Read with the service-role client
-      // and expose nothing but the day itself.
+      // needs to know which hours are taken — any active booking (incl. one
+      // mid-checkout) blocks its own hours plus BOOKING_GAP_HOURS either side.
+      // Read with the service-role client; only the resulting free slots ever
+      // reach the page, never who booked or their note.
       admin
         .from('bookings')
-        .select('day, status, created_at, tourist_id')
+        .select('day, start_hour, end_hour, status, created_at, tourist_id')
         .gte('day', today)
         .in('status', ACTIVE_BOOKING_STATUSES)
         .returns<
           {
             day: string
+            start_hour: number
+            end_hour: number
             status: BookingStatus
             created_at: string
             tourist_id: string
@@ -274,27 +278,32 @@ export default async function GuidePage({ searchParams }: Props) {
       : 0
   const firstName = guide.display_name.split(' ')[0]
 
-  // A day is taken by a confirmed/awaiting booking or a *fresh* hold. An
-  // abandoned hold (older than 30 min) no longer blocks it, so the picker
-  // self-heals even if Stripe's checkout.session.expired webhook is missed.
+  // Hours taken by a confirmed/awaiting booking or a *fresh* hold, per day.
+  // An abandoned hold (older than 30 min) no longer blocks anything, so the
+  // picker self-heals even if Stripe's checkout.session.expired webhook is
+  // missed.
   // eslint-disable-next-line react-hooks/purity -- request-time clock for hold expiry
   const nowMs = Date.now()
-  const bookedDays = new Set(
-    (activeBookings ?? [])
-      // Abandoned holds (older than 30 min) no longer block the day.
-      .filter(
-        (b) => !isHoldExpired(b.status, new Date(b.created_at).getTime(), nowMs),
-      )
-      // Your own in-progress hold shouldn't hide the day from you — you can
-      // reclaim it (requestBooking drops it first). It still blocks others,
-      // including anonymous visitors browsing the preview.
-      .filter(
-        (b) => !(b.status === 'pending_payment' && b.tourist_id === user?.id),
-      )
-      .map((b) => b.day),
-  )
+  const bookedByDay = new Map<string, TimeRange[]>()
+  // Days where the signed-in tourist already has a request or confirmed tour:
+  // one booking per tourist per day (requestBooking enforces the same).
+  const myBookedDays = new Set<string>()
+  for (const b of activeBookings ?? []) {
+    if (isHoldExpired(b.status, new Date(b.created_at).getTime(), nowMs)) {
+      continue
+    }
+    // Your own in-progress hold shouldn't hide its hours from you — you can
+    // reclaim it (requestBooking drops it first). It still blocks others,
+    // including anonymous visitors browsing the preview.
+    if (b.status === 'pending_payment' && b.tourist_id === user?.id) continue
+    if (user && b.tourist_id === user.id) myBookedDays.add(b.day)
+    const list = bookedByDay.get(b.day) ?? []
+    list.push({ start_hour: b.start_hour, end_hour: b.end_hour })
+    bookedByDay.set(b.day, list)
+  }
 
-  // Days that are not taken yet and have at least one bookable (≥4h) window.
+  // Days with at least one free segment that still fits a minimum-length
+  // tour, at least BOOKING_GAP_HOURS clear of every existing booking.
   const dayOptions: { day: string; segments: FreeSegment[] }[] = []
   const windowsByDay = new Map<string, AvailabilityWindow[]>()
   for (const w of windows ?? []) {
@@ -303,9 +312,10 @@ export default async function GuidePage({ searchParams }: Props) {
     windowsByDay.set(w.day, list)
   }
   for (const [day, dayWindows] of windowsByDay) {
-    if (bookedDays.has(day)) continue // one booking blocks the whole day
+    if (myBookedDays.has(day)) continue // you already have a tour that day
+    const booked = bookedByDay.get(day) ?? []
     const segments = dayWindows
-      .flatMap(bookableSegments)
+      .flatMap((w) => bookableSegments(w, booked))
       .sort((a, b) => a.start - b.start)
     if (segments.length > 0) dayOptions.push({ day, segments })
   }
@@ -349,6 +359,7 @@ export default async function GuidePage({ searchParams }: Props) {
       .gte('day', today)
       .in('status', ['pending', 'approved'])
       .order('day')
+      .order('start_hour')
       .returns<GuideBookingRow[]>()
     guideBookings = data ?? []
     const ids = Array.from(new Set(guideBookings.map((b) => b.tourist_id)))
@@ -502,7 +513,7 @@ export default async function GuidePage({ searchParams }: Props) {
           <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
             {sp.approved
               ? 'Booking confirmed — the tourist has been emailed.'
-              : 'Booking declined — the tourist was refunded and the day is free again.'}
+              : 'Booking declined — the tourist was refunded and that time slot is free again.'}
           </p>
         )}
         {sp.cancelled && (
@@ -738,8 +749,8 @@ export default async function GuidePage({ searchParams }: Props) {
                       {FREE_TOURS ? (
                         <p className="mt-1">
                           The tour is free, and so is cancelling — just do it
-                          before the tour starts so the day opens up for
-                          someone else.
+                          before the tour starts so the time slot opens up
+                          for someone else.
                         </p>
                       ) : (
                         <ul className="mt-1 space-y-0.5">

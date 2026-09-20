@@ -159,7 +159,7 @@ export async function resolveBookingById(
       `Booking declined — ${when}`,
       [
         `The booking request for ${when} was declined and the tourist refunded.`,
-        'Your day is free again.',
+        'That time slot is free again.',
         '',
         `See your bookings: ${siteUrl()}/guide`,
       ].join('\n'),
@@ -266,7 +266,7 @@ export async function cancelBookingByTourist(
     `Booking cancelled — ${when}`,
     [
       `A tourist cancelled their booking for ${when}.`,
-      'Your day is free again.',
+      'That time slot is free again.',
       '',
       `See your bookings: ${siteUrl()}/guide`,
     ].join('\n'),
@@ -278,7 +278,7 @@ export async function cancelBookingByTourist(
     text: [
       `A tourist cancelled their booking for ${when}.`,
       refundText,
-      'The day is free again.',
+      'That time slot is free again.',
       '',
       describeGuideNotify(guideNotified),
     ].join('\n'),

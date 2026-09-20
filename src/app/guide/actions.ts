@@ -194,8 +194,8 @@ export async function requestBooking(formData: FormData) {
   const admin = createSupabaseAdminClient()
 
   // Free abandoned holds on this day — anyone's checkout that expired (incl.
-  // ones the Stripe expiry webhook missed) — so a dead hold can't lock the
-  // day forever or trip the exclusion constraint on insert.
+  // ones the Stripe expiry webhook missed) — so a dead hold can't lock its
+  // hours forever or trip the exclusion constraint on insert.
   const staleCutoffIso = new Date(
     Date.now() - HOLD_EXPIRY_MINUTES * 60_000,
   ).toISOString()
@@ -207,7 +207,7 @@ export async function requestBooking(formData: FormData) {
     .lt('created_at', staleCutoffIso)
 
   // Drop this tourist's own current hold for the day (if they bailed out of a
-  // previous checkout) so they can retry without tripping the day lock.
+  // previous checkout) so they can retry without tripping the overlap lock.
   await admin
     .from('bookings')
     .delete()
@@ -215,8 +215,9 @@ export async function requestBooking(formData: FormData) {
     .eq('day', day)
     .eq('status', 'pending_payment')
 
-  // Recheck the day is still bookable. Any active booking (incl. another
-  // tourist mid-checkout) holds the whole day.
+  // Recheck the slot is still bookable: inside a published window and at
+  // least BOOKING_GAP_HOURS clear of every active booking on the day (incl.
+  // another tourist mid-checkout — stale holds were just cleaned up above).
   const { data: windows } = await supabase
     .from('availability_windows')
     .select('id, day, start_hour, end_hour')
@@ -226,25 +227,35 @@ export async function requestBooking(formData: FormData) {
     fail('The guide is not available on that day.', day)
   }
 
-  const { count: activeCount } = await admin
+  const { data: activeBookings, error: activeError } = await admin
     .from('bookings')
-    .select('id', { count: 'exact', head: true })
+    .select('tourist_id, start_hour, end_hour')
     .eq('day', day)
     .in('status', ACTIVE_BOOKING_STATUSES)
-  if ((activeCount ?? 0) > 0) {
-    fail('Sorry — that day was just booked by someone else.', day)
+    .returns<{ tourist_id: string; start_hour: number; end_hour: number }[]>()
+  if (activeError) {
+    fail('Could not check availability — please try again.', day)
   }
+  const dayBookings = activeBookings ?? []
 
-  const segments = windows.flatMap(bookableSegments)
-  if (!fitsInSegments(segments, startHour, endHour)) {
+  // One booking per tourist per day (the picker hides such days too).
+  if (dayBookings.some((b) => b.tourist_id === user.id)) {
     fail(
-      `${formatHourRange(startHour, endHour)} is outside the guide's hours on that day — pick a listed slot.`,
+      'You already have a booking on that day — cancel it first if you want a different time.',
       day,
     )
   }
 
-  // Create the booking as a hold first — this locks the day via the exclusion
-  // constraint before the tourist leaves for Stripe.
+  const segments = windows.flatMap((w) => bookableSegments(w, dayBookings))
+  if (!fitsInSegments(segments, startHour, endHour)) {
+    fail(
+      `${formatHourRange(startHour, endHour)} isn't available on that day — it's outside the guide's hours or too close to another booking. Pick a listed slot.`,
+      day,
+    )
+  }
+
+  // Create the booking as a hold first — this locks the hours via the
+  // exclusion constraint before the tourist leaves for Stripe.
   const { data: booking, error } = await supabase
     .from('bookings')
     .insert({
@@ -261,10 +272,18 @@ export async function requestBooking(formData: FormData) {
     .select('id')
     .single<{ id: string }>()
   if (error || !booking) {
-    // 23P01 = exclusion constraint violation: someone grabbed the day
-    // between our check and the insert.
+    // 23P01 = exclusion constraint violation: someone grabbed those hours
+    // (or ones within the gap) between our check and the insert.
     if (error?.code === '23P01') {
-      fail('Sorry — that day was just booked by someone else.', day)
+      fail('Sorry — that time was just booked by someone else.', day)
+    }
+    // 23505 = the bookings_one_per_tourist_per_day unique index: this
+    // tourist's other request for the day landed first (e.g. two tabs).
+    if (error?.code === '23505') {
+      fail(
+        'You already have a booking on that day — cancel it first if you want a different time.',
+        day,
+      )
     }
     fail(error?.message ?? 'Could not create the booking.', day)
   }
@@ -348,8 +367,8 @@ export async function requestBooking(formData: FormData) {
   }
 
   // Hold created — send the tourist to the payment page to choose card (Stripe)
-  // or PayPal. The hold keeps the day locked until a payment completes (status
-  // -> pending) or the hold expires and self-heals.
+  // or PayPal. The hold keeps the hours locked until a payment completes
+  // (status -> pending) or the hold expires and self-heals.
   revalidatePath('/guide')
   redirect(`/guide/pay/${booking.id}`)
 }

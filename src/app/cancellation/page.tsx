@@ -152,7 +152,7 @@ export default function CancellationPage() {
           <Section title="8. Currency &amp; pricing">
             <p>
               During our free pilot, tours are offered at no charge — a
-              cancellation simply frees the day, and there is nothing to
+              cancellation simply frees the time slot, and there is nothing to
               refund. When tours are paid: all bookings and refunds are
               processed in Canadian dollars (CAD), tours are priced at a flat
               rate per hour shown at checkout, and your card issuer may apply

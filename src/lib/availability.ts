@@ -70,13 +70,18 @@ export async function removeAvailabilityWindow(id: string): Promise<string | nul
     .lt('created_at', staleCutoffIso)
 
   // Don't pull a window out from under live requests — resolve those first.
-  const { count } = await admin
+  // Only bookings inside THIS window count (a day can have several windows
+  // and, since the two-hour gap rule, several bookings).
+  const { count, error } = await admin
     .from('bookings')
     .select('id', { count: 'exact', head: true })
     .eq('day', window.day)
     .in('status', ACTIVE_BOOKING_STATUSES)
+    .lt('start_hour', window.end_hour)
+    .gt('end_hour', window.start_hour)
+  if (error) return error.message
   if ((count ?? 0) > 0) {
-    return 'That day has a pending or confirmed booking — handle it first.'
+    return 'That window has a pending or confirmed booking — handle it first.'
   }
 
   await admin.from('availability_windows').delete().eq('id', id)

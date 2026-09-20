@@ -57,13 +57,16 @@ Vercel.
    - `supabase/migrations/0007_match_role_constraint.sql` — guide↔tourist
      constraint on conversations
    - `supabase/migrations/0008_bookings.sql` — `availability_windows` +
-     `bookings` for the single-guide beta (one booking per day, enforced by
-     an exclusion constraint)
+     `bookings` for the single-guide beta (originally one booking per day;
+     `0018_booking_gap.sql` relaxes that to any number of bookings at least
+     two hours apart, enforced by an exclusion constraint)
    - `supabase/migrations/0009_booking_payments.sql` — adds Stripe payment
      columns + `pending_payment` hold state to `bookings`
    - continue running the remaining files **in order** through
-     `supabase/migrations/0015_paypal_payments.sql` (0015 adds PayPal columns
-     — `payment_provider`, `paypal_order_id`, `paypal_capture_id`)
+     `supabase/migrations/0018_booking_gap.sql` (0015 adds PayPal columns
+     — `payment_provider`, `paypal_order_id`, `paypal_capture_id`; 0017
+     widens the tour length for the free pilot; 0018 replaces the
+     one-booking-per-day lock with the two-hour gap rule)
 
 4. **Auth settings** (Supabase dashboard → Authentication → URL Configuration)
    - **Site URL:** `http://localhost:3000` (plus your Vercel URL once deployed)

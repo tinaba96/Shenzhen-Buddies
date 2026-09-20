@@ -5,7 +5,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 // Stripe's cancel_url lands here when a tourist backs out of checkout. We
 // release their hold immediately (instead of waiting for the 30-min session
-// expiry) so the day frees up right away, then send them back to /guide.
+// expiry) so the slot frees up right away, then send them back to /guide.
 export async function GET(request: NextRequest) {
   const supabase = await createSupabaseServerClient()
   const {
