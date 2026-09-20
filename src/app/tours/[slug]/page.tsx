@@ -9,9 +9,9 @@ import {
   bookHref,
   CURRENCY_FOR_PACKAGES,
   defaultItinerary,
+  packageHoursLabel,
   packagePrice,
   packagePriceCents,
-  PACKAGE_HOURS,
   packages,
 } from '@/content/packages'
 import { localizedPackage, localizedPackages } from '@/content/packages-i18n'
@@ -144,7 +144,7 @@ export default async function TourDetailPage({ params }: Props) {
           <p className="mt-6 max-w-2xl text-lg text-white/90">{pkg.tagline}</p>
 
           <div className="mt-8 flex flex-wrap gap-2 text-sm">
-            <Pill>{t.common.hours.replace('{n}', String(PACKAGE_HOURS))}</Pill>
+            <Pill>{packageHoursLabel(pkg, t.common)}</Pill>
             <Pill>{t.common.oneOnOne}</Pill>
             <Pill>{pkg.district}</Pill>
             <Pill>{price}</Pill>
@@ -286,7 +286,7 @@ export default async function TourDetailPage({ params }: Props) {
 
             <dl className="mt-6 space-y-3 border-t border-zinc-100 pt-5 text-sm dark:border-zinc-800">
               <Row label={t.tours.detail.duration}>
-                {t.common.hours.replace('{n}', String(PACKAGE_HOURS))}
+                {packageHoursLabel(pkg, t.common)}
               </Row>
               <Row label={t.tours.detail.groupSize}>
                 {t.tours.detail.groupSizeValue}

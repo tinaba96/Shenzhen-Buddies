@@ -16,6 +16,7 @@ export const ja: Dictionary = {
 
   common: {
     hours: '{n} 時間',
+    hoursRange: '{a}–{b} 時間',
     free: '無料',
     oneOnOne: 'マンツーマン',
     perPerson: '1名あたり',

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { focusFor } from '@/content/gallery'
 import {
   defaultItinerary,
-  PACKAGE_HOURS,
+  packageHoursLabel,
   type PackageAccent,
   type TourPackage,
 } from '@/content/packages'
@@ -122,7 +122,7 @@ export function PackageCard({
                 {pkg.kicker}
               </span>
               <span className="rounded-full border border-zinc-200 px-2.5 py-1 text-[11px] font-medium text-zinc-500 dark:border-zinc-700">
-                {t.common.hours.replace('{n}', String(PACKAGE_HOURS))}
+                {packageHoursLabel(pkg, t.common)}
               </span>
               <span className="rounded-full border border-zinc-200 px-2.5 py-1 text-[11px] font-medium text-zinc-500 dark:border-zinc-700">
                 {t.common.oneOnOne}
@@ -217,7 +217,7 @@ export function PackageCard({
 
         <div className="mt-5 flex items-center gap-2 text-[11px] text-zinc-500">
           <ClockIcon />
-          <span>{t.common.hours.replace('{n}', String(PACKAGE_HOURS))}</span>
+          <span>{packageHoursLabel(pkg, t.common)}</span>
           <span aria-hidden>·</span>
           <span>{t.common.oneOnOne}</span>
           <span aria-hidden>·</span>

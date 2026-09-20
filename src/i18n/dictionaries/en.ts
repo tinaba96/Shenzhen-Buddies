@@ -34,6 +34,7 @@ export const en = {
 
   common: {
     hours: '{n} hours',
+    hoursRange: '{a}–{b} hours',
     free: 'Free',
     oneOnOne: 'One-on-one',
     perPerson: 'per person',

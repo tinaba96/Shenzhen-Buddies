@@ -16,6 +16,7 @@ export const zhHans: Dictionary = {
 
   common: {
     hours: '{n} 小时',
+    hoursRange: '{a}–{b} 小时',
     free: '免费',
     oneOnOne: '一对一',
     perPerson: '每人',

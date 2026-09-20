@@ -31,6 +31,22 @@ export const CURRENCY_FOR_PACKAGES = CURRENCY.toUpperCase()
 // the pilot's shape settles.
 export const PACKAGE_HOURS = 3
 
+// The tour length a card or detail page advertises for a package: its
+// `hoursRange` as "{a}–{b} hours" when it has one, else PACKAGE_HOURS as
+// "{n} hours". `common` is the dictionary's common block for the locale.
+export function packageHoursLabel(
+  pkg: Pick<TourPackage, 'hoursRange'>,
+  common: { hours: string; hoursRange: string },
+): string {
+  if (pkg.hoursRange) {
+    const [min, max] = pkg.hoursRange
+    return common.hoursRange
+      .replace('{a}', String(min))
+      .replace('{b}', String(max))
+  }
+  return common.hours.replace('{n}', String(PACKAGE_HOURS))
+}
+
 export type PackageAccent =
   | 'signal'
   | 'ember'
@@ -83,6 +99,10 @@ export type TourPackage = {
   // The heading over the itinerary section, when the package has one worth
   // naming. Absent, the detail page uses the dictionary's generic heading.
   itineraryTitle?: string
+  // The lengths advertised on cards and the detail page ("2–3 hours"), for a
+  // package sold at more than one length. Absent, they advertise
+  // PACKAGE_HOURS. Both ends must be lengths the booking engine sells.
+  hoursRange?: readonly [min: number, max: number]
   // Shortest first. More than one and the detail page shows a length toggle.
   itineraries: ItineraryVariant[]
   includes: string[]
@@ -221,13 +241,13 @@ export const packages: TourPackage[] = [
   },
   {
     slug: 'dongmen-street-food',
-    title: 'Dongmen Street-Food Crawl',
-    cn: '东门',
+    title: 'Dongmen Laojie',
+    cn: '东门老街',
     kicker: 'Food & night market',
-    tagline:
-      'The old downtown after dark, eaten one small plate at a time.',
+    tagline: "Where Shenzhen's past meets its vibrant nightlife.",
     summary:
-      'Dongmen is where Shenzhen existed before the towers went up, and it still eats like it. This is a walking dinner rather than a restaurant booking: skewers off the grill, tofu skin, sugar-glazed fruit, Hakka snacks, whatever the queue is longest for. Your buddy orders, explains what arrived, and steers you past the stalls that exist for people who will only come once.',
+      "Dongmen Laojie is where old Shenzhen meets modern city life. Wander through lively streets filled with local snacks, hidden shops, and nonstop energy while discovering one of Shenzhen's oldest and most famous neighborhoods. Join to experience the authentic side of the city, taste local favorites, and explore Dongmen like a local.",
+    hoursRange: [2, 3],
     photo: '/gallery/dongmen-pagoda-street-night.webp',
     alt: 'The Dongmen pedestrian street at night, pagoda-roofed buildings lit above the crowd',
     district: 'Luohu',
@@ -655,6 +675,16 @@ export function assertPackagesValid(
     seen.add(slug)
 
     if (pkg.featured) featured++
+
+    if (pkg.hoursRange) {
+      const [min, max] = pkg.hoursRange
+      if (!Number.isInteger(min) || !Number.isInteger(max) || min >= max) {
+        fail(slug, `advertises ${min}–${max} hours, which is not a range`)
+      }
+      if (min < MIN_BOOKING_HOURS) {
+        fail(slug, `advertises ${min}-hour tours but the booking engine will not sell one shorter than ${MIN_BOOKING_HOURS} hours`)
+      }
+    }
 
     if (pkg.itineraries.length === 0) fail(slug, 'has no itinerary')
     const hoursSeen = new Set<number>()
