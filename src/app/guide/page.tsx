@@ -953,10 +953,11 @@ export default async function GuidePage({ searchParams }: Props) {
                       >
                         {status.label}
                       </span>
-                      {/* Confirmed and still ahead: open (or resume) the
-                          chat with the guide to plan the day. Same action
-                          as the Message button on /browse. */}
-                      {b.status === 'approved' && !finished && (
+                      {/* Confirmed, before or after the tour: open (or
+                          resume) the chat with the guide — to plan the day
+                          ahead of it, or to say thanks afterwards. Same
+                          action as the Message button on /browse. */}
+                      {b.status === 'approved' && (
                         <form action={startConversationWith}>
                           <input type="hidden" name="other_id" value={guideId} />
                           <SubmitButton
