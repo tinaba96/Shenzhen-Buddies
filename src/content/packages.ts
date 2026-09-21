@@ -60,6 +60,7 @@ export type ItineraryBeat = {
   // purpose — the start hour is whatever the traveller picks at checkout.
   at: string
   title: string
+  // Empty for a closing "Tour ends" beat that needs no description.
   body: string
 }
 
@@ -99,6 +100,8 @@ export type TourPackage = {
   // The heading over the itinerary section, when the package has one worth
   // naming. Absent, the detail page uses the dictionary's generic heading.
   itineraryTitle?: string
+  // One line under that heading, when the package has one.
+  itinerarySubtitle?: string
   // The lengths advertised on cards and the detail page ("2–3 hours"), for a
   // package sold at more than one length. Absent, they advertise
   // PACKAGE_HOURS. Both ends must be lengths the booking engine sells.
@@ -253,34 +256,84 @@ export const packages: TourPackage[] = [
     district: 'Luohu',
     bestStart: 'Early evening — the grills come out around 17:00',
     meetingPoint: 'Laojie station, on the Dongmen pedestrian street side',
+    itineraryTitle: 'Dongmen Street Food & Night Market Walk',
+    itinerarySubtitle:
+      'Experience old Shenzhen after dark — street food, hidden lanes, local culture, and the energy of Dongmen Laojie',
     itineraries: [
       {
-        hours: 4,
+        hours: 2,
+        title: "The Night Market Essentials",
         beats: [
           {
             at: '0:00',
-            title: 'The first skewer',
-            body: 'We start eating immediately. Grilled squid, chicken hearts, enoki wrapped in pork belly — whatever is coming off fastest, because fastest means freshest.',
+            title: "Welcome to Old Shenzhen",
+            body: "Meet your local guide and discover the district that existed long before Shenzhen's skyscrapers. Get a quick introduction before heading into the pedestrian streets.",
           },
           {
-            at: '0:45',
-            title: 'Into the lanes',
-            body: 'Off the main pedestrian street into the side lanes where the prices halve. Tofu skin, rice noodle rolls, stinky tofu if you are brave, sugar-glazed hawthorn if you are not.',
+            at: '0:20',
+            title: "Explore the Main Street",
+            body: "Walk through the lively heart of Dongmen, surrounded by shops, traditional-style buildings, neon lights, and the energy that makes this one of Shenzhen's most famous districts.",
           },
           {
-            at: '1:40',
-            title: 'A proper sit-down',
-            body: 'One plastic-stool table, one real dish, one cold beer or one sugarcane juice. Your buddy orders in Cantonese or Mandarin and tells you what is in front of you.',
+            at: '0:50',
+            title: "Street Food Discovery",
+            body: "Browse the food streets and learn about local favorites. Feel free to stop and buy snacks that catch your eye, from grilled skewers to sweet treats and local specialties.",
           },
           {
-            at: '2:40',
-            title: 'The dessert and dried-goods streets',
-            body: 'Preserved fruit by the jar, herbal tea by the cup, egg waffles, and the shops selling things you will want to take home and will have questions about.',
+            at: '1:20',
+            title: "Hidden Lanes & Local Life",
+            body: "Step away from the busiest streets and explore smaller alleys filled with local shops, old market culture, and unexpected finds.",
           },
           {
-            at: '3:20',
-            title: 'Last stop, your pick',
-            body: 'By now you know what you like. We go back for it, or we find one more thing you have not tried yet. Your call.',
+            at: '1:45',
+            title: "Night Views & Photos",
+            body: "Finish with a relaxed walk through the brightest parts of Dongmen, taking photos and enjoying the atmosphere before the tour ends.",
+          },
+          {
+            at: '2:00',
+            title: "Tour Ends",
+            body: "",
+          },
+        ],
+      },
+      {
+        hours: 3,
+        title: "The Full Evening, with an Optional Arcade Stop",
+        beats: [
+          {
+            at: '0:00',
+            title: "Welcome to Dongmen",
+            body: "Meet your local guide and hear the story of Shenzhen's oldest commercial district before beginning the walk.",
+          },
+          {
+            at: '0:20',
+            title: "The Main Pedestrian Street",
+            body: "Explore the busiest part of Dongmen, packed with shops, street performers, local life, and classic Shenzhen energy.",
+          },
+          {
+            at: '0:50',
+            title: "Street Food Adventure",
+            body: "Discover food streets filled with local snacks and desserts. Buy and try anything that looks interesting at your own pace.",
+          },
+          {
+            at: '1:30',
+            title: "Hidden Corners & Shopping Streets",
+            body: "Wander through side streets, local markets, and lesser-known areas that many visitors miss. Great for people-watching and photos.",
+          },
+          {
+            at: '2:00',
+            title: "Optional Arcade Stop",
+            body: "If you'd like, we can visit a local arcade to try claw machines, rhythm games, racing games, or other popular favorites. Game credits are optional and paid directly by you.",
+          },
+          {
+            at: '2:30',
+            title: "Night Lights & Photo Walk",
+            body: "Enjoy the evening atmosphere, neon signs, traditional-style architecture, and some of the best photo spots in Dongmen.",
+          },
+          {
+            at: '3:00',
+            title: "Tour Ends",
+            body: "",
           },
         ],
       },

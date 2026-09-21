@@ -51,6 +51,7 @@ export function localizePackage(
     goodFor: tr.goodFor,
     insiderTip: tr.insiderTip,
     itineraryTitle: tr.itineraryTitle ?? pkg.itineraryTitle,
+    itinerarySubtitle: tr.itinerarySubtitle ?? pkg.itinerarySubtitle,
     // `hours` and `at` stay from the base: the timeline is structure, not
     // prose, and it is validated there.
     itineraries: pkg.itineraries.map((variant, v) => ({
@@ -131,6 +132,11 @@ export function assertPackageTranslationsValid(): void {
       if (!!pkg.itineraryTitle !== !!tr.itineraryTitle?.trim()) {
         problems.push(
           `${locale}.${pkg.slug} ${pkg.itineraryTitle ? 'is missing itineraryTitle' : 'has an itineraryTitle the English original does not'}`,
+        )
+      }
+      if (!!pkg.itinerarySubtitle !== !!tr.itinerarySubtitle?.trim()) {
+        problems.push(
+          `${locale}.${pkg.slug} ${pkg.itinerarySubtitle ? 'is missing itinerarySubtitle' : 'has an itinerarySubtitle the English original does not'}`,
         )
       }
       // A short list here is how a translated card silently loses the line

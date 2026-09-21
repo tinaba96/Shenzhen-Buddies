@@ -164,6 +164,11 @@ export default async function TourDetailPage({ params }: Props) {
             <h2 className="sb-display text-3xl">
               {pkg.itineraryTitle ?? t.tours.detail.itinerary}
             </h2>
+            {pkg.itinerarySubtitle && (
+              <p className="mt-3 text-lg text-zinc-700 dark:text-zinc-300">
+                {pkg.itinerarySubtitle}
+              </p>
+            )}
             <p className="mt-2 text-sm text-zinc-500">
               {t.tours.detail.itineraryNote}
             </p>

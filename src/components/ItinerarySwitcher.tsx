@@ -88,9 +88,11 @@ export function ItinerarySwitcher({
                 {beat.at}
               </p>
               <Beat className="mt-1 text-lg font-semibold">{beat.title}</Beat>
-              <p className="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                {beat.body}
-              </p>
+              {beat.body && (
+                <p className="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  {beat.body}
+                </p>
+              )}
             </div>
           </li>
         ))}
