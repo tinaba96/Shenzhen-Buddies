@@ -34,6 +34,7 @@ export const dongmenOldDowntown: Post = {
   pillar: 'neighborhoods',
   tags: ['dongmen', 'street-food', 'markets', 'first-visit'],
   publishedAt: '2026-09-14',
+  updatedAt: '2026-09-20',
   author: 'bryan',
   heroGalleryId: 'dongmen-pagoda-street-night',
   relatedSlugs: ['what-shenzhen-actually-eats', 'shenzhen-after-dark'],
@@ -53,7 +54,7 @@ export const dongmenOldDowntown: Post = {
     { k: 'h2', text: 'What Dongmen actually is' },
     {
       k: 'p',
-      text: 'A tangle of pedestrian streets in Luohu, a few minutes from the Hong Kong border, with its own metro stop and no obvious edges. The buildings wear traditional eaves over modern retail — the district decided decades ago that the old-town look was worth keeping, and committed. Even the McDonald’s got a pagoda roof, and that branch is a piece of history in its own right: when McDonald’s came to mainland China in 1990, this is where it opened first. Queues went around the block. Locals still navigate by it.',
+      text: 'A tangle of pedestrian streets in Luohu, a few minutes from the Hong Kong border, with its own metro stop and no obvious edges. Locals call it Laojie — “the old street” — and the metro stop is named after it, which settles any argument about which part of town was here first. The buildings wear traditional eaves over modern retail — the district decided decades ago that the old-town look was worth keeping, and committed. Even the McDonald’s got a pagoda roof, and that branch is a piece of history in its own right: when McDonald’s came to mainland China in 1990, this is where it opened first. Queues went around the block. Locals still navigate by it.',
     },
     {
       k: 'p',
@@ -69,7 +70,7 @@ export const dongmenOldDowntown: Post = {
     },
     {
       k: 'p',
-      text: 'Dongmen eating is vertical grazing: nothing sit-down, everything in sequence. Skewers off the grill, rice-noodle rolls, curry fish balls, whatever fruit is in season pressed into a cup. The rule we use everywhere in this city works hardest here — eat where the queue is, at the hour the queue forms. A stall with a self-translating menu and scorpions on sticks is a photo stop; the stall beside it with a fifteen-person line of teenagers is dinner.',
+      text: 'Dongmen eating is a moving meal: nothing sit-down, everything in sequence. Skewers off the grill, rice-noodle rolls, curry fish balls, whatever fruit is in season pressed into a cup. The rule we use everywhere in this city works hardest here — eat where the queue is, at the hour the queue forms. A stall with a self-translating menu and scorpions on sticks is a photo stop; the stall beside it with a fifteen-person line of teenagers is dinner.',
     },
     {
       k: 'img',
@@ -79,7 +80,7 @@ export const dongmenOldDowntown: Post = {
     },
     {
       k: 'p',
-      text: 'In between the grills are the older trades: preserved fruit in hand-labelled jars, dried goods, herbal tea counters that have outlived every fashion around them. What any of it is, and which of it you should actually eat, is the subject of [our food guide](/blog/what-shenzhen-actually-eats) — and ordering across the language gap is half of why [our Dongmen street-food walk](/tours/dongmen-street-food) exists. The other half is knowing which queue is worth joining.',
+      text: 'In between the grills are the older trades: preserved fruit in hand-labelled jars, dried goods, herbal tea counters that have outlived every fashion around them. What any of it is, and which of it you should actually eat, is the subject of [our food guide](/blog/what-shenzhen-actually-eats) — and ordering across the language gap is half of why [our Dongmen Laojie walk](/tours/dongmen-street-food) exists. The other half is knowing which queue is worth joining.',
     },
     {
       k: 'cta',
@@ -116,8 +117,8 @@ export const dongmenOldDowntown: Post = {
     },
     {
       k: 'cta',
-      label: 'Book the Dongmen street-food walk',
-      sub: 'Two hours, one snack street at a time, with a buddy who knows which windows are worth the wait.',
+      label: 'Book the Dongmen Laojie walk',
+      sub: 'Two to three hours, one snack street at a time, with a buddy who knows which windows are worth the wait.',
     },
   ],
   faq: [
@@ -135,7 +136,7 @@ export const dongmenOldDowntown: Post = {
     },
     {
       q: 'How do I get to Dongmen?',
-      a: 'It has its own metro stop, an easy ride from the Hong Kong border crossings, and the district itself is pedestrian-only. Set up mobile payments before you arrive — even the smallest stalls are phone-paid.',
+      a: 'Ride the metro to Laojie station — named after the district itself — an easy trip from the Hong Kong border crossings. The streets are pedestrian-only. Set up mobile payments before you arrive — even the smallest stalls are phone-paid.',
     },
     {
       q: 'Was the first McDonald’s in China really in Dongmen?',
