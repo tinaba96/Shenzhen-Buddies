@@ -22,10 +22,12 @@ import {
   FREE_TOUR_LENGTHS,
   FREE_TOURS,
   HOLD_EXPIRY_MINUTES,
+  isLiveBooking,
   MAX_BOOKING_HOURS,
   MIN_BOOKING_HOURS,
   todayInShenzhen,
   type AvailabilityWindow,
+  type BookingStatus,
 } from '@/lib/booking'
 import {
   adminEmails,
@@ -215,6 +217,37 @@ export async function requestBooking(formData: FormData) {
     .eq('day', day)
     .eq('status', 'pending_payment')
 
+  // One booking at a time: a tourist with a live tour anywhere on the
+  // calendar (awaiting review, confirmed, or a fresh hold; not yet over)
+  // can't request another. Own holds for THIS day were just dropped, so a
+  // retry on the same day passes. The bookings_one_at_a_time trigger
+  // (migration 0019) backstops the race between two submissions.
+  const { data: myUpcoming, error: myUpcomingError } = await admin
+    .from('bookings')
+    .select('day, start_hour, end_hour, status, created_at')
+    .eq('tourist_id', user.id)
+    .gte('day', todayInShenzhen())
+    .in('status', ACTIVE_BOOKING_STATUSES)
+    .returns<
+      {
+        day: string
+        start_hour: number
+        end_hour: number
+        status: BookingStatus
+        created_at: string
+      }[]
+    >()
+  if (myUpcomingError) {
+    fail('Could not check your bookings — please try again.', day)
+  }
+  const live = (myUpcoming ?? []).find((b) => isLiveBooking(b, Date.now()))
+  if (live) {
+    fail(
+      `You already have a tour booked for ${formatDay(live.day)}, ${formatHourRange(live.start_hour, live.end_hour)}. Tours are free, so it's one booking per person at a time — cancel it first if you'd like a different one.`,
+      day,
+    )
+  }
+
   // Recheck the slot is still bookable: inside a published window and at
   // least BOOKING_GAP_HOURS clear of every active booking on the day (incl.
   // another tourist mid-checkout — stale holds were just cleaned up above).
@@ -229,22 +262,14 @@ export async function requestBooking(formData: FormData) {
 
   const { data: activeBookings, error: activeError } = await admin
     .from('bookings')
-    .select('tourist_id, start_hour, end_hour')
+    .select('start_hour, end_hour')
     .eq('day', day)
     .in('status', ACTIVE_BOOKING_STATUSES)
-    .returns<{ tourist_id: string; start_hour: number; end_hour: number }[]>()
+    .returns<{ start_hour: number; end_hour: number }[]>()
   if (activeError) {
     fail('Could not check availability — please try again.', day)
   }
   const dayBookings = activeBookings ?? []
-
-  // One booking per tourist per day (the picker hides such days too).
-  if (dayBookings.some((b) => b.tourist_id === user.id)) {
-    fail(
-      'You already have a booking on that day — cancel it first if you want a different time.',
-      day,
-    )
-  }
 
   const segments = windows.flatMap((w) => bookableSegments(w, dayBookings))
   if (!fitsInSegments(segments, startHour, endHour)) {
@@ -277,11 +302,11 @@ export async function requestBooking(formData: FormData) {
     if (error?.code === '23P01') {
       fail('Sorry — that time was just booked by someone else.', day)
     }
-    // 23505 = the bookings_one_per_tourist_per_day unique index: this
-    // tourist's other request for the day landed first (e.g. two tabs).
-    if (error?.code === '23505') {
+    // SB001 = the bookings_one_at_a_time trigger, 23505 = the per-day
+    // unique index: this tourist's other request landed first (two tabs).
+    if (error?.code === 'SB001' || error?.code === '23505') {
       fail(
-        'You already have a booking on that day — cancel it first if you want a different time.',
+        "You already have a tour booked. Tours are free, so it's one booking per person at a time — cancel it first if you'd like a different one.",
         day,
       )
     }

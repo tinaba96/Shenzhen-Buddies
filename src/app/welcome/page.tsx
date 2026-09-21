@@ -427,6 +427,10 @@ function Faq() {
       a: '2 or 3 hours, your choice, one-on-one with your buddy.',
     },
     {
+      q: 'Can I book more than one tour?',
+      a: 'One at a time. Tours are free, so we keep it to one booking per person until that tour is done — that way everyone gets a turn. Once it’s over, you’re welcome to book another.',
+    },
+    {
       q: 'When will I know it’s confirmed?',
       a: 'We confirm by email within 3 business days of your request.',
     },

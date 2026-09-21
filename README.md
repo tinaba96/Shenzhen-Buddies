@@ -63,10 +63,11 @@ Vercel.
    - `supabase/migrations/0009_booking_payments.sql` — adds Stripe payment
      columns + `pending_payment` hold state to `bookings`
    - continue running the remaining files **in order** through
-     `supabase/migrations/0018_booking_gap.sql` (0015 adds PayPal columns
-     — `payment_provider`, `paypal_order_id`, `paypal_capture_id`; 0017
-     widens the tour length for the free pilot; 0018 replaces the
-     one-booking-per-day lock with the two-hour gap rule)
+     `supabase/migrations/0019_one_booking_at_a_time.sql` (0015 adds PayPal
+     columns — `payment_provider`, `paypal_order_id`, `paypal_capture_id`;
+     0017 widens the tour length for the free pilot; 0018 replaces the
+     one-booking-per-day lock with the two-hour gap rule; 0019 adds the
+     one-live-booking-per-tourist trigger)
 
 4. **Auth settings** (Supabase dashboard → Authentication → URL Configuration)
    - **Site URL:** `http://localhost:3000` (plus your Vercel URL once deployed)

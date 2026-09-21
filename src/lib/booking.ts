@@ -105,6 +105,24 @@ export const ACTIVE_BOOKING_STATUSES: BookingStatus[] = [
   'approved',
 ]
 
+// Free pilot: one booking per tourist at a time. A booking is "live" while
+// it still counts as that one — awaiting review, confirmed, or a fresh
+// checkout hold — and its end time hasn't passed. Mirrored by the
+// bookings_one_at_a_time trigger (migration 0019); keep the two in sync.
+export function isLiveBooking(
+  b: {
+    status: BookingStatus
+    day: string
+    end_hour: number
+    created_at: string
+  },
+  nowMs: number,
+): boolean {
+  if (!ACTIVE_BOOKING_STATUSES.includes(b.status)) return false
+  if (isHoldExpired(b.status, Date.parse(b.created_at), nowMs)) return false
+  return hoursUntilTourStart(b.day, b.end_hour, nowMs) > 0
+}
+
 export type BookingRow = {
   id: string
   tourist_id: string

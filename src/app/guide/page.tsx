@@ -19,6 +19,7 @@ import {
   hoursUntilTourStart,
   HOURLY_RATE_CENTS,
   isHoldExpired,
+  isLiveBooking,
   MAX_BOOKING_HOURS,
   MIN_BOOKING_HOURS,
   todayInShenzhen,
@@ -239,11 +240,12 @@ export default async function GuidePage({ searchParams }: Props) {
       // reach the page, never who booked or their note.
       admin
         .from('bookings')
-        .select('day, start_hour, end_hour, status, created_at, tourist_id')
+        .select('id, day, start_hour, end_hour, status, created_at, tourist_id')
         .gte('day', today)
         .in('status', ACTIVE_BOOKING_STATUSES)
         .returns<
           {
+            id: string
             day: string
             start_hour: number
             end_hour: number
@@ -285,18 +287,28 @@ export default async function GuidePage({ searchParams }: Props) {
   // eslint-disable-next-line react-hooks/purity -- request-time clock for hold expiry
   const nowMs = Date.now()
   const bookedByDay = new Map<string, TimeRange[]>()
-  // Days where the signed-in tourist already has a request or confirmed tour:
-  // one booking per tourist per day (requestBooking enforces the same).
-  const myBookedDays = new Set<string>()
+  // One booking at a time: the signed-in tourist's live booking (awaiting
+  // review, confirmed, or a fresh checkout hold; not yet over), if any.
+  // While it exists the form gives way to a notice — the same rule
+  // requestBooking (isLiveBooking) and the bookings_one_at_a_time trigger
+  // enforce, so the page never offers a form the server would reject.
+  let myLiveBooking: {
+    id: string
+    day: string
+    start_hour: number
+    end_hour: number
+    status: BookingStatus
+  } | null = null
   for (const b of activeBookings ?? []) {
     if (isHoldExpired(b.status, new Date(b.created_at).getTime(), nowMs)) {
       continue
     }
-    // Your own in-progress hold shouldn't hide its hours from you — you can
-    // reclaim it (requestBooking drops it first). It still blocks others,
-    // including anonymous visitors browsing the preview.
-    if (b.status === 'pending_payment' && b.tourist_id === user?.id) continue
-    if (user && b.tourist_id === user.id) myBookedDays.add(b.day)
+    const mine = user != null && b.tourist_id === user.id
+    if (mine && !myLiveBooking && isLiveBooking(b, nowMs)) myLiveBooking = b
+    // Your own in-progress hold still blocks its hours for everyone else,
+    // including anonymous visitors browsing the preview, but not for you:
+    // the notice above offers to finish or release it instead.
+    if (mine && b.status === 'pending_payment') continue
     const list = bookedByDay.get(b.day) ?? []
     list.push({ start_hour: b.start_hour, end_hour: b.end_hour })
     bookedByDay.set(b.day, list)
@@ -312,7 +324,6 @@ export default async function GuidePage({ searchParams }: Props) {
     windowsByDay.set(w.day, list)
   }
   for (const [day, dayWindows] of windowsByDay) {
-    if (myBookedDays.has(day)) continue // you already have a tour that day
     const booked = bookedByDay.get(day) ?? []
     const segments = dayWindows
       .flatMap((w) => bookableSegments(w, booked))
@@ -640,7 +651,8 @@ export default async function GuidePage({ searchParams }: Props) {
             {FREE_TOURS ? (
               <>
                 Tours are free during our pilot — pick a 2 or 3 hour tour, no
-                payment, no card. Request a day and we confirm by email.
+                payment, no card. One free tour per person at a time, so
+                everyone gets a turn. Request a day and we confirm by email.
               </>
             ) : (
               <>
@@ -665,6 +677,41 @@ export default async function GuidePage({ searchParams }: Props) {
                   as a tourist to request a day.
                 </>
               )}
+            </div>
+          ) : myLiveBooking?.status === 'pending_payment' ? (
+            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-6 py-8 text-center text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
+              You have a checkout in progress for{' '}
+              <span className="font-medium">
+                {formatDay(myLiveBooking.day)},{' '}
+                {formatHourRange(myLiveBooking.start_hour, myLiveBooking.end_hour)}
+              </span>
+              . It&apos;s one booking per person at a time, so{' '}
+              <Link
+                href={`/guide/pay/${myLiveBooking.id}`}
+                className="underline underline-offset-2"
+              >
+                finish paying
+              </Link>{' '}
+              or{' '}
+              <Link
+                href={`/guide/cancel?day=${myLiveBooking.day}`}
+                className="underline underline-offset-2"
+              >
+                release it
+              </Link>{' '}
+              to pick a different time.
+            </div>
+          ) : myLiveBooking ? (
+            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-6 py-8 text-center text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
+              You already have a tour booked for{' '}
+              <span className="font-medium">
+                {formatDay(myLiveBooking.day)},{' '}
+                {formatHourRange(myLiveBooking.start_hour, myLiveBooking.end_hour)}
+              </span>
+              . Tours are free, so it&apos;s one booking per person at a time
+              and everyone gets a turn — once it&apos;s done you&apos;re welcome
+              to book another. Need a different day? Cancel it under
+              &ldquo;Your bookings&rdquo; below first.
             </div>
           ) : dayOptions.length === 0 ? (
             <div className="mt-4 rounded-2xl border border-dashed border-zinc-300 px-6 py-12 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
