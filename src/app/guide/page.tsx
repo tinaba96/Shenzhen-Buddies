@@ -947,7 +947,9 @@ export default async function GuidePage({ searchParams }: Props) {
                         </p>
                       )}
                     </div>
-                    <div className="flex flex-col items-end gap-2">
+                    {/* Phones: the actions wrap under the date as one row.
+                        Wider screens: a right-aligned column beside it. */}
+                    <div className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end">
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${status.className}`}
                       >
