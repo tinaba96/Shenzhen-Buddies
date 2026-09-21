@@ -35,6 +35,7 @@ import { getI18n } from '@/i18n/server'
 import { DEFAULT_OG_IMAGE, isSingleGuideMode, officialGuideId } from '@/lib/config'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { startConversationWith } from '@/app/messages/actions'
 import {
   approveGuideBooking,
   cancelOwnBooking,
@@ -952,6 +953,20 @@ export default async function GuidePage({ searchParams }: Props) {
                       >
                         {status.label}
                       </span>
+                      {/* Confirmed and still ahead: open (or resume) the
+                          chat with the guide to plan the day. Same action
+                          as the Message button on /browse. */}
+                      {b.status === 'approved' && !finished && (
+                        <form action={startConversationWith}>
+                          <input type="hidden" name="other_id" value={guideId} />
+                          <SubmitButton
+                            pendingLabel="Opening…"
+                            className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                          >
+                            Message {firstName}
+                          </SubmitButton>
+                        </form>
+                      )}
                       {finished && (
                         <Link
                           href={`/guide/review/${b.id}`}

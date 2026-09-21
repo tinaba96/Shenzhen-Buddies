@@ -111,6 +111,7 @@ export async function resolveBookingById(
           `When: ${when}`,
           '',
           `See your bookings: ${siteUrl()}/guide`,
+          `Want to plan the day together? Use the "Message ${guideName.split(' ')[0]}" button on your booking there to chat with ${guideName} directly.`,
           '',
           // A durable link they can come back to once the tour is over — the
           // page itself refuses reviews until then.
