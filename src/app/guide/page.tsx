@@ -1088,9 +1088,22 @@ function GuideBookings({
                   </p>
                 </div>
                 {confirmed ? (
-                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                    Confirmed
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                      Confirmed
+                    </span>
+                    {/* Open (or resume) the chat with this tourist — the
+                        mirror of the Message button they get on their side. */}
+                    <form action={startConversationWith}>
+                      <input type="hidden" name="other_id" value={b.tourist_id} />
+                      <SubmitButton
+                        pendingLabel="Opening…"
+                        className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                      >
+                        Message {(names.get(b.tourist_id) ?? 'tourist').split(' ')[0]}
+                      </SubmitButton>
+                    </form>
+                  </div>
                 ) : (
                   <div className="flex shrink-0 gap-2">
                     <form action={approveGuideBooking}>
