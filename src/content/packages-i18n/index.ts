@@ -50,6 +50,7 @@ export function localizePackage(
     notIncluded: tr.notIncluded,
     goodFor: tr.goodFor,
     insiderTip: tr.insiderTip,
+    insiderTipLead: tr.insiderTipLead ?? pkg.insiderTipLead,
     itineraryTitle: tr.itineraryTitle ?? pkg.itineraryTitle,
     itinerarySubtitle: tr.itinerarySubtitle ?? pkg.itinerarySubtitle,
     // `hours` and `at` stay from the base: the timeline is structure, not
@@ -132,6 +133,11 @@ export function assertPackageTranslationsValid(): void {
       if (!!pkg.itineraryTitle !== !!tr.itineraryTitle?.trim()) {
         problems.push(
           `${locale}.${pkg.slug} ${pkg.itineraryTitle ? 'is missing itineraryTitle' : 'has an itineraryTitle the English original does not'}`,
+        )
+      }
+      if (!!pkg.insiderTipLead !== !!tr.insiderTipLead?.trim()) {
+        problems.push(
+          `${locale}.${pkg.slug} ${pkg.insiderTipLead ? 'is missing insiderTipLead' : 'has an insiderTipLead the English original does not'}`,
         )
       }
       if (!!pkg.itinerarySubtitle !== !!tr.itinerarySubtitle?.trim()) {

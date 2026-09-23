@@ -263,6 +263,11 @@ export default async function TourDetailPage({ params }: Props) {
               {t.tours.detail.insiderTip}
             </p>
             <p className="mt-3 text-base leading-relaxed text-zinc-800 dark:text-zinc-200">
+              {pkg.insiderTipLead && (
+                <>
+                  <strong className="font-semibold">{pkg.insiderTipLead}</strong>{' '}
+                </>
+              )}
               {pkg.insiderTip}
             </p>
           </section>

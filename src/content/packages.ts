@@ -111,6 +111,9 @@ export type TourPackage = {
   includes: string[]
   notIncluded: string[]
   goodFor: string[]
+  // Optional bold opener for the tip ("Dongmen is best enjoyed slowly."),
+  // rendered inline before insiderTip.
+  insiderTipLead?: string
   insiderTip: string
   accent: PackageAccent
   // The one card that gets the full-width treatment on the homepage. Exactly
@@ -339,23 +342,27 @@ export const packages: TourPackage[] = [
       },
     ],
     includes: [
-      '2–3 hours one-on-one with a local who eats here',
-      'Ordering, translating and explaining every dish',
-      'A route built around what you actually eat — allergies and no-go lists respected',
-      'Payment handled by QR so you never hold up a queue',
+      "2–3 hours exploring Dongmen with a local guide",
+      "Local recommendations on what to try, see, and photograph",
+      "Help ordering food and translating when needed",
+      "A flexible route based on your interests, pace, and appetite",
+      "Stories about Dongmen, old Shenzhen, and local life",
     ],
     notIncluded: [
-      'The food and drinks themselves — usually modest, and you pay stalls directly',
-      'Metro fare',
+      "Food and drinks (you buy only what you'd like to try)",
+      "Metro, taxi, or transportation costs",
+      "Arcade games or other optional activities",
     ],
     goodFor: [
-      'First-timers in Shenzhen',
-      'Anyone travelling without Mandarin',
-      'Adventurous eaters',
-      'People who hate booked restaurants',
+      "🏙️ First-time visitors to Shenzhen",
+      "🍢 Street food lovers",
+      "🌏 Travelers who don't speak Mandarin",
+      "🚶 People who enjoy walking and exploring local neighborhoods",
+      "📸 Anyone looking to experience Shenzhen after dark",
     ],
+    insiderTipLead: "Dongmen is best enjoyed slowly.",
     insiderTip:
-      'Come hungry but pace yourself — the good stuff is in the last hour, and everyone fills up on skewers in the first twenty minutes.',
+      "Save room for later stops, because some of the most popular snacks and dessert stalls are hidden deeper inside the neighborhood. The fun isn't just eating—it's wandering, discovering, and seeing where the night takes you.",
     accent: 'ember',
   },
   {
