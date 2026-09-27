@@ -95,8 +95,9 @@ Vercel.
    - **Free pilot (current):** `FREE_TOURS` in `src/lib/booking.ts` is on, so
      tours are free and come in fixed lengths (`FREE_TOUR_LENGTHS`, 2 or 3
      hours) with no payment step; flip it to false to restore paid bookings.
-     Tips and donations still use Stripe (`src/lib/support.ts`, `/donate`,
-     `/guide/review/[id]`).
+     Tips still use Stripe only (`src/lib/support.ts`, `/guide/review/[id]`);
+     donations (`/donate`) take card via Stripe **and** PayPal when the PayPal
+     vars below are set.
    - Paid booking pricing is a flat CA$10/hour (4–8h), set in
      `src/lib/booking.ts` (`HOURLY_RATE_CENTS`, `CURRENCY`). Declining a paid
      booking auto-refunds.
@@ -105,10 +106,15 @@ Vercel.
      PayPal from a single field on the payment page. A 100%-off code makes a
      free booking (hides PayPal, uses the $0 card path).
 
-6. **PayPal** (optional second booking-payment method)
+6. **PayPal** (optional second payment method for bookings and donations)
    - After the booking form, tourists land on a payment page
      (`/guide/pay/[id]`) offering **card (Stripe)** and, if configured,
      **PayPal**. Leave the PayPal vars blank to show card only.
+   - `/donate` offers the same pair. PayPal donations are created and captured
+     by `/api/paypal/create-donation` and `/api/paypal/capture-donation`
+     (no sign-in needed, nothing written to the database — the PayPal
+     dashboard is the ledger, and the admins get the same "donation received"
+     email the Stripe webhook sends for card donations).
    - Create an app at <https://developer.paypal.com/dashboard/> — the Sandbox
      and Live tabs each expose a **Client ID** and **Secret** (different pairs).
    - Paste into `.env.local`: `PAYPAL_ENV` (`sandbox` or `live`),

@@ -1,7 +1,8 @@
 // Server-side PayPal REST client (Orders v2). Sandbox vs live is chosen by
 // PAYPAL_ENV. Only the secret-bearing calls live here; the browser only ever
-// sees NEXT_PUBLIC_PAYPAL_CLIENT_ID. Used for booking payments as an
-// alternative to Stripe (WeChat/PayPal aren't available on our Stripe account).
+// sees NEXT_PUBLIC_PAYPAL_CLIENT_ID. Used for booking payments and for
+// donations (/donate) as an alternative to Stripe (WeChat/PayPal aren't
+// available on our Stripe account).
 
 const LIVE_BASE = 'https://api-m.paypal.com'
 const SANDBOX_BASE = 'https://api-m.sandbox.paypal.com'
@@ -77,12 +78,56 @@ export async function createPaypalOrder(params: {
   return (await res.json()) as PaypalOrder
 }
 
+export type PaypalOrderDetails = {
+  id: string
+  status: string
+  referenceId: string | null
+  amountCents: number
+  currency: string
+}
+
+// Look an order up without changing it. The donation capture route uses this
+// to check that an order id handed in by the browser really is one of OUR
+// donation orders (reference_id) before capturing it — that route has no
+// signed-in user to authorise against, unlike the booking one.
+export async function getPaypalOrder(orderId: string): Promise<PaypalOrderDetails> {
+  const token = await accessToken()
+  const res = await fetch(
+    `${paypalBase()}/v2/checkout/orders/${encodeURIComponent(orderId)}`,
+    { headers: { Authorization: `Bearer ${token}` } },
+  )
+  if (!res.ok) {
+    throw new Error(`PayPal get order failed: ${res.status} ${await res.text()}`)
+  }
+  const data = (await res.json()) as {
+    id: string
+    status: string
+    purchase_units?: Array<{
+      reference_id?: string
+      amount?: { value: string; currency_code: string }
+    }>
+  }
+  const unit = data.purchase_units?.[0]
+  return {
+    id: data.id,
+    status: data.status,
+    referenceId: unit?.reference_id ?? null,
+    amountCents: unit?.amount
+      ? Math.round(parseFloat(unit.amount.value) * 100)
+      : 0,
+    currency: unit?.amount?.currency_code?.toLowerCase() ?? 'cad',
+  }
+}
+
 export type PaypalCapture = {
   captureId: string
   status: string
   amountCents: number
   currency: string
   referenceId: string | null
+  // The buyer's PayPal account email, when PayPal returns it. Informational
+  // (it goes in the "donation received" email); never used for auth.
+  payerEmail: string | null
 }
 
 // Capture an approved order. Returns the capture id (needed later for refunds)
@@ -103,6 +148,7 @@ export async function capturePaypalOrder(orderId: string): Promise<PaypalCapture
     throw new Error(`PayPal capture failed: ${res.status} ${await res.text()}`)
   }
   const data = (await res.json()) as {
+    payer?: { email_address?: string }
     purchase_units?: Array<{
       reference_id?: string
       payments?: {
@@ -127,6 +173,7 @@ export async function capturePaypalOrder(orderId: string): Promise<PaypalCapture
       : 0,
     currency: capture.amount?.currency_code?.toLowerCase() ?? 'cad',
     referenceId: unit?.reference_id ?? null,
+    payerEmail: data.payer?.email_address ?? null,
   }
 }
 

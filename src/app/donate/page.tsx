@@ -1,12 +1,16 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { SubmitButton } from '@/components/SubmitButton'
+import { DonatePanel } from '@/components/DonatePanel'
+import { CURRENCY } from '@/lib/booking'
 import { DEFAULT_OG_IMAGE } from '@/lib/config'
-import { startDonationCheckout } from './actions'
+import { paypalConfigured } from '@/lib/paypal'
+import { supportConfigured } from '@/lib/support'
 
 // The tours are free during the pilot; this page is how anyone — before,
 // after, or without a booking — can chip in to keep it running. Linked from
 // the footer and the booking page. English-only for now, like /welcome.
+// Card (Stripe) and PayPal are both offered when configured; the amount picker
+// and buttons live in DonatePanel, the card checkout in ./actions.
 
 const TITLE = 'Support the pilot — Shenzhen Buddies'
 const DESCRIPTION =
@@ -25,14 +29,14 @@ export const metadata: Metadata = {
   },
 }
 
-const AMOUNTS = [5, 10, 20]
-
 type Props = {
   searchParams: Promise<{ thanks?: string; error?: string }>
 }
 
 export default async function DonatePage({ searchParams }: Props) {
   const sp = await searchParams
+  const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
+  const showPaypal = paypalConfigured() && Boolean(paypalClientId)
 
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-4 py-14">
@@ -64,46 +68,13 @@ export default async function DonatePage({ searchParams }: Props) {
         </p>
       )}
 
-      <form
-        action={startDonationCheckout}
-        className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-      >
-        <p className="text-sm font-semibold">Choose an amount</p>
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          {AMOUNTS.map((d) => (
-            <SubmitButton
-              key={d}
-              name="amount"
-              value={String(d)}
-              pendingLabel="…"
-              className="rounded-xl border border-zinc-300 bg-white px-2 py-3.5 text-base font-semibold transition hover:border-amber-400 hover:bg-amber-50 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:border-amber-600 dark:hover:bg-amber-950/40"
-            >
-              CA${d}
-            </SubmitButton>
-          ))}
-        </div>
-        <div className="mt-3 flex gap-2">
-          <input
-            type="number"
-            name="custom_amount"
-            min={1}
-            max={500}
-            step={1}
-            placeholder="Custom amount (CA$)"
-            className="block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
-          />
-          <SubmitButton
-            pendingLabel="Opening…"
-            className="shrink-0 rounded-full bg-zinc-900 px-6 py-2 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
-            Donate
-          </SubmitButton>
-        </div>
-        <p className="mt-3 text-xs text-zinc-500">
-          Paid securely by card via Stripe. One-off, no account needed, and no
-          perks attached — this is a thank-you, not a purchase.
-        </p>
-      </form>
+      <div className="mt-8">
+        <DonatePanel
+          cardEnabled={supportConfigured()}
+          paypalClientId={showPaypal ? paypalClientId! : null}
+          currency={CURRENCY}
+        />
+      </div>
 
       <p className="mt-8 text-sm text-zinc-500">
         Haven&apos;t booked yet?{' '}

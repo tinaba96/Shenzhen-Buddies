@@ -1,13 +1,20 @@
 // One-off "support" payments — tips after a tour and donations to the pilot.
-// These ride the existing Stripe rails but deliberately never touch the
-// bookings table: the money is the record, in the Stripe dashboard. The
-// webhook only recognises sessions carrying metadata.kind from here (it keys
-// booking payments on metadata.booking_id, which these sessions do not set at
-// the session level — a tip's booking reference lives under tip_booking_id).
+// These ride the existing payment rails but deliberately never touch the
+// bookings table: the money is the record, in the Stripe or PayPal dashboard.
+// The Stripe webhook only recognises sessions carrying metadata.kind from here
+// (it keys booking payments on metadata.booking_id, which these sessions do
+// not set at the session level — a tip's booking reference lives under
+// tip_booking_id). PayPal donations are captured server-side by
+// /api/paypal/capture-donation, which calls notifyDonationReceived directly.
 
-import { siteUrl } from '@/lib/config'
+import { adminEmails, siteUrl } from '@/lib/config'
+import { sendEmail } from '@/lib/email'
 import { stripe } from '@/lib/stripe'
-import { CURRENCY } from '@/lib/booking'
+import { CURRENCY, formatMoney } from '@/lib/booking'
+
+// reference_id stamped on every PayPal donation order so the capture route can
+// tell a donation order from a booking order (those carry the booking id).
+export const DONATION_PAYPAL_REFERENCE_ID = 'donation'
 
 export const SUPPORT_AMOUNT_MIN_CENTS = 100 // CA$1
 export const SUPPORT_AMOUNT_MAX_CENTS = 50_000 // CA$500 — fat-finger guard
@@ -60,4 +67,30 @@ export async function createSupportCheckout(params: {
   })
   if (!session.url) throw new Error('Stripe did not return a checkout URL')
   return session.url
+}
+
+// Tell the operators a PayPal donation landed. Purely informational — the
+// money already moved and there is no database row — so a mail failure must
+// never fail the capture that already happened. (Stripe donations get the
+// same email from the webhook.)
+export async function notifyDonationReceived(params: {
+  amountCents: number
+  currency: string
+  from: string | null
+}): Promise<void> {
+  try {
+    const amount = formatMoney(params.amountCents, params.currency)
+    await sendEmail({
+      to: adminEmails(),
+      subject: `Donation received — ${amount}`,
+      text: [
+        `A donation of ${amount} just came through PayPal.`,
+        `From: ${params.from ?? 'someone (no email)'}`,
+        '',
+        'Details are in the PayPal dashboard (Activity).',
+      ].join('\n'),
+    })
+  } catch (err) {
+    console.error('Donation notification failed:', err)
+  }
 }
