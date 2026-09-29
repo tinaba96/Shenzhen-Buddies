@@ -2,22 +2,26 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { SubmitButton } from '@/components/SubmitButton'
+import { SupportPanel } from '@/components/SupportPanel'
 import {
+  CURRENCY,
   formatDay,
   formatHourRange,
   hoursUntilTourStart,
   type BookingRow,
 } from '@/lib/booking'
 import { isSingleGuideMode, officialGuideId } from '@/lib/config'
+import { paypalConfigured } from '@/lib/paypal'
 import { supportConfigured } from '@/lib/support'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { startTipCheckout, submitTourReview } from './actions'
 
 // Post-tour page: thumbs up/down + an optional 5–50 word review, then the
-// option to tip the guide. Linked from the tourist's booking list on /guide
-// and from the confirmation email, so it works as a durable URL they can
-// come back to after the tour.
+// option to tip the guide by card (Stripe, ./actions) or PayPal
+// (api/paypal/create-tip + capture-tip), both via SupportPanel. Linked from
+// the tourist's booking list on /guide and from the confirmation email, so it
+// works as a durable URL they can come back to after the tour.
 
 export const metadata: Metadata = {
   title: 'How was your tour? — Shenzhen Buddies',
@@ -34,6 +38,8 @@ type Props = {
 export default async function ReviewPage({ params, searchParams }: Props) {
   if (!isSingleGuideMode()) redirect('/browse')
   const [{ id }, sp] = await Promise.all([params, searchParams])
+  const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
+  const showPaypal = paypalConfigured() && Boolean(paypalClientId)
 
   const supabase = await createSupabaseServerClient()
   const {
@@ -184,52 +190,29 @@ export default async function ReviewPage({ params, searchParams }: Props) {
             </p>
           </form>
 
-          {/* Tip, once a thumb has landed (and only when Stripe is set up) */}
-          {reviewed && supportConfigured() && (
+          {/* Tip, once a thumb has landed (and only when a processor is set up) */}
+          {reviewed && (supportConfigured() || showPaypal) && (
             <section className="mt-6 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-rose-50 p-6 dark:border-amber-900/40 dark:from-amber-950/20 dark:to-rose-950/20">
               <p className="text-sm font-semibold">
                 Want to leave {firstName} a tip?
               </p>
-              <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+              <p className="mt-1 mb-4 text-xs text-zinc-600 dark:text-zinc-400">
                 Totally optional — the tour stays free either way. 100% goes to{' '}
                 {firstName}.
               </p>
-              <form action={startTipCheckout} className="mt-4">
-                <input type="hidden" name="booking_id" value={booking.id} />
-                <div className="grid grid-cols-4 gap-2">
-                  {TIP_PRESETS.map((d) => (
-                    <SubmitButton
-                      key={d}
-                      name="amount"
-                      value={String(d)}
-                      pendingLabel="…"
-                      className="rounded-xl border border-zinc-300 bg-white px-2 py-3 text-sm font-semibold transition hover:border-amber-400 hover:bg-amber-50 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:border-amber-600 dark:hover:bg-amber-950/40"
-                    >
-                      CA${d}
-                    </SubmitButton>
-                  ))}
-                </div>
-                <div className="mt-3 flex gap-2">
-                  <input
-                    type="number"
-                    name="custom_amount"
-                    min={1}
-                    max={500}
-                    step={1}
-                    placeholder="Custom (CA$)"
-                    className="block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
-                  />
-                  <SubmitButton
-                    pendingLabel="Opening…"
-                    className="shrink-0 rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-                  >
-                    Tip
-                  </SubmitButton>
-                </div>
-              </form>
-              <p className="mt-2 text-[11px] text-zinc-500">
-                Paid securely by card via Stripe.
-              </p>
+              <SupportPanel
+                kind="tip"
+                bookingId={booking.id}
+                presets={TIP_PRESETS}
+                defaultPreset={5}
+                cardEnabled={supportConfigured()}
+                paypalClientId={showPaypal ? paypalClientId! : null}
+                currency={CURRENCY}
+                cardAction={startTipCheckout}
+                successHref={`/guide/review/${booking.id}?tipped=1`}
+                verb="Tip"
+                frame={false}
+              />
             </section>
           )}
         </>

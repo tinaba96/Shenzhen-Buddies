@@ -1,16 +1,17 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { DonatePanel } from '@/components/DonatePanel'
+import { SupportPanel } from '@/components/SupportPanel'
 import { CURRENCY } from '@/lib/booking'
 import { DEFAULT_OG_IMAGE } from '@/lib/config'
 import { paypalConfigured } from '@/lib/paypal'
 import { supportConfigured } from '@/lib/support'
+import { startDonationCheckout } from './actions'
 
 // The tours are free during the pilot; this page is how anyone — before,
 // after, or without a booking — can chip in to keep it running. Linked from
 // the footer and the booking page. English-only for now, like /welcome.
 // Card (Stripe) and PayPal are both offered when configured; the amount picker
-// and buttons live in DonatePanel, the card checkout in ./actions.
+// and buttons live in SupportPanel, the card checkout in ./actions.
 
 const TITLE = 'Support the pilot — Shenzhen Buddies'
 const DESCRIPTION =
@@ -69,10 +70,16 @@ export default async function DonatePage({ searchParams }: Props) {
       )}
 
       <div className="mt-8">
-        <DonatePanel
+        <SupportPanel
+          kind="donation"
+          presets={[5, 10, 20]}
+          defaultPreset={10}
           cardEnabled={supportConfigured()}
           paypalClientId={showPaypal ? paypalClientId! : null}
           currency={CURRENCY}
+          cardAction={startDonationCheckout}
+          successHref="/donate?thanks=1"
+          verb="Donate"
         />
       </div>
 

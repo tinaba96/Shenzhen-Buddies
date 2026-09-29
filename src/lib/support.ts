@@ -4,17 +4,26 @@
 // The Stripe webhook only recognises sessions carrying metadata.kind from here
 // (it keys booking payments on metadata.booking_id, which these sessions do
 // not set at the session level — a tip's booking reference lives under
-// tip_booking_id). PayPal donations are captured server-side by
-// /api/paypal/capture-donation, which calls notifyDonationReceived directly.
+// tip_booking_id). PayPal tips and donations are captured server-side by
+// /api/paypal/capture-tip and /api/paypal/capture-donation, which call
+// notifySupportPaymentReceived directly.
 
 import { adminEmails, siteUrl } from '@/lib/config'
 import { sendEmail } from '@/lib/email'
+import { notifyGuide } from '@/lib/notify'
 import { stripe } from '@/lib/stripe'
 import { CURRENCY, formatMoney } from '@/lib/booking'
 
-// reference_id stamped on every PayPal donation order so the capture route can
-// tell a donation order from a booking order (those carry the booking id).
+export type SupportKind = 'tip' | 'donation'
+
+// reference_id stamped on every PayPal support order so the capture routes can
+// tell a donation or tip order from a booking order (those carry the bare
+// booking uuid) and from each other. A tip's reference embeds its booking id
+// so the capture route can check the order was created for THAT booking.
 export const DONATION_PAYPAL_REFERENCE_ID = 'donation'
+export function tipPaypalReferenceId(bookingId: string): string {
+  return `tip:${bookingId}`
+}
 
 export const SUPPORT_AMOUNT_MIN_CENTS = 100 // CA$1
 export const SUPPORT_AMOUNT_MAX_CENTS = 50_000 // CA$500 — fat-finger guard
@@ -69,28 +78,47 @@ export async function createSupportCheckout(params: {
   return session.url
 }
 
-// Tell the operators a PayPal donation landed. Purely informational — the
-// money already moved and there is no database row — so a mail failure must
-// never fail the capture that already happened. (Stripe donations get the
-// same email from the webhook.)
-export async function notifyDonationReceived(params: {
+// Tell the operators a PayPal tip or donation landed, and for a tip tell the
+// guide too — the same pair of emails the Stripe webhook sends for card
+// payments (notifySupportPayment in api/stripe/webhook). Purely informational:
+// the money already moved and there is no database row, so a mail failure
+// must never fail the capture that already happened.
+export async function notifySupportPaymentReceived(params: {
+  kind: SupportKind
   amountCents: number
   currency: string
   from: string | null
+  // The tour a tip belongs to, for the admin email.
+  bookingId?: string
 }): Promise<void> {
   try {
     const amount = formatMoney(params.amountCents, params.currency)
+    const label = params.kind === 'tip' ? 'Tip' : 'Donation'
     await sendEmail({
       to: adminEmails(),
-      subject: `Donation received — ${amount}`,
+      subject: `${label} received — ${amount}`,
       text: [
-        `A donation of ${amount} just came through PayPal.`,
+        `A ${params.kind} of ${amount} just came through PayPal.`,
         `From: ${params.from ?? 'someone (no email)'}`,
+        params.bookingId ? `Booking: ${params.bookingId}` : '',
         '',
         'Details are in the PayPal dashboard (Activity).',
-      ].join('\n'),
+      ]
+        .filter(Boolean)
+        .join('\n'),
     })
+
+    if (params.kind === 'tip') {
+      await notifyGuide(
+        `You received a tip — ${amount}`,
+        [
+          `A tourist left you a ${amount} tip after their tour. Nice work!`,
+          '',
+          'The operators will settle it with you.',
+        ].join('\n'),
+      )
+    }
   } catch (err) {
-    console.error('Donation notification failed:', err)
+    console.error('Support payment notification failed:', err)
   }
 }

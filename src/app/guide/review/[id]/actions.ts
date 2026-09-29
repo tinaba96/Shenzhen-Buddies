@@ -2,15 +2,14 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { formatDay, hoursUntilTourStart, type BookingRow } from '@/lib/booking'
+import { formatDay } from '@/lib/booking'
 import { officialGuideId } from '@/lib/config'
 import {
   createSupportCheckout,
   parseSupportAmountCents,
   supportConfigured,
 } from '@/lib/support'
-import { createSupabaseAdminClient } from '@/lib/supabase/admin'
-import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { checkTipEligibility, officialGuideDisplayName } from '@/lib/tips'
 
 // Post-tour review: a thumb up/down plus an optional short written review.
 // Stored in the existing reviews table — up maps to 5 stars, down to 1 — so
@@ -26,32 +25,28 @@ function reviewFail(bookingId: string, message: string): never {
 }
 
 // The booking this review/tip hangs off, verified to belong to the signed-in
-// tourist and to be a finished, confirmed tour.
+// tourist and to be a finished, confirmed tour. The rule itself lives in
+// lib/tips (shared with the PayPal tip routes); this turns its verdict into
+// the redirects a form submission expects.
 async function requireFinishedBooking(bookingId: string) {
-  const supabase = await createSupabaseServerClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) {
-    redirect(`/login?next=${encodeURIComponent(`/guide/review/${bookingId}`)}`)
+  const eligibility = await checkTipEligibility(bookingId)
+  if (!eligibility.ok) {
+    switch (eligibility.reason) {
+      case 'signed_out':
+        redirect(`/login?next=${encodeURIComponent(`/guide/review/${bookingId}`)}`)
+      case 'not_found':
+        reviewFail(bookingId, 'Booking not found.')
+      case 'not_approved':
+        reviewFail(bookingId, 'Only confirmed tours can be reviewed.')
+      case 'not_finished':
+        reviewFail(bookingId, 'You can review once your tour has finished.')
+    }
   }
-
-  const { data: booking } = await supabase
-    .from('bookings')
-    .select('id, tourist_id, day, start_hour, end_hour, status')
-    .eq('id', bookingId)
-    .eq('tourist_id', user.id)
-    .maybeSingle<
-      Pick<BookingRow, 'id' | 'tourist_id' | 'day' | 'start_hour' | 'end_hour' | 'status'>
-    >()
-  if (!booking) reviewFail(bookingId, 'Booking not found.')
-  if (booking.status !== 'approved') {
-    reviewFail(bookingId, 'Only confirmed tours can be reviewed.')
+  return {
+    user: eligibility.user,
+    booking: eligibility.booking,
+    supabase: eligibility.supabase,
   }
-  if (hoursUntilTourStart(booking.day, booking.end_hour, Date.now()) > 0) {
-    reviewFail(bookingId, 'You can review once your tour has finished.')
-  }
-  return { user, booking, supabase }
 }
 
 export async function submitTourReview(formData: FormData) {
@@ -120,17 +115,7 @@ export async function startTipCheckout(formData: FormData) {
     reviewFail(bookingId, 'Pick a tip between CA$1 and CA$500 (whole dollars).')
   }
 
-  let guideName = 'your guide'
-  const guideId = officialGuideId()
-  if (guideId) {
-    const admin = createSupabaseAdminClient()
-    const { data: guide } = await admin
-      .from('profiles')
-      .select('display_name')
-      .eq('id', guideId)
-      .maybeSingle<{ display_name: string }>()
-    if (guide?.display_name) guideName = guide.display_name
-  }
+  const guideName = await officialGuideDisplayName()
 
   let checkoutUrl: string
   try {

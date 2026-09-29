@@ -95,9 +95,9 @@ Vercel.
    - **Free pilot (current):** `FREE_TOURS` in `src/lib/booking.ts` is on, so
      tours are free and come in fixed lengths (`FREE_TOUR_LENGTHS`, 2 or 3
      hours) with no payment step; flip it to false to restore paid bookings.
-     Tips still use Stripe only (`src/lib/support.ts`, `/guide/review/[id]`);
-     donations (`/donate`) take card via Stripe **and** PayPal when the PayPal
-     vars below are set.
+     Tips (`/guide/review/[id]`) and donations (`/donate`) take card via
+     Stripe (`src/lib/support.ts`) **and** PayPal when the PayPal vars below
+     are set.
    - Paid booking pricing is a flat CA$10/hour (4–8h), set in
      `src/lib/booking.ts` (`HOURLY_RATE_CENTS`, `CURRENCY`). Declining a paid
      booking auto-refunds.
@@ -110,11 +110,13 @@ Vercel.
    - After the booking form, tourists land on a payment page
      (`/guide/pay/[id]`) offering **card (Stripe)** and, if configured,
      **PayPal**. Leave the PayPal vars blank to show card only.
-   - `/donate` offers the same pair. PayPal donations are created and captured
-     by `/api/paypal/create-donation` and `/api/paypal/capture-donation`
-     (no sign-in needed, nothing written to the database — the PayPal
-     dashboard is the ledger, and the admins get the same "donation received"
-     email the Stripe webhook sends for card donations).
+   - `/donate` and the post-tour tip step offer the same pair. PayPal
+     donations go through `/api/paypal/create-donation` + `capture-donation`
+     (no sign-in needed) and tips through `/api/paypal/create-tip` +
+     `capture-tip` (signed-in tourist, own finished tour — the rule in
+     `src/lib/tips.ts`). Nothing is written to the database — the PayPal
+     dashboard is the ledger — and the admins (and, for tips, the guide) get
+     the same emails the Stripe webhook sends for card payments.
    - Create an app at <https://developer.paypal.com/dashboard/> — the Sandbox
      and Live tabs each expose a **Client ID** and **Secret** (different pairs).
    - Paste into `.env.local`: `PAYPAL_ENV` (`sandbox` or `live`),

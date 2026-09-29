@@ -5,33 +5,43 @@ import {
   paypalConfigured,
 } from '@/lib/paypal'
 import {
-  DONATION_PAYPAL_REFERENCE_ID,
   notifySupportPaymentReceived,
+  tipPaypalReferenceId,
 } from '@/lib/support'
+import { checkTipEligibility } from '@/lib/tips'
 
 export const runtime = 'nodejs'
 
-// Capture an approved PayPal donation order and email the operators.
-//
-// There is no signed-in user to authorise against here (donating while signed
-// out is allowed), so the guard is on the order itself: we look it up first
-// and only capture orders that carry our donation reference_id. That keeps
-// this route from being pointed at a booking order — those are captured by
-// /api/paypal/capture-order, which also finalises the booking.
+// Capture an approved PayPal tip order and email the operators and the guide.
+// Two guards: the caller must be the tourist who may tip this booking, and
+// the order must be one we created for THIS booking (its reference_id embeds
+// the booking id), so neither a booking order nor another tourist's tip order
+// can be captured through here. Retried captures are idempotent.
 export async function POST(request: NextRequest) {
   if (!paypalConfigured()) {
     return NextResponse.json({ error: 'paypal not configured' }, { status: 503 })
   }
 
-  const body = (await request.json().catch(() => ({}))) as { orderId?: unknown }
+  const body = (await request.json().catch(() => ({}))) as {
+    bookingId?: unknown
+    orderId?: unknown
+  }
+  const bookingId = typeof body.bookingId === 'string' ? body.bookingId.trim() : ''
   const orderId = typeof body.orderId === 'string' ? body.orderId.trim() : ''
-  if (!orderId) {
-    return NextResponse.json({ error: 'missing orderId' }, { status: 400 })
+  if (!bookingId || !orderId) {
+    return NextResponse.json({ error: 'missing params' }, { status: 400 })
+  }
+
+  const eligibility = await checkTipEligibility(bookingId)
+  if (!eligibility.ok) {
+    return eligibility.reason === 'signed_out'
+      ? NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+      : NextResponse.json({ error: 'booking not tippable' }, { status: 400 })
   }
 
   try {
     const order = await getPaypalOrder(orderId)
-    if (order.referenceId !== DONATION_PAYPAL_REFERENCE_ID) {
+    if (order.referenceId !== tipPaypalReferenceId(bookingId)) {
       return NextResponse.json({ error: 'invalid order' }, { status: 400 })
     }
     // Already captured (e.g. a retried onApprove) — idempotent success, and
@@ -39,8 +49,6 @@ export async function POST(request: NextRequest) {
     if (order.status === 'COMPLETED') {
       return NextResponse.json({ ok: true })
     }
-    // The buyer has not finished the PayPal approval step (or backed out):
-    // say so rather than letting the capture call fail as a generic 500.
     if (order.status !== 'APPROVED') {
       return NextResponse.json({ error: 'payment not approved' }, { status: 402 })
     }
@@ -50,14 +58,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'payment not completed' }, { status: 402 })
     }
     await notifySupportPaymentReceived({
-      kind: 'donation',
+      kind: 'tip',
       amountCents: capture.amountCents,
       currency: capture.currency,
-      from: capture.payerEmail,
+      from: capture.payerEmail ?? eligibility.user.email ?? null,
+      bookingId,
     })
     return NextResponse.json({ ok: true })
   } catch (err) {
-    console.error('PayPal donation capture failed:', err)
+    console.error('PayPal tip capture failed:', err)
     return NextResponse.json({ error: 'capture failed' }, { status: 500 })
   }
 }
