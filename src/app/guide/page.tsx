@@ -651,8 +651,11 @@ export default async function GuidePage({ searchParams }: Props) {
           <p className="mt-1 text-sm text-zinc-500">
             {FREE_TOURS ? (
               <>
-                Tours are free during our pilot — pick a 2 or 3 hour tour, no
-                payment, no card. One free tour per person at a time, so
+                Tours are free during our pilot —{' '}
+                {selectedPackage?.hours
+                  ? `this one is a ${selectedPackage.hours} hour tour`
+                  : 'pick a 2 or 3 hour tour'}
+                , no payment, no card. One free tour per person at a time, so
                 everyone gets a turn. Request a day and we confirm by email.
               </>
             ) : (
