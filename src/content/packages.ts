@@ -10,12 +10,17 @@
 //
 // PHOTO RULE — every `photo` below is one of the founder's own photographs
 // from /public/gallery, and each one has to actually show the thing the
-// package is about. That constraint is why there is no coast or park package
-// yet: we have no coast or park photograph, and illustrating a tour with a
+// package is about. That constraint is why there is no coast package yet: we
+// have no coast photograph, and illustrating a tour with a
 // picture of somewhere else is the stock-photo problem wearing a disguise.
 // See the provenance note at the top of src/app/explore/page.tsx.
 
-import { amountCentsForHours, CURRENCY, MIN_BOOKING_HOURS } from '@/lib/booking'
+import {
+  amountCentsForHours,
+  CURRENCY,
+  MAX_BOOKING_HOURS,
+  MIN_BOOKING_HOURS,
+} from '@/lib/booking'
 
 // Re-exported under a clearer name for the schema.org Offer on the detail
 // page, which wants an ISO 4217 code in upper case. Same constant the
@@ -32,10 +37,11 @@ export const CURRENCY_FOR_PACKAGES = CURRENCY.toUpperCase()
 export const PACKAGE_HOURS = 3
 
 // The tour length a card or detail page advertises for a package: its
-// `hoursRange` as "{a}–{b} hours" when it has one, else PACKAGE_HOURS as
+// `hoursRange` as "{a}–{b} hours" when it has one, else its fixed `hours`
+// or PACKAGE_HOURS as
 // "{n} hours". `common` is the dictionary's common block for the locale.
 export function packageHoursLabel(
-  pkg: Pick<TourPackage, 'hoursRange'>,
+  pkg: Pick<TourPackage, 'hoursRange' | 'hours'>,
   common: { hours: string; hoursRange: string },
 ): string {
   if (pkg.hoursRange) {
@@ -44,7 +50,7 @@ export function packageHoursLabel(
       .replace('{a}', String(min))
       .replace('{b}', String(max))
   }
-  return common.hours.replace('{n}', String(PACKAGE_HOURS))
+  return common.hours.replace('{n}', String(pkg.hours ?? PACKAGE_HOURS))
 }
 
 export type PackageAccent =
@@ -106,6 +112,12 @@ export type TourPackage = {
   // package sold at more than one length. Absent, they advertise
   // PACKAGE_HOURS. Both ends must be lengths the booking engine sells.
   hoursRange?: readonly [min: number, max: number]
+  // A package sold at one length only ("2 hours"), for a tour that is only
+  // ever run at that length. Advertised instead of PACKAGE_HOURS, and the
+  // booking form offers just this length when the tourist arrives from the
+  // package. Must be a length the booking engine sells, and must have an
+  // itinerary written for it.
+  hours?: number
   // Shortest first. More than one and the detail page shows a length toggle.
   itineraries: ItineraryVariant[]
   includes: string[]
@@ -433,79 +445,73 @@ export const packages: TourPackage[] = [
     accent: 'violet',
   },
   {
-    slug: 'first-four-hours',
-    title: 'First Hours from Hong Kong',
-    cn: '口岸',
-    kicker: 'Arrival & logistics',
+    slug: 'talent-park-night',
+    title: 'Shenzhen Talent Park',
+    cn: '人才公园',
+    kicker: 'Night walk & skyline',
     tagline:
-      'Cross the border and get a working phone, a working wallet and a real lunch.',
+      'A stroll into the future, with stunning night views of Shenzhen’s entrepreneurial skyline.',
     summary:
-      'The day trip from Hong Kong falls apart in the same four places every time: the crossing, the SIM, the payment apps and the first meal. This package exists to take those four off the table in one go. You come out the other side of the checkpoint able to pay for things, call a car, read a menu and get yourself back — which is the whole difference between a good Shenzhen day and an expensive walk around a mall.',
-    photo: '/gallery/skyline-tower-walkway-night.webp',
-    alt: 'A Shenzhen tower lit white against the night sky, seen past a raised pedestrian walkway',
-    district: 'Futian / Luohu',
-    bestStart: 'Morning — cross early and the queues are half the length',
-    meetingPoint:
-      'Mainland side of the Futian or Luohu checkpoint, arrivals hall — you pick which crossing',
+      'Talent Park sits on the edge of Shenzhen Bay in Nanshan, the district where much of the city’s tech industry goes to work. After dark the lake at its centre turns into a mirror for the towers around it, and the footbridge across the water lights up blue. It is one of the easiest places in Shenzhen to see what the city has become — and, with a local beside you, to hear how it got there: the companies behind the lit windows, the people who moved here to start something, and what building a life in a city this young is actually like.',
+    photo: '/gallery/talent-park-skyline-night.webp',
+    alt: 'The Nanshan skyline at night across the lake in Shenzhen Talent Park, with a footbridge lit bright blue along the water',
+    district: 'Nanshan',
+    bestStart: 'Evening — arrive around sunset and watch the towers light up',
+    meetingPoint: 'Sent the day before, with the nearest metro exit',
+    hours: 2,
     itineraries: [
       {
-        hours: 4,
+        hours: 2,
         beats: [
           {
             at: '0:00',
-            title: 'Met on the mainland side',
-            body: 'Your buddy is waiting past immigration with your name on a phone screen. No hunting for a meeting point in a hall with eleven exits.',
+            title: 'Meet at the park',
+            body: 'Your buddy meets you at the entrance with the short version of Nanshan: how a stretch of coastline became the district so many of the city’s tech companies call home.',
           },
           {
             at: '0:20',
-            title: 'Phone, data, and the honest version of what works',
-            body: 'Data sorted, the apps you will actually need installed, and a straight answer about which of your usual services do and do not work here — rather than finding out at the moment you need one.',
+            title: 'Around the lake as the lights come on',
+            body: 'The path around the water, walked while the sky goes dark and the towers switch on. Your buddy knows where to stop for the reflection shot.',
           },
           {
             at: '0:50',
-            title: 'A wallet that works',
-            body: 'Alipay or WeChat Pay linked to your card and tested on a real purchase, plus a metro QR set up. This is the step that quietly decides whether the rest of the trip is easy.',
+            title: 'Across the blue bridge',
+            body: 'The footbridge over the lake, glowing blue along its length, with the whole skyline in front of you.',
           },
           {
-            at: '1:30',
-            title: 'Lunch, properly ordered',
-            body: 'A first meal somewhere locals eat, ordered and explained. Also where we sit down and plan the rest of your day against the hours you actually have.',
+            at: '1:20',
+            title: 'The skyline, explained',
+            body: 'What goes on behind those windows, why so many young people moved here to start something, and what life in Shenzhen is really like — from someone who lives it.',
           },
           {
-            at: '2:30',
-            title: 'One neighbourhood, walked',
-            body: 'Whichever you came for — the electronics market, the old town, the towers. Enough of it that you could come back tomorrow on your own.',
+            at: '1:50',
+            title: 'Where next',
+            body: 'Directions to the metro or a late snack nearby, and a short list of what else in Nanshan is worth your next evening.',
           },
           {
-            at: '3:30',
-            title: 'The way back, rehearsed',
-            body: 'Which line, which exit, how long the return queue runs at that hour, and a written card with it all on it. You leave knowing how you get home.',
+            at: '2:00',
+            title: 'Tour ends',
+            body: '',
           },
         ],
       },
     ],
     includes: [
-      '2–3 hours one-on-one from the moment you clear immigration',
-      'Payment apps and metro QR set up and tested',
-      'Translation for anything you sign up to on the day',
-      'Lunch ordered and explained',
-      'A written route home with times',
+      '2 hours one-on-one, timed to the evening lights',
+      'The photo spots around the lake',
+      'The story of Shenzhen’s skyline from someone who lives here',
+      'Navigation and translation throughout',
     ],
-    notIncluded: [
-      'Visas and entry permits — those are yours, and we cannot advise on them',
-      'Data plans, SIMs, food and fares',
-      'Your Hong Kong side transport',
-    ],
+    notIncluded: ['Food and drinks', 'Metro fare and taxis'],
     goodFor: [
-      'First visit to mainland China',
-      'Hong Kong day-trippers',
-      'Business travellers with one free day',
-      'Anyone nervous about the crossing',
+      'Photographers',
+      'Couples',
+      'Tech and startup fans',
+      'Anyone with one evening in the city',
     ],
     insiderTip:
-      'Do the payment apps before you fly if you possibly can. Verification sometimes wants a text to your home number, and home numbers are exactly what stops working at the border.',
+      'Come a little before sunset. The towers come on as the sky darkens, and watching the change is better than arriving to the finished picture.',
     accent: 'jade',
-    readMoreSlug: 'shenzhen-from-hong-kong-day-trip',
   },
   {
     slug: 'crayfish-night-table',
@@ -681,7 +687,7 @@ export function otherPackages(): TourPackage[] {
 // detail page's first paint all read this so they cannot disagree.
 export function defaultItinerary(pkg: TourPackage): ItineraryVariant {
   return (
-    pkg.itineraries.find((v) => v.hours === PACKAGE_HOURS) ??
+    pkg.itineraries.find((v) => v.hours === (pkg.hours ?? PACKAGE_HOURS)) ??
     pkg.itineraries[pkg.itineraries.length - 1]
   )
 }
@@ -743,6 +749,22 @@ export function assertPackagesValid(
       }
       if (min < MIN_BOOKING_HOURS) {
         fail(slug, `advertises ${min}-hour tours but the booking engine will not sell one shorter than ${MIN_BOOKING_HOURS} hours`)
+      }
+    }
+
+    if (pkg.hours !== undefined) {
+      if (pkg.hoursRange) {
+        fail(slug, 'sets both a fixed length and a range; pick one')
+      }
+      if (
+        !Number.isInteger(pkg.hours) ||
+        pkg.hours < MIN_BOOKING_HOURS ||
+        pkg.hours > MAX_BOOKING_HOURS
+      ) {
+        fail(slug, `is sold at ${pkg.hours} hours, which the booking engine does not sell`)
+      }
+      if (!pkg.itineraries.some((v) => v.hours === pkg.hours)) {
+        fail(slug, `is sold at ${pkg.hours} hours but has no itinerary for that length`)
       }
     }
 

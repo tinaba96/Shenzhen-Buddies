@@ -198,6 +198,25 @@ export const galleryItems: GalleryItem[] = [
     featured: true,
   },
   {
+    id: 'talent-park-skyline-night',
+    kind: 'image',
+    src: '/gallery/talent-park-skyline-night.webp',
+    width: 1199,
+    height: 1600,
+    alt: 'The Nanshan skyline at night across the lake in Shenzhen Talent Park, a footbridge lit bright blue along the water and the towers reflected beneath it, framed by dark tree branches.',
+    title: 'Talent Park after dark',
+    caption: 'The Nanshan towers across the lake, and a footbridge that turns blue after dark. Worth the walk to see it from the water.',
+    location: 'other',
+    themes: ['nightlife'],
+    // The frame is tree silhouette at the top and dark water at the bottom;
+    // the towers and the blue bridge fill the middle, spire to reflection. The
+    // package card shows only a band of the height, so centre it there or
+    // the card is branches and black water.
+    focus: '50% 50%',
+    // Place shot. The figures on the bridge are specks at 1200x1600.
+    people: 'none',
+  },
+  {
     id: 'skyline-blue-towers-night',
     kind: 'image',
     src: '/gallery/skyline-blue-towers-night.webp',

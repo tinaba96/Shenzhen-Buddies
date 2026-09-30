@@ -757,7 +757,14 @@ export default async function GuidePage({ searchParams }: Props) {
                   <form action={requestBooking} className="mt-4 space-y-4">
                     <input type="hidden" name="day" value={selectedDay.day} />
                     {FREE_TOURS ? (
-                      <FreeBookingFields startOptions={startOptions} />
+                      <FreeBookingFields
+                        startOptions={startOptions}
+                        lengths={
+                          selectedPackage?.hours
+                            ? [selectedPackage.hours]
+                            : undefined
+                        }
+                      />
                     ) : (
                       <BookingFields
                         startOptions={startOptions}

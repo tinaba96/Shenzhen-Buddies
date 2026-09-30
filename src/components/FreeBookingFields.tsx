@@ -17,16 +17,20 @@ type StartOption = { hour: number; maxDuration: number }
 // lib/booking).
 export function FreeBookingFields({
   startOptions,
+  lengths = FREE_TOUR_LENGTHS,
 }: {
   startOptions: StartOption[]
+  // The lengths to show. A package sold at one length only (its `hours`)
+  // narrows this to that one; otherwise every free length is on offer.
+  lengths?: number[]
 }) {
   // A length is offered only if some start hour leaves room for it that day.
-  const available = FREE_TOUR_LENGTHS.filter((l) =>
+  const available = lengths.filter((l) =>
     startOptions.some((o) => o.maxDuration >= l),
   )
   const defaultLength = available.includes(DEFAULT_FREE_TOUR_LENGTH)
     ? DEFAULT_FREE_TOUR_LENGTH
-    : (available[available.length - 1] ?? DEFAULT_FREE_TOUR_LENGTH)
+    : (available[available.length - 1] ?? lengths[lengths.length - 1])
 
   const [length, setLength] = useState(defaultLength)
   const validStarts = startOptions.filter((o) => o.maxDuration >= length)
@@ -48,7 +52,7 @@ export function FreeBookingFields({
       <div>
         <span className="text-sm font-medium">Tour length</span>
         <div className="mt-1.5 grid grid-cols-2 gap-3">
-          {FREE_TOUR_LENGTHS.map((l) => {
+          {lengths.map((l) => {
             const selected = l === length
             const offered = available.includes(l)
             return (
