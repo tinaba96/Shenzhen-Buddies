@@ -217,6 +217,26 @@ export const galleryItems: GalleryItem[] = [
     people: 'none',
   },
   {
+    id: 'futian-cbd-street-night',
+    kind: 'image',
+    src: '/gallery/futian-cbd-street-night.webp',
+    width: 1600,
+    height: 1200,
+    alt: 'A Futian CBD street at night: towers lit red and blue, a faceted glass skybridge between two buildings, a facade of coloured light panels, and a taxi on the wet road below.',
+    title: 'Futian after dark',
+    caption: 'In the CBD the buildings are the screen. Street level is where you see it.',
+    // Founder's own shot, taken in the Futian CBD.
+    location: 'futian',
+    themes: ['nightlife', 'street'],
+    // Landscape frame: lit towers and the skybridge across the upper half,
+    // the street and planters below. The card keeps a wide band, so hold
+    // it just above centre where the light panels and the bridge are.
+    focus: '50% 45%',
+    // Street scene. No one in frame is identifiable at 1600x1200.
+    people: 'none',
+    capturedAt: '2026-09',
+  },
+  {
     id: 'skyline-blue-towers-night',
     kind: 'image',
     src: '/gallery/skyline-blue-towers-night.webp',

@@ -108,6 +108,10 @@ export type TourPackage = {
   itineraryTitle?: string
   // One line under that heading, when the package has one.
   itinerarySubtitle?: string
+  // Replaces the dictionary's generic note under the itinerary heading
+  // ("Times are elapsed from your meeting point…"), when the package has its
+  // own wording for it.
+  itineraryNote?: string
   // The lengths advertised on cards and the detail page ("2–3 hours"), for a
   // package sold at more than one length. Absent, they advertise
   // PACKAGE_HOURS. Both ends must be lengths the booking engine sells.
@@ -386,8 +390,8 @@ export const packages: TourPackage[] = [
       'Up the hill for the sunset, down into the CBD for the lights.',
     summary:
       "Shenzhen built itself upward in forty years and the skyline is the argument. This one is timed rather than routed: we start climbing while it is still light, hit the viewpoint as the towers switch on, then drop into the CBD at street level where the buildings themselves are the screen. It is the evening people come back with photographs from.",
-    photo: '/gallery/skyline-blue-towers-night.webp',
-    alt: 'Shenzhen towers lit blue at night, seen from street level',
+    photo: '/gallery/futian-cbd-street-night.webp',
+    alt: 'A Futian CBD street at night, towers and a mall facade lit red and blue above a glass skybridge',
     district: 'Futian',
     bestStart: 'Mid-afternoon — we time the climb to the sunset',
     meetingPoint: 'Lianhuashan Park, east gate',
@@ -452,12 +456,18 @@ export const packages: TourPackage[] = [
     tagline:
       'A stroll into the future, with stunning night views of Shenzhen’s entrepreneurial skyline.',
     summary:
-      'Talent Park sits on the edge of Shenzhen Bay in Nanshan, the district where much of the city’s tech industry goes to work. After dark the lake at its centre turns into a mirror for the towers around it, and the footbridge across the water lights up blue. It is one of the easiest places in Shenzhen to see what the city has become — and, with a local beside you, to hear how it got there: the companies behind the lit windows, the people who moved here to start something, and what building a life in a city this young is actually like.',
+      "Talent Park is where Shenzhen slows down for a moment. Lakes, waterfront paths, skyline views, and some of the city's best sunset spots come together in one easy walk. This experience is less about rushing between attractions and more about enjoying the views, taking photos, and seeing how nature and one of China's most futuristic skylines share the same space.",
     photo: '/gallery/talent-park-skyline-night.webp',
     alt: 'The Nanshan skyline at night across the lake in Shenzhen Talent Park, with a footbridge lit bright blue along the water',
     district: 'Nanshan',
-    bestStart: 'Evening — arrive around sunset and watch the towers light up',
-    meetingPoint: 'Sent the day before, with the nearest metro exit',
+    bestStart:
+      'Late afternoon — about an hour and a half before sunset, so the walk ends with the sunset and the lights coming on',
+    meetingPoint: 'Talent Park — the exact entrance is sent the day before',
+    itineraryTitle: 'Shenzhen Night Skyline Walk at Talent Park',
+    itinerarySubtitle:
+      "Explore one of Shenzhen's most vibrant waterfront destinations, where nature, innovation, and culture come together. Enjoy scenic walking trails, stunning city views, and inspiring spaces that celebrate the city's entrepreneurial spirit and talent.",
+    itineraryNote:
+      'Times are measured from our meeting point. The route may vary slightly depending on weather, crowds, and sunset time.',
     hours: 2,
     itineraries: [
       {
@@ -465,52 +475,59 @@ export const packages: TourPackage[] = [
         beats: [
           {
             at: '0:00',
-            title: 'Meet at the park',
-            body: 'Your buddy meets you at the entrance with the short version of Nanshan: how a stretch of coastline became the district so many of the city’s tech companies call home.',
+            title: 'Meet at Talent Park',
+            body: "Meet your local guide and get a quick introduction to Shenzhen, Nanshan, and the skyline you'll be seeing throughout the walk.",
           },
           {
             at: '0:20',
-            title: 'Around the lake as the lights come on',
-            body: 'The path around the water, walked while the sky goes dark and the towers switch on. Your buddy knows where to stop for the reflection shot.',
+            title: 'The Lake & Skyline Walk',
+            body: 'Take an easy stroll around the lakeside paths while enjoying views of the Houhai skyline, Shenzhen Bay, and the famous Spring Bamboo tower.',
           },
           {
             at: '0:50',
-            title: 'Across the blue bridge',
-            body: 'The footbridge over the lake, glowing blue along its length, with the whole skyline in front of you.',
+            title: 'Starlight Bridge',
+            body: "Visit one of the park's most iconic landmarks and take photos overlooking the lake and city skyline. The bridge becomes especially beautiful as the lights begin to appear.",
           },
           {
-            at: '1:20',
-            title: 'The skyline, explained',
-            body: 'What goes on behind those windows, why so many young people moved here to start something, and what life in Shenzhen is really like — from someone who lives it.',
+            at: '1:15',
+            title: 'Hidden Corners & Local Stories',
+            body: "Explore quieter parts of the park while learning how Shenzhen grew from a small fishing town into one of the world's leading technology hubs.",
           },
           {
-            at: '1:50',
-            title: 'Where next',
-            body: 'Directions to the metro or a late snack nearby, and a short list of what else in Nanshan is worth your next evening.',
+            at: '1:40',
+            title: 'Sunset & Photo Stop',
+            body: "Relax by the waterfront and enjoy one of Shenzhen's best sunset views. Plenty of time for photos, skyline shots, and simply taking in the atmosphere.",
           },
           {
             at: '2:00',
-            title: 'Tour ends',
+            title: 'Tour Ends',
             body: '',
           },
         ],
       },
     ],
     includes: [
-      '2 hours one-on-one, timed to the evening lights',
-      'The photo spots around the lake',
-      'The story of Shenzhen’s skyline from someone who lives here',
-      'Navigation and translation throughout',
+      '2 hours exploring Talent Park with a local',
+      'Easy-paced lakeside and waterfront walk',
+      "Local stories about Shenzhen's growth and innovation",
+      'Recommendations for nearby food, cafés, and places to visit after the tour',
+      "Help taking photos if you'd like some skyline shots",
     ],
-    notIncluded: ['Food and drinks', 'Metro fare and taxis'],
+    notIncluded: [
+      'Food and drinks',
+      'Metro, taxi, or transportation costs',
+      'Any optional purchases you choose to make',
+    ],
     goodFor: [
-      'Photographers',
-      'Couples',
-      'Tech and startup fans',
-      'Anyone with one evening in the city',
+      '🏙️ First-time visitors to Shenzhen',
+      '📸 Photography lovers',
+      '🌅 People who enjoy sunsets and skyline views',
+      '🚶 Travelers looking for a relaxed walk',
+      '🌏 Visitors who want to understand Shenzhen beyond shopping malls',
+      '❤️ Couples, friends, solo travelers, and families',
     ],
     insiderTip:
-      'Come a little before sunset. The towers come on as the sky darkens, and watching the change is better than arriving to the finished picture.',
+      'Come around sunset if possible. Talent Park is beautiful during the day, but the real magic happens when the skyline lights up, reflections appear on the lake, and the city transitions from daylight to night.',
     accent: 'jade',
   },
   {

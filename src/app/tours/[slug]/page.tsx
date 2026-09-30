@@ -170,7 +170,7 @@ export default async function TourDetailPage({ params }: Props) {
               </p>
             )}
             <p className="mt-2 text-sm text-zinc-500">
-              {t.tours.detail.itineraryNote}
+              {pkg.itineraryNote ?? t.tours.detail.itineraryNote}
             </p>
 
             <ItinerarySwitcher
@@ -313,7 +313,9 @@ export default async function TourDetailPage({ params }: Props) {
               {t.tours.detail.bookCta}
             </Link>
             <p className="mt-3 text-center text-xs leading-relaxed text-zinc-500">
-              {t.tours.detail.bookNote}
+              {pkg.hours
+                ? t.tours.detail.bookNoteFixed.replace('{n}', String(pkg.hours))
+                : t.tours.detail.bookNote}
             </p>
             <p className="mt-2 text-center text-xs leading-relaxed text-zinc-500">
               {t.tours.detail.priceNote}

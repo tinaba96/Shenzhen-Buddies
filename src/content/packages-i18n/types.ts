@@ -33,6 +33,8 @@ export type LocalizedPackage = Pick<
   itineraryTitle?: string
   // Present exactly when the English record has one.
   itinerarySubtitle?: string
+  // Present exactly when the English record has one.
+  itineraryNote?: string
   insiderTipLead?: string
   // Same count and order as the English itineraries, and inside each the same
   // count and order of beats. `hours` and `at` are not translated — "1:20" is
