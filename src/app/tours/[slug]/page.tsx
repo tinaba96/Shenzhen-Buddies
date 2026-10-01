@@ -155,7 +155,7 @@ export default async function TourDetailPage({ params }: Props) {
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14">
         {/* MAIN COLUMN */}
         <div className="min-w-0">
-          <p className="text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
+          <p className="whitespace-pre-line text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
             {pkg.summary}
           </p>
 

@@ -8,10 +8,8 @@ import type { Post } from './types'
 // on purpose:
 //
 //   - The Futian CBD facade light show runs "on show nights" with no schedule
-//     stated — the schedule genuinely varies week to week, and the
-//     skyline-after-dark package copy makes the same commitment ("your buddy
-//     checks the schedule that week"). This post mirrors it rather than
-//     inventing a timetable.
+//     stated — the schedule genuinely varies week to week, so this post
+//     does not invent a timetable.
 //   - Ping An Finance Centre "roughly 600 metres" — completed 2017 at 599m,
 //     stable and widely documented.
 //   - Metro hours appear only as "last trains leave before midnight" — true
@@ -72,7 +70,7 @@ export const shenzhenAfterDark: Post = {
     },
     {
       k: 'p',
-      text: 'The best free seat in the house is Lianhuashan Park, a twenty-minute walk up through trees — a path, not a hike — that puts the whole CBD in one line beneath you. Go up while it is still light. The show is not the view itself; it is the transition: kites coming down, retirees dancing in the square, the sky going orange and then blue, and the towers coming on one block at a time. Timing that transition is the entire craft, which is why [our skyline evening](/tours/skyline-after-dark) is timed to the sunset rather than routed on a map.',
+      text: 'The best free seat in the house is Lianhuashan Park, a twenty-minute walk up through trees — a path, not a hike — that puts the whole CBD in one line beneath you. Go up while it is still light. The show is not the view itself; it is the transition: kites coming down, retirees dancing in the square, the sky going orange and then blue, and the towers coming on one block at a time. Timing that transition is the entire craft. Once the towers are on, [our skyline evening](/tours/skyline-after-dark) picks up at street level in the CBD below.',
     },
     {
       k: 'p',
@@ -129,7 +127,7 @@ export const shenzhenAfterDark: Post = {
       k: 'callout',
       tone: 'tip',
       title: 'Haze can veto the whole plan',
-      text: 'Air clarity decides a skyline night as much as the show schedule does, and both change by the week. Ask at your hotel close to the date — or let your buddy check and build the walk around the answer, which is what we do on the skyline evening.',
+      text: 'Air clarity decides a skyline night as much as the show schedule does, and both change by the week. Ask at your hotel close to the date, or ask your buddy before you set out.',
     },
     {
       k: 'quote',
@@ -142,7 +140,7 @@ export const shenzhenAfterDark: Post = {
     {
       k: 'cta',
       label: 'Spend the evening with someone who lives here',
-      sub: 'Two or three hours, timed to that day’s sunset — or to the hour the crayfish tables fill. Your call.',
+      sub: 'Two or three hours under the towers after dark — or at the hour the crayfish tables fill. Your call.',
     },
   ],
   faq: [
