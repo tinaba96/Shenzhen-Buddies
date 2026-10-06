@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
       // Old links and shared cards land on the list of experiences rather
       // than a 404.
       {
+        source: '/tours/crayfish-night-table',
+        destination: '/tours/shekou-sea-world',
+        permanent: true,
+      },
+      {
         source: '/tours/breakfast-shift',
         destination: '/tours/shenzhen-bay-cycling',
         permanent: true,

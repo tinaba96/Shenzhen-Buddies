@@ -589,67 +589,87 @@ export const packages: TourPackage[] = [
     accent: 'jade',
   },
   {
-    slug: 'crayfish-night-table',
-    title: 'Crayfish & the Late Table',
-    cn: '大排档',
-    kicker: 'Late night & drinking food',
+    slug: 'shekou-sea-world',
+    title: 'Shekou Sea World',
+    cn: '海上世界',
+    kicker: 'Waterfront & evening walk',
     tagline:
-      'The meal Shenzhen has at eleven at night, on plastic stools, with your hands.',
+      "A relaxed evening walk through Shekou's waterfront, city lights, and local landmarks.",
     summary:
-      'Dàpáidàng is the open-air late-night table: garlic crayfish by the tray, noodles, cold beer, and a table that stays up long after the restaurants have folded their napkins. It is the most social meal in the city and the hardest one to walk into alone, because the ordering is verbal, the menu is a wall, and the good places are unmarked.',
-    photo: '/gallery/crayfish-noodles-lift.webp',
-    alt: 'Chopsticks lifting noodles beside a bowl of garlic crayfish',
-    district: 'Luohu / Futian',
-    bestStart: 'Night — the tables fill from 20:00 and get better later',
-    meetingPoint: 'Sent the day before, once your buddy knows which tables are running',
+      "Sea World is where Shenzhen slows down and enjoys the waterfront. Walk past the iconic Minghua ship, explore lively plazas, enjoy sea views, and experience the lights, fountains, and atmosphere that make Shekou one of the city's favorite evening destinations. A relaxed walk filled with great views, local stories, and photo opportunities.",
+    // NOT a photograph. A computer-generated illustration the owner supplied
+    // and chose to use after being told twice that (a) it shows a marine park
+    // that does not exist at Sea World — the real place is a waterfront plaza
+    // around the Minghua ship — and (b) it carries a "SeaWorld Shenzhen"
+    // wordmark, which is a third party's trademark. Kept out of
+    // src/content/gallery.ts, which presents real photographs.
+    photo: '/gallery/shekou-sea-world-illustration.webp',
+    alt: 'An illustration of a marine theme park at sunset with a "SeaWorld Shenzhen" sign, a Ferris wheel, palm trees and dolphins leaping from the water',
+    district: 'Nanshan / Shekou',
+    hours: 2,
+    bestStart: 'Afternoon or evening',
+    meetingPoint: 'Sea World station, Exit A',
+    itineraryTitle: 'Sea World After Dark',
+    itinerarySubtitle:
+      "Waterfront lights, sea breezes, and one of Shenzhen's most beautiful nights.",
     itineraries: [
       {
-        hours: 4,
+        hours: 2,
         beats: [
           {
             at: '0:00',
-            title: 'A cold one, standing up',
-            body: 'We start with a drink and a walk past three or four options so you can see the difference between a table that is busy and a table that is busy with locals.',
+            title: "Meet at Sea World",
+            body: "Meet outside Sea World Station and get a quick introduction to Shekou and the evening ahead.",
           },
           {
-            at: '0:40',
-            title: 'The crayfish order',
-            body: 'Garlic, spicy, or thirteen-spice — the argument that splits every table in the city. We order more than one so you get to have an opinion.',
+            at: '0:20',
+            title: "The Minghua Ship",
+            body: "Explore the famous Minghua ship and the heart of Sea World Plaza while learning how this area became one of Shenzhen's most unique landmarks.",
           },
           {
-            at: '1:40',
-            title: 'Everything that goes with it',
-            body: 'Grilled oysters, clams in black bean, fried rice noodles, greens with garlic. Your buddy orders around what you liked instead of running a fixed list.',
+            at: '0:50',
+            title: "Waterfront Walk",
+            body: "Stroll along the waterfront promenade, enjoy sea views, public art, and some of the best photo spots in Shekou.",
           },
           {
-            at: '2:40',
-            title: 'The part where you stop being a tourist',
-            body: 'Nobody at this table is in a hurry. This is the hour people actually talk — about the city, the work, why anyone moves to Shenzhen at twenty-three.',
+            at: '1:20',
+            title: "Lights & Fountains",
+            body: "Watch the plaza come alive after dark with illuminated buildings, fountain displays, and a lively atmosphere.",
           },
           {
-            at: '3:30',
-            title: 'Home, or one more street',
-            body: 'A car called to your hotel, or a last walk if the night is behaving.',
+            at: '1:50',
+            title: "The Best of Sea World",
+            body: "Take final photos, explore hidden corners of the plaza, and get recommendations for food, drinks, and places to continue your evening.",
+          },
+          {
+            at: '2:00',
+            title: "Tour Ends",
+            body: "Finish at Sea World Plaza.",
           },
         ],
       },
     ],
     includes: [
-      '2–3 hours one-on-one at a table you would not have found',
-      'Ordering, translating and the spice level negotiated honestly',
-      'A ride home called and explained to the driver',
+      "2 hours one-on-one with a local",
+      "Stories about Sea World, Shekou, and Shenzhen",
+      "Guided waterfront walk",
+      "Best photo spots and viewpoints",
+      "Local recommendations for food and nightlife",
     ],
     notIncluded: [
-      'Food and drinks — you pay the table directly',
-      'The ride itself',
+      "Food and drinks",
+      "Metro or transportation costs",
+      "Personal purchases",
     ],
     goodFor: [
-      'Solo travellers who do not want to eat alone',
-      'Seafood people',
-      'Anyone who has done the daytime version of a city',
+      "🌊 First-time visitors to Shenzhen",
+      "📸 Photography lovers",
+      "🌃 Travelers who enjoy night views",
+      "🚶 Easy-going explorers",
+      "💑 Couples, friends, and solo travelers",
     ],
     insiderTip:
-      'Wear something you do not mind wearing garlic on afterwards. There is no elegant way to eat crayfish and nobody at the table is attempting one.',
+      'The magic starts after sunset. Sea World feels completely different once the lights come on and the waterfront begins to glow.',
     accent: 'coral',
   },
   {
@@ -663,7 +683,7 @@ export const packages: TourPackage[] = [
       'Shenzhen Bay is where the city opens up to the sea. Ride along dedicated coastal cycling paths, enjoy views of the Shenzhen skyline and Hong Kong across the water, pass waterfront parks and mangroves, and discover why this is one of the most popular outdoor experiences in Shenzhen. The route is flat, beginner-friendly, and perfect for photos.',
     hoursRange: [2, 3],
     // NOT a photograph. A computer-generated illustration the owner supplied
-    // and chose to use — see the note on the Shekou package. Kept out of
+    // and chose to use — see the note on the Shekou package below. Kept out of
     // src/content/gallery.ts, which presents real photographs.
     photo: '/gallery/shenzhen-bay-illustration.webp',
     alt: 'An illustration of a bay-side park at sunset, with a waterfront promenade, palm trees and a skyline across the water',

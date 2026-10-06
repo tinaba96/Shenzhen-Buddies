@@ -113,7 +113,7 @@ export const whatShenzhenActuallyEats: Post = {
     },
     {
       k: 'p',
-      text: 'A crayfish table is a social format as much as a meal — slow, messy, and impossible to do while looking at your phone, which is why groups of friends default to it. It is also the single best table in the city to be a guest at, which is why [one of our evenings](/tours/crayfish-night-table) ends at one.',
+      text: 'A crayfish table is a social format as much as a meal — slow, messy, and impossible to do while looking at your phone, which is why groups of friends default to it. It is also the single best table in the city to be a guest at, and worth asking [your buddy](/tours) to end an evening at one.',
     },
 
     { k: 'h2', text: 'How to read a night market' },

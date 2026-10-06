@@ -90,7 +90,7 @@ export const shenzhenAfterDark: Post = {
     },
     {
       k: 'p',
-      text: 'It is also the hardest meal in Shenzhen to walk into alone. The menu is a wall, the ordering is verbal, the good places are unmarked, and every table is mid-argument about garlic versus thirteen-spice. That is not a flaw — it is what makes it the most social table in the city, and it is why [one of our evenings](/tours/crayfish-night-table) simply is this meal. What crayfish are and when they run is covered in [our food guide](/blog/what-shenzhen-actually-eats); the short version is that summer nights are what the dish was invented for.',
+      text: 'It is also the hardest meal in Shenzhen to walk into alone. The menu is a wall, the ordering is verbal, the good places are unmarked, and every table is mid-argument about garlic versus thirteen-spice. That is not a flaw — it is what makes it the most social table in the city, and a good reason to ask [your buddy](/tours) to end the evening at one. What crayfish are and when they run is covered in [our food guide](/blog/what-shenzhen-actually-eats); the short version is that summer nights are what the dish was invented for.',
     },
     {
       k: 'cta',
@@ -140,7 +140,7 @@ export const shenzhenAfterDark: Post = {
     {
       k: 'cta',
       label: 'Spend the evening with someone who lives here',
-      sub: 'Two or three hours under the towers after dark — or at the hour the crayfish tables fill. Your call.',
+      sub: 'Two or three hours under the towers after dark, or along the water in Shekou. Your call.',
     },
   ],
   faq: [
