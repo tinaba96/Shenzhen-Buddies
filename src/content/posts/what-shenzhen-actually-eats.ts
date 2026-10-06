@@ -66,7 +66,7 @@ export const whatShenzhenActuallyEats: Post = {
     },
     {
       k: 'p',
-      text: 'The other Cantonese institution is breakfast, taken seriously: congee cooked long enough to lose the shape of the rice, and chángfěn — rice noodle rolls steamed to order and folded around egg or beef under sweet soy. Morning food here is its own culture with its own pace, which is exactly why we built [a morning with a buddy](/tours/breakfast-shift) around nothing else.',
+      text: 'The other Cantonese institution is breakfast, taken seriously: congee cooked long enough to lose the shape of the rice, and chángfěn — rice noodle rolls steamed to order and folded around egg or beef under sweet soy. Morning food here is its own culture with its own pace, and it is worth asking [your buddy](/tours) to start the day with it.',
     },
 
     { k: 'h2', text: 'Then the whole country moved in' },

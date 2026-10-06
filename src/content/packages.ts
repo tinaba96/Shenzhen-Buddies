@@ -10,9 +10,10 @@
 //
 // PHOTO RULE — every `photo` below is one of the founder's own photographs
 // from /public/gallery, and each one has to actually show the thing the
-// package is about. That constraint is why there is no coast package yet: we
-// have no coast photograph, and illustrating a tour with a
-// picture of somewhere else is the stock-photo problem wearing a disguise.
+// package is about, because illustrating a tour with a picture of somewhere
+// else is the stock-photo problem wearing a disguise. The owner has chosen to
+// make an exception for computer-generated illustrations where no photograph
+// exists yet; each one is marked as such on the package below.
 // See the provenance note at the top of src/app/explore/page.tsx.
 
 import {
@@ -652,71 +653,127 @@ export const packages: TourPackage[] = [
     accent: 'coral',
   },
   {
-    slug: 'breakfast-shift',
-    title: 'The Breakfast Shift',
-    cn: '早茶',
-    kicker: 'Mornings & markets',
+    slug: 'shenzhen-bay-cycling',
+    title: 'Shenzhen Bay Coastal Ride',
+    cn: '深圳湾公园',
+    kicker: '🚴 Cycling & waterfront',
     tagline:
-      'What twelve million people actually eat before work, plus the market it comes from.',
+      "Sea breeze, skyline views, and the city's favorite waterfront cycling route.",
     summary:
-      'Shenzhen at seven in the morning is a completely different city from the one in the photographs — canteen trays, rice rolls off the steamer, tea drunk standing up, and a wet market doing the day’s serious business before most visitors are awake. This is the quietest and most ordinary tour we offer, and it is the one people say they remember.',
-    photo: '/gallery/canteen-tray-lunch.webp',
-    alt: 'A canteen tray of rice, greens and braised dishes on a steel counter',
-    district: 'Luohu',
-    bestStart: 'Early — 07:00 or 08:00, and yes, that is the point',
-    meetingPoint: 'Your hotel lobby if you are central, or the nearest metro exit',
+      'Shenzhen Bay is where the city opens up to the sea. Ride along dedicated coastal cycling paths, enjoy views of the Shenzhen skyline and Hong Kong across the water, pass waterfront parks and mangroves, and discover why this is one of the most popular outdoor experiences in Shenzhen. The route is flat, beginner-friendly, and perfect for photos.',
+    hoursRange: [2, 3],
+    // NOT a photograph. A computer-generated illustration the owner supplied
+    // and chose to use — see the note on the Shekou package. Kept out of
+    // src/content/gallery.ts, which presents real photographs.
+    photo: '/gallery/shenzhen-bay-illustration.webp',
+    alt: 'An illustration of a bay-side park at sunset, with a waterfront promenade, palm trees and a skyline across the water',
+    district: 'Nanshan',
+    bestStart: 'Early afternoon',
+    meetingPoint: 'Your guide will let you know after booking',
     itineraries: [
       {
-        hours: 4,
+        hours: 2,
+        title: '2-Hour Itinerary',
         beats: [
           {
             at: '0:00',
-            title: 'Breakfast where the queue is',
-            body: 'Rice noodle rolls off the steamer, congee, soy milk, a fried dough stick. Ordered at a counter, eaten fast, standing or sitting depending on the room.',
+            title: "Meet at Shenzhen Bay Park",
+            body: "Meet near Shenzhen Bay Park Station. Get your bike ready and receive a quick introduction to the route.",
+          },
+          {
+            at: '0:15',
+            title: "Coastal Ride Begins",
+            body: "Cycle along the waterfront greenway with sea views, palm trees, and dedicated cycling lanes.",
+          },
+          {
+            at: '0:45',
+            title: "Skyline Photo Stop",
+            body: "Stop at one of the best viewpoints overlooking Shenzhen Bay, the skyline, and Hong Kong across the water.",
+          },
+          {
+            at: '1:10',
+            title: "Waterfront Parks & Mangroves",
+            body: "Continue riding past scenic sections of the coastline while learning about Shenzhen Bay and the surrounding area.",
+          },
+          {
+            at: '1:40',
+            title: "The Best Bay Views",
+            body: "Relax, take photos, enjoy the sea breeze, and explore one of the most beautiful stretches of the route.",
+          },
+          {
+            at: '2:00',
+            title: "Tour Ends",
+            body: "Finish near Shenzhen Bay Park.",
+          },
+        ],
+      },
+      {
+        hours: 3,
+        title: '3-Hour Itinerary',
+        beats: [
+          {
+            at: '0:00',
+            title: "Meet at Shenzhen Bay Park",
+            body: "Meet near Shenzhen Bay Park Station and prepare for a longer coastal ride.",
+          },
+          {
+            at: '0:15',
+            title: "The Bay Route",
+            body: "Ride along Shenzhen's famous waterfront cycling path with uninterrupted sea views.",
           },
           {
             at: '0:50',
-            title: 'Tea, sat down',
-            body: 'The slower half of a Cantonese morning — a pot, a few baskets, and an hour that nobody is trying to turn over. Your buddy explains the etiquette, including the finger tap.',
+            title: "Skyline & Photo Stops",
+            body: "Stop at several scenic viewpoints for photos of the bay, skyline, and Shenzhen Bay Bridge.",
+          },
+          {
+            at: '1:20',
+            title: "Talent Park Area",
+            body: "Ride through the waterfront areas around Talent Park and enjoy some of Shenzhen's best city-meets-nature views.",
           },
           {
             at: '1:50',
-            title: 'The wet market',
-            body: 'Fish still moving, greens you have not seen before, dried goods, the preserved-fruit jars, herbs sold by the handful. This is where the food you have been eating comes from and where prices are set.',
+            title: "Coastal Highlights",
+            body: "Continue along the coastline, passing public art, waterfront promenades, and popular local recreation areas.",
           },
           {
-            at: '2:50',
-            title: 'A bakery stop',
-            body: 'Shenzhen’s bakery habit is real and specific. Pineapple buns, sourdough, egg tarts, coffee that is better than it has any right to be.',
+            at: '2:30',
+            title: "Sunset & Sea Views",
+            body: "Enjoy the most scenic section of the route and take final photos before heading back.",
           },
           {
-            at: '3:30',
-            title: 'Where to go next, decided over coffee',
-            body: 'You now have a whole day left and a much better sense of the city. Your buddy maps the rest of it against what you liked this morning.',
+            at: '3:00',
+            title: "Tour Ends",
+            body: "Finish near Shenzhen Bay Park.",
           },
         ],
       },
     ],
     includes: [
-      '2–3 hours one-on-one starting at a civilised local hour',
-      'Ordering and translating at counters that have no English menu',
-      'Market prices explained so you know what things cost',
-      'A plan for the rest of your day, written down',
+      "2–3 hours one-on-one with a local",
+      "Guided cycling route",
+      "Local stories and recommendations",
+      "Best viewpoints and photo spots",
+      "Help with bike rental if needed",
     ],
     notIncluded: [
-      'Food, tea and anything you buy at the market',
-      'Metro fare',
+      "Bike rental fee",
+      "Food and drinks",
+      "Metro fare",
+      "Personal purchases",
     ],
     goodFor: [
-      'Early risers and the jet-lagged',
-      'Food writers and cooks',
-      'Families',
-      'Anyone who wants the unphotogenic, real version',
+      "🌊 First-time visitors to Shenzhen",
+      "🚴 Casual cyclists",
+      "📸 Photography lovers",
+      "🌇 Sunset seekers",
+      "🌍 Travelers wanting to see a different side of Shenzhen",
     ],
     insiderTip:
-      'Jet lag from Europe or the Americas puts you awake at five in the morning anyway. This is the package that turns that into an advantage instead of a problem.',
+      "Shenzhen Bay is much longer than most visitors expect. The best experience isn't rushing from point to point—it's riding at a relaxed pace, stopping for photos, enjoying the sea breeze, and taking in the changing views along the waterfront. The route is mostly flat and beginner-friendly, making it enjoyable even if you don't cycle often.",
     accent: 'sky',
   },
+
 ]
 
 // ---------------------------------------------------------------------------
