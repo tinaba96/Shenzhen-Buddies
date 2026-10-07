@@ -11,9 +11,7 @@
 // PHOTO RULE — every `photo` below is one of the founder's own photographs
 // from /public/gallery, and each one has to actually show the thing the
 // package is about, because illustrating a tour with a picture of somewhere
-// else is the stock-photo problem wearing a disguise. The owner has chosen to
-// make an exception for computer-generated illustrations where no photograph
-// exists yet; each one is marked as such on the package below.
+// else is the stock-photo problem wearing a disguise.
 // See the provenance note at the top of src/app/explore/page.tsx.
 
 import {
@@ -597,14 +595,8 @@ export const packages: TourPackage[] = [
       "A relaxed evening walk through Shekou's waterfront, city lights, and local landmarks.",
     summary:
       "Sea World is where Shenzhen slows down and enjoys the waterfront. Walk past the iconic Minghua ship, explore lively plazas, enjoy sea views, and experience the lights, fountains, and atmosphere that make Shekou one of the city's favorite evening destinations. A relaxed walk filled with great views, local stories, and photo opportunities.",
-    // NOT a photograph. A computer-generated illustration the owner supplied
-    // and chose to use after being told twice that (a) it shows a marine park
-    // that does not exist at Sea World — the real place is a waterfront plaza
-    // around the Minghua ship — and (b) it carries a "SeaWorld Shenzhen"
-    // wordmark, which is a third party's trademark. Kept out of
-    // src/content/gallery.ts, which presents real photographs.
-    photo: '/gallery/shekou-sea-world-illustration.webp',
-    alt: 'An illustration of a marine theme park at sunset with a "SeaWorld Shenzhen" sign, a Ferris wheel, palm trees and dolphins leaping from the water',
+    photo: '/gallery/sea-world-minghua-ship-night.webp',
+    alt: 'The white Minghua ship lit up at night above the Sea World plaza in Shekou, with palm trees and people strolling in front',
     district: 'Nanshan / Shekou',
     hours: 2,
     bestStart: 'Afternoon or evening',
@@ -682,11 +674,8 @@ export const packages: TourPackage[] = [
     summary:
       'Shenzhen Bay is where the city opens up to the sea. Ride along dedicated coastal cycling paths, enjoy views of the Shenzhen skyline and Hong Kong across the water, pass waterfront parks and mangroves, and discover why this is one of the most popular outdoor experiences in Shenzhen. The route is flat, beginner-friendly, and perfect for photos.',
     hoursRange: [2, 3],
-    // NOT a photograph. A computer-generated illustration the owner supplied
-    // and chose to use — see the note on the Shekou package below. Kept out of
-    // src/content/gallery.ts, which presents real photographs.
-    photo: '/gallery/shenzhen-bay-illustration.webp',
-    alt: 'An illustration of a bay-side park at sunset, with a waterfront promenade, palm trees and a skyline across the water',
+    photo: '/gallery/shenzhen-bay-railing-day.webp',
+    alt: 'The Shenzhen Bay waterfront promenade on a clear day, a wooden railing running along green water with hills across the bay',
     district: 'Nanshan',
     bestStart: 'Early afternoon',
     meetingPoint: 'Your guide will let you know after booking',

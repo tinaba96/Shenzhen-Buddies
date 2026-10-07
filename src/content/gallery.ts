@@ -237,6 +237,43 @@ export const galleryItems: GalleryItem[] = [
     capturedAt: '2026-09',
   },
   {
+    id: 'shenzhen-bay-railing-day',
+    kind: 'image',
+    src: '/gallery/shenzhen-bay-railing-day.webp',
+    width: 1216,
+    height: 1544,
+    alt: 'The Shenzhen Bay waterfront promenade on a clear day: a wooden-topped railing runs along green water, with hills across the bay under a blue sky.',
+    title: 'Shenzhen Bay, looking across',
+    caption: 'The promenade runs for kilometres along the water. The hills on the far side are Hong Kong.',
+    location: 'other',
+    themes: ['nature'],
+    // Sky above, water below, the hills on the horizon a little above the
+    // middle. Centre holds the railing and the far shore together.
+    focus: '50% 50%',
+    people: 'none',
+    capturedAt: '2026-10',
+  },
+  {
+    id: 'sea-world-minghua-ship-night',
+    kind: 'image',
+    src: '/gallery/sea-world-minghua-ship-night.webp',
+    width: 1146,
+    height: 1600,
+    alt: 'The white Minghua ship lit up at night above the Sea World plaza in Shekou, with palm trees, restaurant signs and people strolling across the square.',
+    title: 'The ship that never sails',
+    caption: 'The Minghua has been moored at Sea World since the eighties. The plaza around it is where Shekou spends its evenings.',
+    location: 'shekou',
+    themes: ['nightlife', 'street'],
+    // Sky at the top, the ship across the middle, the plaza and the crowd at
+    // the bottom. Hold it just below centre so the card keeps the ship and
+    // the square together.
+    focus: '50% 55%',
+    // Place shot. The people are small, walking away or in silhouette, and
+    // unresolved at the published 1146x1600.
+    people: 'none',
+    capturedAt: '2026-10',
+  },
+  {
     id: 'skyline-blue-towers-night',
     kind: 'image',
     src: '/gallery/skyline-blue-towers-night.webp',
