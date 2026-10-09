@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { POLICY_EFFECTIVE } from '@/lib/policy'
+import { CONTACT_EMAIL } from '@/lib/config'
 
 export const metadata: Metadata = {
   title: 'Cancellation & Refund Policy — Shenzhen Buddies',
@@ -9,7 +10,6 @@ export const metadata: Metadata = {
 }
 
 const EFFECTIVE = POLICY_EFFECTIVE
-const CONTACT_EMAIL = 'hello@shenzhen-buddies.com'
 
 export default function CancellationPage() {
   return (

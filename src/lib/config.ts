@@ -43,6 +43,12 @@ export function instagramUrl(): string {
 // WhatsApp buttons disappear.
 export const WECHAT_ID = 'bryan_wangqian'
 
+// The one inbox visitors can write to. It is the operator's Gmail account
+// (the same one booking emails go out from), so mail actually arrives;
+// the @shenzhen-buddies.com addresses the pages used to show had no
+// mailbox behind them. Used by /contact, /terms, /cancellation, /privacy.
+export const CONTACT_EMAIL = 'tensaitech.admin@gmail.com'
+
 export function whatsappNumber(): string | null {
   const digits = (process.env.WHATSAPP_NUMBER ?? '').replace(/\D/g, '')
   return digits.length >= 8 ? digits : null

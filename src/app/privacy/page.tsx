@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { CONTACT_EMAIL } from '@/lib/config'
 
 export const metadata: Metadata = {
   title: 'Privacy — Shenzhen Buddies',
@@ -229,7 +230,7 @@ export default function PrivacyPage() {
           <Section id="contact" icon="send" title="Contact">
             <p>
               For privacy questions or to exercise any rights above, email us at{' '}
-              <strong>privacy@shenzhen-buddies.com</strong>. We aim to respond
+              <strong>{CONTACT_EMAIL}</strong>. We aim to respond
               within seven days.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">

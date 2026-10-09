@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { DEFAULT_OG_IMAGE, WECHAT_ID, isSingleGuideMode, isWhatsAppConfigured } from '@/lib/config'
+import { CONTACT_EMAIL, DEFAULT_OG_IMAGE, WECHAT_ID, isSingleGuideMode, isWhatsAppConfigured } from '@/lib/config'
 import { HeroImage } from '@/components/HeroImage'
 import { WeChatId } from '@/components/WeChatId'
 
@@ -21,9 +21,6 @@ export const metadata: Metadata = {
   },
 }
 
-
-const CONTACT_EMAIL = 'hello@shenzhen-buddies.com'
-const PRESS_EMAIL = 'press@shenzhen-buddies.com'
 
 type ChannelIconName = 'envelope' | 'guide' | 'megaphone' | 'shield' | 'whatsapp' | 'wechat'
 
@@ -94,7 +91,7 @@ const CHANNELS: Channel[] = [
     description:
       'Working on a story? We have founder bios, screenshots, and stats ready to share.',
     ctaLabel: 'Press kit',
-    href: `mailto:${PRESS_EMAIL}`,
+    href: `mailto:${CONTACT_EMAIL}`,
     icon: 'megaphone',
     tone: 'sky',
   },
