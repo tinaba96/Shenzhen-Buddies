@@ -9,9 +9,11 @@ import { getI18n } from "@/i18n/server";
 import { avatarPublicUrl } from "@/lib/avatars";
 import {
   INSTAGRAM_HANDLE,
+  WECHAT_ID,
   instagramUrl,
   isAdminEmail,
   isSingleGuideMode,
+  isWhatsAppConfigured,
   officialGuideId,
   siteUrl,
 } from "@/lib/config";
@@ -357,6 +359,34 @@ async function SiteFooter() {
             </svg>
             @{INSTAGRAM_HANDLE}
           </a>
+          {/* Direct chat, same chip style. WhatsApp goes through /whatsapp so
+              the number is never in the HTML; WeChat has no web deep link, so
+              the chip sends people to the contact card with the copyable ID. */}
+          <div className="mt-2 flex flex-wrap gap-2">
+            {isWhatsAppConfigured() && (
+              <a
+                href="/whatsapp"
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                className="inline-flex items-center gap-2 rounded-full border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-white"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden>
+                  <path d="M3 21l1.6-4.7A8.5 8.5 0 1 1 7.9 19.5L3 21z" />
+                </svg>
+                WhatsApp
+              </a>
+            )}
+            <Link
+              href="/contact#wechat"
+              className="inline-flex items-center gap-2 rounded-full border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-white"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden>
+                <path d="M9.5 4C5.9 4 3 6.5 3 9.6c0 1.7.9 3.2 2.3 4.2L4.7 16l2.5-1.3c.7.2 1.5.3 2.3.3" />
+                <path d="M9 10.6c0 3 2.9 5.4 6.5 5.4.7 0 1.4-.1 2-.3L20 17l-.5-2c1-.9 1.5-2 1.5-3.4 0-3-2.9-5.4-6.5-5.4S9 7.6 9 10.6z" />
+              </svg>
+              WeChat · {WECHAT_ID}
+            </Link>
+          </div>
 
           {/* The switcher again, spelled out rather than behind a globe icon.
               Someone who lands mid-page in a language they cannot read looks

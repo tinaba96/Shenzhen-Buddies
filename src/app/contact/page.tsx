@@ -1,19 +1,20 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { DEFAULT_OG_IMAGE, isSingleGuideMode } from '@/lib/config'
+import { DEFAULT_OG_IMAGE, WECHAT_ID, isSingleGuideMode, isWhatsAppConfigured } from '@/lib/config'
 import { HeroImage } from '@/components/HeroImage'
+import { WeChatId } from '@/components/WeChatId'
 
 export const metadata: Metadata = {
   title: 'Contact — Shenzhen Buddies',
   description:
-    'Get in touch with the Shenzhen Buddies team — feedback, partnerships, press, or trust and safety.',
+    'Get in touch with the Shenzhen Buddies team on WhatsApp, WeChat or email — questions, feedback, partnerships, press, or trust and safety.',
   alternates: { canonical: '/contact' },
   // Declared explicitly: the root layout sets an openGraph block, and
   // metadata merges per key — so a page that omits this inherits the site's
   // generic title, description and an og:url pointing at the homepage.
   openGraph: {
     title: 'Contact — Shenzhen Buddies',
-    description: 'Get in touch with the Shenzhen Buddies team — feedback, partnerships, press, or trust and safety.',
+    description: 'Get in touch with the Shenzhen Buddies team on WhatsApp, WeChat or email — questions, feedback, partnerships, press, or trust and safety.',
     url: '/contact',
     // Required alongside any openGraph object — see the note in about/page.tsx.
     images: [DEFAULT_OG_IMAGE],
@@ -24,15 +25,28 @@ export const metadata: Metadata = {
 const CONTACT_EMAIL = 'hello@shenzhen-buddies.com'
 const PRESS_EMAIL = 'press@shenzhen-buddies.com'
 
-const CHANNELS: {
+type ChannelIconName = 'envelope' | 'guide' | 'megaphone' | 'shield' | 'whatsapp' | 'wechat'
+
+type Channel = {
+  id: string
   title: string
   description: string
-  ctaLabel: string
-  href: string
-  icon: 'envelope' | 'guide' | 'megaphone' | 'shield'
-  tone: 'amber' | 'rose' | 'emerald' | 'sky'
-}[] = [
+  icon: ChannelIconName
+  tone: 'amber' | 'rose' | 'emerald' | 'sky' | 'lime'
+} & (
+  | { kind: 'link'; ctaLabel: string; href: string }
+  // Opens in a new tab and must not be prefetched: the href is a redirect
+  // to WhatsApp, and the number behind it stays out of the page on purpose.
+  | { kind: 'external'; ctaLabel: string; href: string }
+  // WeChat has no web link to add a contact, so the card shows the ID with
+  // a copy button instead of a button that goes somewhere.
+  | { kind: 'wechat'; wechatId: string }
+)
+
+const CHANNELS: Channel[] = [
   {
+    id: 'email',
+    kind: 'link',
     title: 'Say hello',
     description:
       'Questions, feedback, partnership ideas, or just a friendly hi. We read every message.',
@@ -42,6 +56,29 @@ const CHANNELS: {
     tone: 'amber',
   },
   {
+    id: 'whatsapp',
+    kind: 'external',
+    title: 'WhatsApp',
+    description:
+      'The quickest way to reach us before or during your trip. Message us and we reply from Shenzhen, usually the same day.',
+    ctaLabel: 'Chat on WhatsApp',
+    href: '/whatsapp',
+    icon: 'whatsapp',
+    tone: 'emerald',
+  },
+  {
+    id: 'wechat',
+    kind: 'wechat',
+    title: 'WeChat',
+    description:
+      'Already on WeChat? Add our founder Bryan by ID and send a quick hello so we know who you are.',
+    wechatId: WECHAT_ID,
+    icon: 'wechat',
+    tone: 'lime',
+  },
+  {
+    id: 'guide',
+    kind: 'link',
     title: 'Become a guide',
     description:
       'Living in Shenzhen and want to host visitors? Apply and we’ll fast-track your profile review.',
@@ -51,6 +88,8 @@ const CHANNELS: {
     tone: 'rose',
   },
   {
+    id: 'press',
+    kind: 'link',
     title: 'Press',
     description:
       'Working on a story? We have founder bios, screenshots, and stats ready to share.',
@@ -60,6 +99,8 @@ const CHANNELS: {
     tone: 'sky',
   },
   {
+    id: 'safety',
+    kind: 'link',
     title: 'Safety',
     description:
       'Concerned about another user? Report it from their profile, or email our trust & safety team.',
@@ -83,9 +124,12 @@ export default function ContactPage() {
   // signup ignores ?as=guide and profile/actions.ts hands every new account
   // the 'tourist' role, so the only way to become a guide is by hand in the
   // database. Unset OFFICIAL_GUIDE_ID and the card returns untouched.
-  const channels = isSingleGuideMode()
-    ? CHANNELS.filter((c) => c.icon !== 'guide')
-    : CHANNELS
+  const channels = CHANNELS.filter(
+    (c) =>
+      !(isSingleGuideMode() && c.id === 'guide') &&
+      // No WHATSAPP_NUMBER in the environment → no WhatsApp card.
+      !(c.id === 'whatsapp' && !isWhatsAppConfigured()),
+  )
   return (
     <main className="flex flex-1 flex-col">
       <section className="relative overflow-hidden">
@@ -124,8 +168,9 @@ export default function ContactPage() {
         <div className="mx-auto grid max-w-5xl gap-5 px-6 py-20 sm:grid-cols-2">
           {channels.map((c) => (
             <article
-              key={c.title}
-              className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+              key={c.id}
+              id={c.id}
+              className="group scroll-mt-24 flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
             >
               <span
                 className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl ${
@@ -135,6 +180,8 @@ export default function ContactPage() {
                     ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
                     : c.tone === 'sky'
                     ? 'bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300'
+                    : c.tone === 'lime'
+                    ? 'bg-lime-100 text-lime-700 dark:bg-lime-950 dark:text-lime-300'
                     : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
                 }`}
               >
@@ -144,16 +191,29 @@ export default function ContactPage() {
               <p className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400">
                 {c.description}
               </p>
-              <Link
-                href={c.href}
-                className="mt-5 inline-flex w-fit items-center gap-1 rounded-full bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-              >
-                {c.ctaLabel}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden>
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-              </Link>
+              {c.kind === 'wechat' ? (
+                <div className="mt-5">
+                  <WeChatId id={c.wechatId} />
+                </div>
+              ) : c.kind === 'external' ? (
+                <a
+                  href={c.href}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="mt-5 inline-flex w-fit items-center gap-1 rounded-full bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  {c.ctaLabel}
+                  <CtaArrow />
+                </a>
+              ) : (
+                <Link
+                  href={c.href}
+                  className="mt-5 inline-flex w-fit items-center gap-1 rounded-full bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  {c.ctaLabel}
+                  <CtaArrow />
+                </Link>
+              )}
             </article>
           ))}
         </div>
@@ -216,9 +276,32 @@ export default function ContactPage() {
   )
 }
 
-function ChannelIcon({ name }: { name: 'envelope' | 'guide' | 'megaphone' | 'shield' }) {
+function CtaArrow() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden>
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  )
+}
+
+function ChannelIcon({ name }: { name: ChannelIconName }) {
   const cls = 'h-5 w-5'
   switch (name) {
+    case 'whatsapp':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls} aria-hidden>
+          <path d="M3 21l1.6-4.7A8.5 8.5 0 1 1 7.9 19.5L3 21z" />
+          <path d="M9.5 9.5c0 3 2 5 5 5l1.2-1.2-1.7-1-1 .6a3.5 3.5 0 0 1-1.9-1.9l.6-1-1-1.7L9.5 9.5z" />
+        </svg>
+      )
+    case 'wechat':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls} aria-hidden>
+          <path d="M9.5 4C5.9 4 3 6.5 3 9.6c0 1.7.9 3.2 2.3 4.2L4.7 16l2.5-1.3c.7.2 1.5.3 2.3.3" />
+          <path d="M9 10.6c0 3 2.9 5.4 6.5 5.4.7 0 1.4-.1 2-.3L20 17l-.5-2c1-.9 1.5-2 1.5-3.4 0-3-2.9-5.4-6.5-5.4S9 7.6 9 10.6z" />
+        </svg>
+      )
     case 'envelope':
       return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls} aria-hidden>

@@ -35,6 +35,23 @@ export function instagramUrl(): string {
   return `https://www.instagram.com/${INSTAGRAM_HANDLE}/`
 }
 
+// Direct chat channels, shown on /contact and in the footer. The WeChat ID is
+// a public handle (not a phone number), so it can live in the repo. The
+// WhatsApp number is a phone number: it stays in WHATSAPP_NUMBER (set in
+// Vercel, never committed — this repo is public) and is only ever read by the
+// /whatsapp redirect, so it appears in no page HTML. Leave it unset and the
+// WhatsApp buttons disappear.
+export const WECHAT_ID = 'bryan_wangqian'
+
+export function whatsappNumber(): string | null {
+  const digits = (process.env.WHATSAPP_NUMBER ?? '').replace(/\D/g, '')
+  return digits.length >= 8 ? digits : null
+}
+
+export function isWhatsAppConfigured(): boolean {
+  return whatsappNumber() !== null
+}
+
 // Canonical production URL — used as the fallback so emails and redirect
 // links never point at localhost, even if NEXT_PUBLIC_SITE_URL is unset.
 //

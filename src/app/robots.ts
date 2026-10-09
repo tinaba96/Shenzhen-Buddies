@@ -21,6 +21,9 @@ export default function robots(): MetadataRoute.Robots {
         '/reset-password',
         '/forgot-password',
         '/u',
+        // Redirect to WhatsApp — nothing to index, and the target is a
+        // phone number we keep out of the HTML on purpose.
+        '/whatsapp',
       ],
     },
     sitemap: `${base}/sitemap.xml`,
