@@ -7,6 +7,15 @@
 // to false. Nothing else needs to change: every constant below derives from it.
 export const FREE_TOURS = true
 
+// Guest requests. While true, "Reserve your spot" sends visitors to /book,
+// a short form with no account: name, how to reach them (WhatsApp, WeChat,
+// phone or email), tour length and a rough idea of when. The guide and the
+// admins get an email and settle the exact day in chat. A stop-gap for the
+// early days when every visitor counts and a signup wall costs bookings.
+// Flip to false and the account-based flow on /guide is back as it was;
+// the tour_requests table and /admin's request list stay for the records.
+export const GUEST_REQUESTS = true
+
 // The only lengths a tourist can pick while the pilot is free. Whole hours
 // because start_hour/end_hour are integer columns; 3 is the default the form
 // preselects.

@@ -18,6 +18,7 @@ import {
   addAvailability,
   approveBooking,
   deleteAvailability,
+  markRequestHandled,
   rejectBooking,
   sendTestEmail,
 } from './actions'
@@ -30,7 +31,26 @@ type Props = {
     rejected?: string
     error?: string
     emailtest?: string
+    handled?: string
   }>
+}
+
+// A guest tour request (migration 0020). No slot, no account — the guide
+// settles the day in chat using the contact the visitor left.
+type TourRequestRow = {
+  id: string
+  package_title: string
+  hours: number | null
+  name: string
+  email: string | null
+  phone: string | null
+  whatsapp: string | null
+  wechat: string | null
+  preferred_dates: string | null
+  message: string | null
+  locale: string | null
+  status: 'new' | 'handled'
+  created_at: string
 }
 
 type TouristLite = {
@@ -61,7 +81,7 @@ export default async function AdminPage({ searchParams }: Props) {
   const admin = createSupabaseAdminClient()
   const today = todayInShenzhen()
 
-  const [{ data: windows }, { data: bookings }, mail] = await Promise.all([
+  const [{ data: windows }, { data: bookings }, mail, requestsResult] = await Promise.all([
     admin
       .from('availability_windows')
       .select('id, day, start_hour, end_hour')
@@ -79,7 +99,21 @@ export default async function AdminPage({ searchParams }: Props) {
       .limit(100)
       .returns<BookingRow[]>(),
     emailHealth(),
+    admin
+      .from('tour_requests')
+      .select(
+        'id, package_title, hours, name, email, phone, whatsapp, wechat, preferred_dates, message, locale, status, created_at',
+      )
+      .order('created_at', { ascending: false })
+      .limit(100)
+      .returns<TourRequestRow[]>(),
   ])
+  // The table arrives with migration 0020; until it is run, the query errors
+  // and the section says so instead of the page breaking.
+  const requestsError = requestsResult.error?.message ?? null
+  const requests = requestsResult.data ?? []
+  const openRequests = requests.filter((r) => r.status === 'new')
+  const handledRequests = requests.filter((r) => r.status !== 'new')
   const mailProblems = [
     !mail.smtpConfigured &&
       'GMAIL_USER / GMAIL_APP_PASSWORD are not set on the server — NO emails are being sent to anyone.',
@@ -135,6 +169,7 @@ export default async function AdminPage({ searchParams }: Props) {
           emailed.
         </Banner>
       )}
+      {sp.handled && <Banner tone="ok">Request marked as handled.</Banner>}
       {sp.error && <Banner tone="error">{sp.error}</Banner>}
       {sp.emailtest && (
         <Banner tone={sp.emailtest.includes('NOT sent') ? 'error' : 'ok'}>
@@ -265,6 +300,98 @@ export default async function AdminPage({ searchParams }: Props) {
               )
             })}
           </ul>
+        )}
+      </section>
+
+      {/* Guest tour requests (no account) */}
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold">
+          Tour requests{' '}
+          {openRequests.length > 0 && (
+            <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+              {openRequests.length} open
+            </span>
+          )}
+        </h2>
+        <p className="mt-1 text-sm text-zinc-500">
+          Sent from the website without an account. Reply on the contact they
+          left, agree the day and time in chat, then mark it handled.
+        </p>
+        {requestsError ? (
+          <p className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200">
+            Could not load requests: {requestsError}. Has migration
+            0020_tour_requests been run in Supabase?
+          </p>
+        ) : openRequests.length === 0 ? (
+          <p className="mt-3 rounded-lg border border-dashed border-zinc-300 px-6 py-8 text-center text-sm text-zinc-500 dark:border-zinc-700">
+            No open requests.
+          </p>
+        ) : (
+          <ul className="mt-3 space-y-3">
+            {openRequests.map((r) => (
+              <li
+                key={r.id}
+                className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium">
+                      {r.name}{' '}
+                      <span className="font-normal text-zinc-500">
+                        · {r.package_title}
+                        {r.hours ? ` · ${r.hours}h` : ''}
+                      </span>
+                    </p>
+                    <dl className="mt-2 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
+                      {r.whatsapp && (
+                        <div><dt className="inline text-zinc-500">WhatsApp: </dt><dd className="inline select-all">{r.whatsapp}</dd></div>
+                      )}
+                      {r.wechat && (
+                        <div><dt className="inline text-zinc-500">WeChat: </dt><dd className="inline select-all">{r.wechat}</dd></div>
+                      )}
+                      {r.phone && (
+                        <div><dt className="inline text-zinc-500">Phone: </dt><dd className="inline select-all">{r.phone}</dd></div>
+                      )}
+                      {r.email && (
+                        <div><dt className="inline text-zinc-500">Email: </dt><dd className="inline select-all">{r.email}</dd></div>
+                      )}
+                      <div><dt className="inline text-zinc-500">When: </dt><dd className="inline">{r.preferred_dates ?? 'not given'}</dd></div>
+                      <div><dt className="inline text-zinc-500">Sent: </dt><dd className="inline">{new Date(r.created_at).toLocaleString('en-CA', { timeZone: 'Asia/Shanghai', dateStyle: 'medium', timeStyle: 'short' })} (Shenzhen){r.locale ? ` · ${r.locale}` : ''}</dd></div>
+                    </dl>
+                    {r.message && (
+                      <p className="mt-2 whitespace-pre-line text-sm text-zinc-700 dark:text-zinc-300">
+                        {r.message}
+                      </p>
+                    )}
+                  </div>
+                  <form action={markRequestHandled}>
+                    <input type="hidden" name="id" value={r.id} />
+                    <SubmitButton
+                      pendingLabel="Saving…"
+                      className="rounded-full border border-zinc-300 px-4 py-1.5 text-sm font-medium transition hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                    >
+                      Mark handled
+                    </SubmitButton>
+                  </form>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        {handledRequests.length > 0 && (
+          <details className="mt-3 text-sm text-zinc-500">
+            <summary className="cursor-pointer">
+              {handledRequests.length} handled
+            </summary>
+            <ul className="mt-2 space-y-1">
+              {handledRequests.map((r) => (
+                <li key={r.id}>
+                  {r.name} · {r.package_title} ·{' '}
+                  {new Date(r.created_at).toLocaleDateString('en-CA', { timeZone: 'Asia/Shanghai' })}
+                </li>
+              ))}
+            </ul>
+          </details>
         )}
       </section>
 

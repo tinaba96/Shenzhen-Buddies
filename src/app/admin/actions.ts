@@ -10,6 +10,7 @@ import { resolveBookingById } from '@/lib/bookings'
 import { isAdminEmail, siteUrl } from '@/lib/config'
 import { sendEmail } from '@/lib/email'
 import { notifyGuide } from '@/lib/notify'
+import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 async function requireAdmin() {
@@ -105,4 +106,20 @@ export async function sendTestEmail() {
     guide.sent ? `Guide: sent to ${guide.to}` : `Guide: NOT sent — ${guide.reason}`,
   ]
   redirect(`/admin?emailtest=${encodeURIComponent(parts.join(' · '))}`)
+}
+
+// Guest tour requests (tour_requests) have no approve/decline: the guide
+// settles things in chat. "Handled" just clears it from the open list.
+export async function markRequestHandled(formData: FormData) {
+  await requireAdmin()
+  const id = String(formData.get('id') ?? '')
+  if (!id) fail('Missing request id')
+  const admin = createSupabaseAdminClient()
+  const { error } = await admin
+    .from('tour_requests')
+    .update({ status: 'handled' })
+    .eq('id', id)
+  if (error) fail(error.message)
+  revalidatePath('/admin')
+  redirect('/admin?handled=1')
 }

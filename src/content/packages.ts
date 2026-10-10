@@ -17,6 +17,7 @@
 import {
   amountCentsForHours,
   CURRENCY,
+  GUEST_REQUESTS,
   MAX_BOOKING_HOURS,
   MIN_BOOKING_HOURS,
 } from '@/lib/booking'
@@ -840,7 +841,10 @@ export function getPackage(slug: string): TourPackage | undefined {
 // ?package= and pre-fills the note with it, so the guide sees which experience
 // was booked without the bookings table needing a new column.
 export function bookHref(pkg: TourPackage): string {
-  return `/guide?package=${pkg.slug}`
+  // While guest requests are on, the no-account form comes first.
+  return GUEST_REQUESTS
+    ? `/book?package=${pkg.slug}`
+    : `/guide?package=${pkg.slug}`
 }
 
 // The line dropped into the booking note. Kept here so the card, the detail

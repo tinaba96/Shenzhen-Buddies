@@ -17,7 +17,7 @@ import {
 import { localizedPackage, localizedPackages } from '@/content/packages-i18n'
 import { getPublishedPost } from '@/content/posts'
 import { getI18n } from '@/i18n/server'
-import { FREE_TOURS } from '@/lib/booking'
+import { FREE_TOURS, GUEST_REQUESTS } from '@/lib/booking'
 import { DEFAULT_OG_IMAGE, siteUrl } from '@/lib/config'
 
 type Props = { params: Promise<{ slug: string }> }
@@ -313,9 +313,11 @@ export default async function TourDetailPage({ params }: Props) {
               {t.tours.detail.bookCta}
             </Link>
             <p className="mt-3 text-center text-xs leading-relaxed text-zinc-500">
-              {pkg.hours
-                ? t.tours.detail.bookNoteFixed.replace('{n}', String(pkg.hours))
-                : t.tours.detail.bookNote}
+              {GUEST_REQUESTS
+                ? t.tours.detail.bookNoteGuest
+                : pkg.hours
+                  ? t.tours.detail.bookNoteFixed.replace('{n}', String(pkg.hours))
+                  : t.tours.detail.bookNote}
             </p>
             <p className="mt-2 text-center text-xs leading-relaxed text-zinc-500">
               {t.tours.detail.priceNote}

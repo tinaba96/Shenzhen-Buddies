@@ -16,6 +16,7 @@ import {
   formatHourRange,
   formatMoney,
   FREE_TOURS,
+  GUEST_REQUESTS,
   hoursUntilTourStart,
   HOURLY_RATE_CENTS,
   isHoldExpired,
@@ -755,6 +756,11 @@ export default async function GuidePage({ searchParams }: Props) {
                     <AnonBookingCta
                       nextPath={bookingNext}
                       firstName={firstName}
+                      guestHref={
+                        GUEST_REQUESTS
+                          ? `/book${selectedPackage ? `?package=${selectedPackage.slug}` : ''}`
+                          : null
+                      }
                     />
                   ) : (
                   <form action={requestBooking} className="mt-4 space-y-4">
@@ -1023,16 +1029,36 @@ export default async function GuidePage({ searchParams }: Props) {
 function AnonBookingCta({
   nextPath,
   firstName,
+  guestHref,
 }: {
   nextPath: string
   firstName: string
+  // While guest requests are on: the no-account form, offered first.
+  guestHref: string | null
 }) {
   const next = encodeURIComponent(nextPath)
   return (
     <div className="mt-4 space-y-3">
+      {guestHref && (
+        <>
+          <Link
+            href={guestHref}
+            className="block w-full rounded-full bg-zinc-900 px-4 py-3 text-center text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+          >
+            Request without an account
+          </Link>
+          <p className="text-center text-xs text-zinc-500">
+            Leave your WhatsApp, WeChat or email and {firstName} will message you to set the time. Or, to pick an exact slot now:
+          </p>
+        </>
+      )}
       <Link
         href={`/signup?next=${next}`}
-        className="block w-full rounded-full bg-zinc-900 px-4 py-3 text-center text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+        className={
+          guestHref
+            ? 'block w-full rounded-full border border-zinc-300 px-4 py-3 text-center text-sm font-medium transition hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800'
+            : 'block w-full rounded-full bg-zinc-900 px-4 py-3 text-center text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200'
+        }
       >
         Sign up to book this day
       </Link>
