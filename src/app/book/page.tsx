@@ -58,6 +58,8 @@ export default async function BookPage({ searchParams }: Props) {
   const focus = focusFor(pkg.photo)
   const lengths = pkg.hours ? [pkg.hours] : FREE_TOUR_LENGTHS
   const defaultLength = pkg.hours ?? DEFAULT_FREE_TOUR_LENGTH
+  // The account route, for people who want an exact slot and in-site chat.
+  const accountNext = encodeURIComponent(`/guide?package=${pkg.slug}`)
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
@@ -120,6 +122,17 @@ export default async function BookPage({ searchParams }: Props) {
                   labels={r}
                 />
               </div>
+              <p className="mt-8 border-t border-zinc-200 pt-6 text-sm text-zinc-500 dark:border-zinc-800">
+                {r.accountPrefix}
+                <Link href={`/login?next=${accountNext}`} className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300">
+                  {r.accountLogin}
+                </Link>
+                {r.accountOr}
+                <Link href={`/signup?next=${accountNext}`} className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300">
+                  {r.accountSignup}
+                </Link>
+                {r.accountSuffix}
+              </p>
             </>
           )}
         </div>

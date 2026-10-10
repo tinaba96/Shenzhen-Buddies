@@ -292,6 +292,11 @@ export const zhHans: Dictionary = {
     thanksFaster: '想更快得到回复？直接联系我们：',
     thanksBack: '返回体验页面',
     thanksMore: '所有体验',
+    accountPrefix: '想用账号？',
+    accountLogin: '登录',
+    accountOr: '或',
+    accountSignup: '注册',
+    accountSuffix: '后可以直接选定具体时间，并在网站内给你的伙伴发消息。',
   },
 
   partner: {

@@ -301,6 +301,11 @@ export const zhHant: Dictionary = {
     thanksFaster: '想更快得到回覆？直接聯絡我們：',
     thanksBack: '返回體驗頁面',
     thanksMore: '所有體驗',
+    accountPrefix: '想用帳號？',
+    accountLogin: '登入',
+    accountOr: '或',
+    accountSignup: '註冊',
+    accountSuffix: '後可以直接選定具體時間，並在網站內與你的夥伴傳訊息。',
   },
 
   partner: {

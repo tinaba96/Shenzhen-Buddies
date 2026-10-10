@@ -314,6 +314,12 @@ export const en = {
     thanksFaster: 'Want a faster reply? Message us directly:',
     thanksBack: 'Back to the experience',
     thanksMore: 'All experiences',
+    // Soft mention of the account route — what it offers, no "easier" claim.
+    accountPrefix: 'Prefer to use an account? ',
+    accountLogin: 'Log in',
+    accountOr: ' or ',
+    accountSignup: 'sign up',
+    accountSuffix: ' to pick an exact time and message your buddy here on the site.',
   },
 
   partner: {

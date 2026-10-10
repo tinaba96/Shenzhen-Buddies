@@ -292,6 +292,11 @@ export const ja: Dictionary = {
     thanksFaster: 'お急ぎの場合は直接ご連絡ください：',
     thanksBack: '体験ページに戻る',
     thanksMore: 'すべての体験',
+    accountPrefix: 'アカウントを使う場合は、',
+    accountLogin: 'ログイン',
+    accountOr: 'または',
+    accountSignup: '新規登録',
+    accountSuffix: 'すると、正確な時間を指定したり、サイト内でバディとメッセージをやり取りしたりできます。',
   },
 
   partner: {
