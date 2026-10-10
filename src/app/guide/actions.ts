@@ -164,6 +164,11 @@ export async function requestBooking(formData: FormData) {
   if (day < todayInShenzhen()) {
     fail('That day has already passed — pick another one.')
   }
+  // Free tours ask for a review in return; the checkbox is required in the
+  // form, this catches a request sent without it.
+  if (FREE_TOURS && formData.get('review_pledge') !== 'yes') {
+    fail('Please tick the box about leaving a review.', day)
+  }
 
   const startHour = Number(formData.get('start_hour'))
   const duration = Number(formData.get('duration'))

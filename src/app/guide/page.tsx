@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
 import { BookingFields } from '@/components/BookingFields'
 import { FreeBookingFields } from '@/components/FreeBookingFields'
+import { ReviewPledge } from '@/components/GuestRequestForm'
 import { StarRating } from '@/components/StarRating'
 import { SubmitButton } from '@/components/SubmitButton'
 import { avatarPublicUrl } from '@/lib/avatars'
@@ -836,6 +837,13 @@ export default async function GuidePage({ searchParams }: Props) {
                         Read the full policy
                       </Link>
                     </div>
+
+                    {FREE_TOURS && (
+                      <ReviewPledge
+                        note={i18n.request.pledgeNote}
+                        check={i18n.request.pledgeCheck}
+                      />
+                    )}
 
                     <SubmitButton
                       pendingLabel={

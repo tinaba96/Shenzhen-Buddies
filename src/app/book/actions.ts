@@ -4,18 +4,18 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { getPackage } from '@/content/packages'
 import { getI18n } from '@/i18n/server'
-import { FREE_TOUR_LENGTHS, GUEST_REQUESTS } from '@/lib/booking'
+import { FREE_TOUR_LENGTHS, FREE_TOURS, GUEST_REQUESTS } from '@/lib/booking'
 import { adminEmails, siteUrl } from '@/lib/config'
 import { sendEmail } from '@/lib/email'
 import { describeGuideNotify, notifyGuide } from '@/lib/notify'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 
 export type RequestFormState = {
-  error?: 'package' | 'name' | 'contact' | 'email' | 'hours' | 'long' | 'generic'
+  error?: 'package' | 'name' | 'contact' | 'email' | 'hours' | 'long' | 'pledge' | 'generic'
   // What they typed, echoed back on an error. React resets an uncontrolled
   // form after every action, so without this a typo in the email would
   // wipe the whole form.
-  values?: Partial<Record<keyof typeof MAX, string>> & { hours?: string }
+  values?: Partial<Record<keyof typeof MAX, string>> & { hours?: string; review_pledge?: string }
 }
 
 const MAX = {
@@ -62,6 +62,7 @@ export async function submitTourRequest(
     preferred_dates: field(formData, 'preferred_dates'),
     message: String(formData.get('message') ?? '').trim(),
     hours: String(formData.get('hours') ?? ''),
+    review_pledge: String(formData.get('review_pledge') ?? ''),
   }
   const fail = (error: NonNullable<RequestFormState['error']>): RequestFormState => ({ error, values })
 
@@ -86,6 +87,9 @@ export async function submitTourRequest(
   const allowed = pkg.hours ? [pkg.hours] : FREE_TOUR_LENGTHS
   const hours = Number(formData.get('hours'))
   if (!Number.isInteger(hours) || !allowed.includes(hours)) return fail('hours')
+  // Free tours ask for a review in return (the checkbox is also required
+  // in the browser; this catches a request sent without the form).
+  if (FREE_TOURS && values.review_pledge !== 'yes') return fail('pledge')
 
   const { locale } = await getI18n()
   const h = await headers()
@@ -140,6 +144,7 @@ export async function submitTourRequest(
     `Name: ${name}`,
     ...contactLines,
     `Language they used: ${locale}`,
+    ...(FREE_TOURS ? ['Agreed to leave a review after the tour: yes'] : []),
     '',
     'Message:',
     message || '(none)',

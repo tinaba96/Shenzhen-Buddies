@@ -26,6 +26,8 @@ type Labels = {
   messagePlaceholder: string
   submit: string
   sending: string
+  pledgeNote: string
+  pledgeCheck: string
   termsPrefix: string
   termsLink: string
   termsAnd: string
@@ -44,11 +46,14 @@ export function GuestRequestForm({
   packageSlug,
   lengths,
   defaultLength,
+  askReview,
   labels: l,
 }: {
   packageSlug: string
   lengths: number[]
   defaultLength: number
+  // Free tours only: the review pledge checkbox above the submit button.
+  askReview: boolean
   labels: Labels
 }) {
   const [state, formAction, pending] = useActionState<RequestFormState, FormData>(
@@ -137,6 +142,8 @@ export function GuestRequestForm({
         <textarea name="message" defaultValue={v.message ?? ''} rows={4} maxLength={500} placeholder={l.messagePlaceholder} className={input} />
       </label>
 
+      {askReview && <ReviewPledge note={l.pledgeNote} check={l.pledgeCheck} defaultChecked={v.review_pledge === 'yes'} />}
+
       {error && (
         <p
           role="alert"
@@ -167,5 +174,35 @@ export function GuestRequestForm({
         </p>
       </div>
     </form>
+  )
+}
+
+// The review ask. Shared with the account booking form on /guide so both say
+// exactly the same thing. Required: the browser will not submit without it,
+// and both server actions check it again.
+export function ReviewPledge({
+  note,
+  check,
+  defaultChecked = false,
+}: {
+  note: string
+  check: string
+  defaultChecked?: boolean
+}) {
+  return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-900/60 dark:bg-amber-950/30">
+      <p className="leading-relaxed text-amber-900 dark:text-amber-200">{note}</p>
+      <label className="mt-3 flex cursor-pointer items-start gap-2.5 font-medium text-zinc-900 dark:text-white">
+        <input
+          type="checkbox"
+          name="review_pledge"
+          value="yes"
+          required
+          defaultChecked={defaultChecked}
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-zinc-400 accent-zinc-900 dark:accent-white"
+        />
+        {check}
+      </label>
+    </div>
   )
 }

@@ -295,6 +295,10 @@ export const en = {
     messagePlaceholder: 'Who is coming, what you are into, anything to avoid…',
     submit: 'Send request',
     sending: 'Sending…',
+    // Shown above the submit button on both booking forms while tours are
+    // free (FREE_TOURS). The checkbox is required; tips stay optional.
+    pledgeNote: 'Our tours are free, so a short, honest review after your tour means a lot to your buddy. All feedback is welcome, and tips are entirely optional.',
+    pledgeCheck: 'Happy to leave a review after my tour',
     termsPrefix: 'By sending, you agree to our ',
     termsLink: 'Terms',
     termsAnd: ' and ',
@@ -308,6 +312,7 @@ export const en = {
       hours: 'Please pick a tour length.',
       long: 'One of the fields is a bit too long.',
       generic: 'Something went wrong on our side. Please try again, or message us on WhatsApp.',
+      pledge: 'Please tick the box about leaving a review.',
     },
     thanksTitle: 'Request sent!',
     thanksBody: 'Your buddy will get back to you on the contact you gave, usually within a day, to set the day and time.',

@@ -6,7 +6,7 @@ import { focusFor } from '@/content/gallery'
 import { packageHoursLabel } from '@/content/packages'
 import { localizedPackage, localizedPackages } from '@/content/packages-i18n'
 import { getI18n } from '@/i18n/server'
-import { DEFAULT_FREE_TOUR_LENGTH, FREE_TOUR_LENGTHS, GUEST_REQUESTS } from '@/lib/booking'
+import { DEFAULT_FREE_TOUR_LENGTH, FREE_TOUR_LENGTHS, FREE_TOURS, GUEST_REQUESTS } from '@/lib/booking'
 import { WECHAT_ID, isWhatsAppConfigured } from '@/lib/config'
 
 type Props = { searchParams: Promise<{ package?: string; sent?: string }> }
@@ -119,6 +119,7 @@ export default async function BookPage({ searchParams }: Props) {
                   packageSlug={pkg.slug}
                   lengths={lengths}
                   defaultLength={defaultLength}
+                  askReview={FREE_TOURS}
                   labels={r}
                 />
               </div>
