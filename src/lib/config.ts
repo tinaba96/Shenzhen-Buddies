@@ -28,8 +28,8 @@ export function isAdminEmail(email: string | null | undefined): boolean {
 // Instagram is the only live traffic source this cycle, so the footer links
 // back to it and campaign links carry UTMs (see README, "Campaign links").
 // The footer link, the README UTM examples and the JSON-LD `sameAs` array
-// (PRD R5) all read from here. Note the trailing underscore.
-export const INSTAGRAM_HANDLE = 'shenzhen_buddies_'
+// (PRD R5) all read from here.
+export const INSTAGRAM_HANDLE = 'shenzhenbuddies'
 
 export function instagramUrl(): string {
   return `https://www.instagram.com/${INSTAGRAM_HANDLE}/`
