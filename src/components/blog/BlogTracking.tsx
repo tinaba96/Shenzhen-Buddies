@@ -75,12 +75,16 @@ export function BlogCta({
   href,
   label,
   sub,
+  button,
 }: {
   slug: string
   placement: 'inline' | 'end'
   href: string
   label: string
   sub?: string
+  // The end card's button text, already translated by the server page. Without
+  // it the button would repeat the heading word for word.
+  button?: { label: string }
 }) {
   const onClick = () =>
     track('content_cta_click', { surface: 'blog', placement, slug, target: href })
@@ -101,7 +105,7 @@ export function BlogCta({
           onClick={onClick}
           className="mt-7 inline-flex items-center gap-2 rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-black/10 transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
-          {label}
+          {button?.label ?? label}
           <span aria-hidden>→</span>
         </Link>
       </section>

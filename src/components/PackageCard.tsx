@@ -7,9 +7,8 @@ import {
   type PackageAccent,
   type TourPackage,
 } from '@/content/packages'
-import { localizedCn } from '@/content/packages-i18n'
 import type { Dictionary } from '@/i18n'
-import type { Locale } from '@/i18n/config'
+import { LOCALE_META, type Locale } from '@/i18n/config'
 
 // Per-package accent colours.
 //
@@ -62,7 +61,9 @@ const ACCENT: Record<
 type Props = {
   pkg: TourPackage
   t: Dictionary
-  // For the Chinese place name, which follows the reader's script.
+  // The Chinese place name on the photo is for English readers — the name to
+  // show a taxi driver. Chinese and Japanese titles already say it, in their
+  // own script, so on those pages the badge would only repeat the title.
   locale: Locale
   price: string
   // 'featured' is the wide two-column treatment used once per page. 'standard'
@@ -114,9 +115,11 @@ export function PackageCard({
                 {featuredLabel}
               </span>
             )}
-            <span className="absolute bottom-5 left-5 text-3xl font-semibold text-white drop-shadow-lg md:text-4xl">
-              {localizedCn(pkg, locale)}
-            </span>
+            {locale === 'en' && (
+              <span className="absolute bottom-5 left-5 text-3xl font-semibold text-white drop-shadow-lg md:text-4xl">
+                {pkg.cn}
+              </span>
+            )}
           </div>
 
           <div className="flex flex-col p-7 sm:p-9">
@@ -166,7 +169,9 @@ export function PackageCard({
             <div className="mt-auto flex flex-wrap items-center justify-between gap-4 pt-7">
               <div>
                 <p className="text-2xl font-semibold tracking-tight">{price}</p>
-                <p className="text-xs text-zinc-500">{t.common.perPerson}</p>
+                {price !== t.common.free && (
+                  <p className="text-xs text-zinc-500">{t.common.perPerson}</p>
+                )}
               </div>
               <Link
                 href={href}
@@ -203,9 +208,11 @@ export function PackageCard({
           className={`absolute inset-0 bg-gradient-to-t ${accent.wash} via-black/10 to-transparent`}
         />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/65 to-transparent" />
-        <span className="absolute bottom-3 left-4 text-2xl font-semibold text-white drop-shadow-lg">
-          {localizedCn(pkg, locale)}
-        </span>
+        {locale === 'en' && (
+          <span className="absolute bottom-3 left-4 text-2xl font-semibold text-white drop-shadow-lg">
+            {pkg.cn}
+          </span>
+        )}
         <span
           className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider shadow-sm ${accent.chip}`}
         >
@@ -226,9 +233,9 @@ export function PackageCard({
         <div className="mt-5 flex items-center gap-2 text-[11px] text-zinc-500">
           <ClockIcon />
           <span>{packageHoursLabel(pkg, t.common)}</span>
-          <span aria-hidden>·</span>
+          <span aria-hidden>{LOCALE_META[locale].sep.trim()}</span>
           <span>{t.common.oneOnOne}</span>
-          <span aria-hidden>·</span>
+          <span aria-hidden>{LOCALE_META[locale].sep.trim()}</span>
           <span>{pkg.district}</span>
         </div>
 

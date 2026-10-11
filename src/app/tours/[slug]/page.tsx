@@ -37,7 +37,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const { locale } = await getI18n()
+  const { locale, meta } = await getI18n()
   const pkg = localizedPackage(slug, locale)
   if (!pkg) return {}
 
@@ -53,6 +53,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: pkg.tagline,
     alternates: { canonical: `/tours/${pkg.slug}` },
     openGraph: {
+      locale: meta.ogLocale,
       title,
       description: pkg.tagline,
       url: `/tours/${pkg.slug}`,
@@ -316,7 +317,9 @@ export default async function TourDetailPage({ params }: Props) {
               {t.tours.detail.price}
             </p>
             <p className="mt-1 text-4xl font-semibold tracking-tight">{price}</p>
-            <p className="mt-1 text-xs text-zinc-500">{t.common.perPerson}</p>
+            {!FREE_TOURS && (
+              <p className="mt-1 text-xs text-zinc-500">{t.common.perPerson}</p>
+            )}
 
             <dl className="mt-6 space-y-3 border-t border-zinc-100 pt-5 text-sm dark:border-zinc-800">
               <Row label={t.tours.detail.duration}>

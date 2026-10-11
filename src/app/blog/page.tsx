@@ -15,7 +15,7 @@ import {
   resolvePillarFilter,
 } from '@/content/posts'
 import { fill, type Dictionary } from '@/i18n'
-import type { Locale } from '@/i18n/config'
+import { LOCALE_META, type Locale } from '@/i18n/config'
 import { getI18n } from '@/i18n/server'
 import { DEFAULT_OG_IMAGE, siteUrl } from '@/lib/config'
 
@@ -27,7 +27,7 @@ const DESCRIPTION =
   'Border crossings, payments, neighbourhoods and the people who live here. The things worth knowing before you arrive.'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getI18n()
+  const { meta, t } = await getI18n()
   const seo = t.seo.blog
   return {
     title: seo.title,
@@ -37,6 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: '/blog' },
     openGraph: {
       type: 'website',
+      locale: meta.ogLocale,
       title: seo.ogTitle,
       description: seo.description,
       url: '/blog',
@@ -217,17 +218,18 @@ function formatDate(iso: string, dateLocale: string): string {
   })
 }
 
-function CardMeta({ post, t, dateLocale }: { post: Post } & CardCopy) {
+function CardMeta({ post, t, dateLocale, locale }: { post: Post } & CardCopy) {
+  const sep = LOCALE_META[locale].sep.trim()
   return (
     <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500">
       <span className="font-medium text-zinc-700 dark:text-zinc-300">
         {pillarLabel(post.pillar, t)}
       </span>
-      <span aria-hidden>·</span>
+      <span aria-hidden>{sep}</span>
       <time dateTime={post.publishedAt}>
         {formatDate(post.publishedAt, dateLocale)}
       </time>
-      <span aria-hidden>·</span>
+      <span aria-hidden>{sep}</span>
       <span>{fill(t.minRead, { n: readingTimeMinutes(post) })}</span>
     </p>
   )

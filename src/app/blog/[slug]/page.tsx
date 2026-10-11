@@ -38,6 +38,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const post = getPublishedPost((await params).slug)
   if (!post) return {}
+  // The article is English, but og:locale describes the page it is shared
+  // from, which follows the reader's language like every other page.
+  const { meta } = await getI18n()
 
   const title = post.seo?.title ?? post.title
   const description = post.seo?.description ?? post.excerpt
@@ -63,6 +66,7 @@ export async function generateMetadata({
     authors: [{ name: AUTHORS[post.author].name }],
     openGraph: {
       type: 'article',
+      locale: meta.ogLocale,
       title,
       description,
       url,
@@ -182,7 +186,7 @@ export default async function BlogPostPage({
               <time dateTime={post.publishedAt}>
                 {formatDate(post.publishedAt, dateLocale)}
               </time>
-              {' · '}
+              {meta.sep}
               {fill(t.blog.minRead, { n: readingTimeMinutes(post) })}
             </p>
           </div>
@@ -213,7 +217,11 @@ export default async function BlogPostPage({
         )}
 
         <div lang={articleLang}>
-          <Prose blocks={post.body} slug={post.slug} ctaHref={ctaHref} />
+          <Prose
+            blocks={post.body}
+            slug={post.slug}
+            ctaHref={ctaHref}
+          />
         </div>
 
         {post.faq && post.faq.length > 0 && (
@@ -292,6 +300,7 @@ export default async function BlogPostPage({
           href={ctaHref}
           label={t.blog.ctaLabel}
           sub={t.blog.ctaBody}
+          button={{ label: t.blog.ctaButton }}
         />
       </article>
     </main>

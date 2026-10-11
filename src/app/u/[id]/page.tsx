@@ -5,6 +5,7 @@ import { StarRating, StarRatingInput } from '@/components/StarRating'
 import { SubmitButton } from '@/components/SubmitButton'
 import { fill, type Dictionary } from '@/i18n'
 import { getI18n } from '@/i18n/server'
+import { tagLabel } from '@/i18n/tags'
 import { avatarPublicUrl } from '@/lib/avatars'
 import {
   scoreMatch,
@@ -58,23 +59,13 @@ type ReviewerLite = {
 
 const REVIEW_VISIBILITY_THRESHOLD = 1
 
-// Same rule as /browse: translate the known language/hobby/trait tags, show
-// anything else (or an English entry) exactly as the profile has it.
-function tagLabel(names: Record<string, string>, value: string): string {
-  const key = value.trim().toLowerCase()
-  // Own properties only: a profile tag of "constructor" must not resolve to
-  // Object's constructor.
-  const label = Object.hasOwn(names, key) ? names[key] : undefined
-  return label && label.toLowerCase() !== key ? label : value
-}
-
 export default async function ProfileDetailPage({ params, searchParams }: Props) {
   const { id } = await params
   const { reviewed, error: queryError } = await searchParams
-  const { t, meta } = await getI18n()
+  const { locale, t, meta } = await getI18n()
   const c = t.buddy
   const reviewCountLabel = (n: number) =>
-    fill(n === 1 ? c.reviewCountOne : c.reviewCountOther, { n })
+    fill(n === 1 ? c.reviewCountOne : c.reviewCountOther, { n }, locale)
 
   const supabase = await createSupabaseServerClient()
   const {
@@ -165,7 +156,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
             avatarPublicUrl(profile.cover_path, profile.updated_at) ??
             DEFAULT_COVER
           }
-          alt={fill(c.coverAlt, { name: profile.display_name })}
+          alt={fill(c.coverAlt, { name: profile.display_name }, locale)}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-amber-500/20 via-rose-500/15 to-black/50" />
@@ -225,18 +216,20 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
               >
                 {profile.role === 'guide' ? c.roleGuide : c.roleTourist}
               </span>
-              {myProfile && !isSelf && <MatchBadge score={score} b={t.browse} />}
+              {myProfile && !isSelf && <MatchBadge score={score} b={t.browse} sep={meta.sep} />}
             </div>
-            <p className="mt-1 text-sm text-zinc-500">{profile.city}</p>
+            <p className="mt-1 text-sm text-zinc-500">{tagLabel(t.browse.cityNames, profile.city)}</p>
             {reviewCount > 0 && (
               <div className="mt-2 flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
                 <StarRating
                   value={avgStars}
                   size={16}
-                  label={fill(t.stars.outOf, { value: avgStars.toFixed(1) })}
+                  label={fill(t.stars.outOf, { value: avgStars.toFixed(1) }, locale)}
                 />
                 <span>
-                  {avgStars.toFixed(1)} · {reviewCountLabel(reviewCount)}
+                  {avgStars.toFixed(1)}
+                  {meta.sep}
+                  {reviewCountLabel(reviewCount)}
                 </span>
               </div>
             )}
@@ -287,7 +280,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
               href={`/signup?next=${encodeURIComponent(`/u/${id}`)}`}
               className="inline-block rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
-              {fill(c.signUpToMessage, { name: profile.display_name })}
+              {fill(c.signUpToMessage, { name: profile.display_name }, locale)}
             </Link>
           ) : isSelf ? (
             <Link
@@ -307,7 +300,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
                 pendingLabel={t.browse.opening}
                 className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
-                {fill(c.messageName, { name: profile.display_name })}
+                {fill(c.messageName, { name: profile.display_name }, locale)}
               </SubmitButton>
             </form>
           )}
@@ -322,10 +315,12 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
               <StarRating
                 value={avgStars}
                 size={14}
-                label={fill(t.stars.outOf, { value: avgStars.toFixed(1) })}
+                label={fill(t.stars.outOf, { value: avgStars.toFixed(1) }, locale)}
               />
               <span>
-                {avgStars.toFixed(1)} · {reviewCountLabel(reviewCount)}
+                {avgStars.toFixed(1)}
+                  {meta.sep}
+                  {reviewCountLabel(reviewCount)}
               </span>
             </div>
           )}
@@ -362,7 +357,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
                 rows={4}
                 maxLength={5000}
                 defaultValue={myReview?.body ?? ''}
-                placeholder={fill(c.commentPlaceholder, { name: profile.display_name })}
+                placeholder={fill(c.commentPlaceholder, { name: profile.display_name }, locale)}
                 className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
               />
             </label>
@@ -386,10 +381,10 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
             <p>
               {fill(reviewCount === 1 ? c.hiddenOne : c.hiddenOther, {
                 n: reviewCount,
-              })}
+              }, locale)}
             </p>
             <p className="mt-1 text-xs text-zinc-500">
-              {fill(c.hiddenNote, { n: REVIEW_VISIBILITY_THRESHOLD })}
+              {fill(c.hiddenNote, { n: REVIEW_VISIBILITY_THRESHOLD }, locale)}
             </p>
           </div>
         )}
@@ -426,7 +421,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
                         value={r.stars}
                         size={14}
                         className="mt-1"
-                        label={fill(t.stars.outOf, { value: r.stars.toFixed(1) })}
+                        label={fill(t.stars.outOf, { value: r.stars.toFixed(1) }, locale)}
                       />
                       {r.body && (
                         <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
@@ -449,9 +444,11 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
 function MatchBadge({
   score,
   b,
+  sep,
 }: {
   score: MatchScore
   b: Dictionary['browse']
+  sep: string
 }) {
   if (score.total <= 0) return null
   const shared =
@@ -464,7 +461,7 @@ function MatchBadge({
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
       <span aria-hidden>✦</span>
-      {bits.join(' · ') || b.badgeMatch}
+      {bits.join(sep) || b.badgeMatch}
     </span>
   )
 }

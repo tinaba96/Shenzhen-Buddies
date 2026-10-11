@@ -15,7 +15,7 @@ const SPLITWHOM_URL =
   'https://splitwhom.com/?utm_source=shenzhen-buddies&utm_medium=referral&utm_campaign=og_banner&utm_content=login'
 
 export default async function LoginPage({ searchParams }: Props) {
-  const [{ error, next }, { t }] = await Promise.all([searchParams, getI18n()])
+  const [{ error, next }, { t, locale }] = await Promise.all([searchParams, getI18n()])
   const errorText = authErrorText(error, t.auth.errors)
   // Set when the visitor was bounced here from a gated action (e.g. booking).
   const nextPath = safeNextPath(next)
@@ -85,7 +85,7 @@ export default async function LoginPage({ searchParams }: Props) {
           </SubmitButton>
 
           <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-            {t.auth.login.noAccount}{' '}
+            {t.auth.login.noAccount}{locale === 'en' ? ' ' : ''}
             <Link href={signupHref} className="font-medium underline">
               {t.auth.login.signupLink}
             </Link>
@@ -122,16 +122,6 @@ export default async function LoginPage({ searchParams }: Props) {
           shape="panel"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/30 via-rose-500/30 to-black/60" />
-        <div className="relative flex items-end p-12">
-          <blockquote className="max-w-md text-white drop-shadow">
-            <p className="text-2xl font-medium leading-snug">
-              {t.auth.login.quote}
-            </p>
-            <p className="mt-4 text-sm text-white/85">
-              {t.auth.login.quoteBy}
-            </p>
-          </blockquote>
-        </div>
       </aside>
     </main>
   )

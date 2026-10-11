@@ -88,7 +88,7 @@ export const dongmenOldDowntown: Post = {
     },
     {
       k: 'cta',
-      label: 'Walk Dongmen with someone who grew up eating here',
+      label: 'Walk Dongmen with someone who eats here',
       sub: 'A local buddy reads the boards, knows the queues, and keeps you moving toward the good stalls instead of the loud ones.',
     },
 
@@ -123,7 +123,7 @@ export const dongmenOldDowntown: Post = {
     {
       k: 'cta',
       label: 'Book the Dongmen Laojie walk',
-      sub: 'Two to three hours, one snack street at a time, with a buddy who knows which windows are worth the wait.',
+      sub: 'Two or three hours, one snack street at a time, with a buddy who knows which windows are worth the wait.',
     },
   ],
   faq: [
@@ -137,7 +137,7 @@ export const dongmenOldDowntown: Post = {
     },
     {
       q: 'Is Dongmen worth visiting?',
-      a: 'Yes — go hungry. It is the part of Shenzhen that predates the special economic zone, the street-snack grazing is the best in the city, and after a day or two of glass towers it is a welcome change of pace. Follow the queues of locals.',
+      a: 'Yes, if you go hungry. It is the part of Shenzhen that predates the special economic zone, it is where we go to graze on street snacks, and after a day or two of glass towers it feels like a different city. Follow the queues of locals.',
     },
     {
       q: 'How do I get to Dongmen?',

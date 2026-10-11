@@ -10,7 +10,8 @@ import { getI18n } from '@/i18n/server'
 // free. The VIP50 flow it replaced is in git history if paid tours return.
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = (await getI18n()).t.seo.welcome
+  const { meta, t } = await getI18n()
+  const seo = t.seo.welcome
   return {
     title: seo.title,
     description: seo.description,
@@ -19,6 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // metadata merges per key — so a page that omits this inherits the site's
     // generic title, description and an og:url pointing at the homepage.
     openGraph: {
+      locale: meta.ogLocale,
       title: seo.title,
       description: seo.description,
       url: '/welcome',

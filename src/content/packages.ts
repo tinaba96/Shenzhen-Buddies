@@ -149,7 +149,8 @@ export const packages: TourPackage[] = [
     tagline:
       "The world's largest electronics market, walked with someone who knows where to go.",
     summary:
-      'Huaqiangbei is Shenzhen’s legendary tech paradise, where thousands of shops sell everything from smart gadgets to robots, drones, and electronic parts. Walk through the crowded markets and discover the future of technology at your fingertips. Whether you love tech or just want a unique Shenzhen experience, this place is worth exploring.',
+      'Huaqiangbei is thousands of shops selling everything from smart gadgets to robots, drones and electronic parts, packed into building after building. It is crowded, loud and a lot to take in on your own. You don’t need to be into tech to enjoy it. Most people just want to see it once, and it helps to have someone who knows which floors to bother with.',
+    hoursRange: [2, 3],
     photo: '/gallery/huaqiangbei-electronic-world-night.webp',
     alt: 'The lit entrance of Huaqiang Electronic World at night, above the Huaqiangbei metro entrance',
     district: 'Futian',
@@ -157,107 +158,107 @@ export const packages: TourPackage[] = [
     meetingPoint:
       'Huaqiangbei metro station (Lines 2 and 7) — your buddy sends the exact exit the night before',
     itineraryTitle:
-      "Shenzhen Tech Discovery Walk: Explore the World's Largest Electronics Market with a Local",
+      "A walk through the world's largest electronics market",
     itineraries: [
       {
         hours: 2,
-        title: 'Shenzhen Huaqiangbei Tech Discovery Walk',
+        title: 'The highlights',
         beats: [
           {
             at: '0:00',
-            title: 'Meet & Shenzhen introduction',
-            body: "Meet your local guide and learn how a fishing village became one of the world's leading technology cities in just a few decades.",
+            title: 'Meet your buddy',
+            body: "Meet your buddy and get the short version of how a fishing village became one of the world's big technology cities in a few decades.",
           },
           {
             at: '0:20',
-            title: 'The future gadget hunt',
-            body: "Explore one of Huaqiangbei's most visitor-friendly electronics malls and discover AI gadgets, smart devices, robots, drones, and unusual inventions from Chinese startups.",
+            title: 'Gadget hunting',
+            body: "Start in one of the easier Huaqiangbei malls for visitors: AI gadgets, smart devices, robots, drones and odd inventions from Chinese startups.",
           },
           {
             at: '0:50',
-            title: "Shenzhen's hidden tech stories",
-            body: 'Hear surprising stories about products designed, prototyped, and sourced in Huaqiangbei before appearing around the world.',
+            title: "Where things get made",
+            body: 'Hear how products get designed, prototyped and sourced here before they turn up in shops around the world.',
           },
           {
             at: '1:15',
-            title: 'Hands-on gadget testing',
-            body: 'Try interesting gadgets, compare cool tech, and learn which products are genuinely innovative versus marketing hype.',
+            title: 'Try things out',
+            body: 'Pick things up, compare them, and find out which ones are actually new and which are just good marketing.',
           },
           {
             at: '1:40',
-            title: 'Futuristic street walk',
-            body: "Walk through the famous pedestrian street, take photos, and experience the energy that made Shenzhen China's innovation capital.",
+            title: 'The pedestrian street',
+            body: "Walk the main pedestrian street and take photos of the screens and the crowds.",
           },
           {
             at: '2:00',
             title: 'Tour ends',
-            body: 'Get local recommendations for food, nightlife, and other hidden places to explore in Shenzhen.',
+            body: "Get your buddy's picks for food, nightlife and where to go next in Shenzhen.",
           },
         ],
       },
       {
         hours: 3,
-        title: 'Shenzhen Huaqiangbei Tech & Culture Experience',
+        title: 'The highlights, plus the hidden floors',
         beats: [
           {
             at: '0:00',
-            title: "Welcome to China's Silicon Valley",
-            body: 'Introduction to Shenzhen, Huaqiangbei, and why tech enthusiasts from around the world visit this district.',
+            title: "Meet your buddy",
+            body: 'A quick introduction to Shenzhen and Huaqiangbei, and why people who love tech come here from all over the world.',
           },
           {
             at: '0:20',
-            title: "Explore the world's largest electronics market",
-            body: 'Discover giant electronics malls filled with gadgets, drones, wearables, and technology from every corner of the supply chain.',
+            title: "Into the malls",
+            body: 'Work through the giant electronics malls: gadgets, drones, wearables and parts from every step of the supply chain.',
           },
           {
             at: '1:00',
-            title: 'Gadget safari',
-            body: 'A fun challenge: find the most unusual, futuristic, or surprisingly useful gadget in the market. Great for photos and conversations.',
+            title: 'The gadget challenge',
+            body: 'A small game: find the strangest, most futuristic or most surprisingly useful gadget in the market. Good for photos, and for conversation.',
           },
           {
             at: '1:30',
-            title: 'Local drink break',
-            body: 'Grab a coffee, milk tea, or local drink while discussing Shenzhen life, startups, technology, and travel tips.',
+            title: 'Drink break',
+            body: 'Sit down with a coffee, a milk tea or something local, and talk about Shenzhen life, startups, tech and travel tips.',
           },
           {
             at: '1:50',
-            title: 'Hidden floors & tech culture',
-            body: 'Visit areas most tourists never find and learn how products move from idea to factory to global markets.',
+            title: 'The floors most people miss',
+            body: 'Go to the parts most tourists never find, and see how a product gets from idea to factory to shops around the world.',
           },
           {
             at: '2:30',
-            title: 'Future street photography walk',
-            body: 'Take photos among giant LED screens, modern architecture, and the lively pedestrian streets of Huaqiangbei.',
+            title: 'Photos on the street',
+            body: 'Take photos under the giant LED screens and along the busy pedestrian streets of Huaqiangbei.',
           },
           {
             at: '3:00',
             title: 'Tour ends',
-            body: 'Receive a personalized list of recommended restaurants, attractions, and Shenzhen neighborhoods to visit next.',
+            body: 'You leave with a list of restaurants, sights and neighborhoods to try next, picked for you.',
           },
         ],
       },
     ],
     includes: [
-      '2–3 hours one-on-one experience with a Shenzhen local',
+      '2–3 hours with a Shenzhen local, no group',
       'Real-time English–Mandarin translation in the mall and at the counter — prices, specs, bench tests',
       'Negotiating a better price when there is something you want to buy',
       'Digital payment checked before you need to buy anything',
-      'Insider knowledge of the culture, business and food',
+      "Your buddy's take on the culture, the business and the food",
     ],
     notIncluded: [
       "Anything you buy in the mall — you pay stalls directly, we don't profit from it",
       'Food, drinks and metro fare',
-      'Courier and shipping charges, etc.',
+      'Courier and shipping charges',
     ],
     goodFor: [
       '🏙️ First-time visitors to Shenzhen',
       '🤖 Technology enthusiasts',
-      "🔍 Curious explorers who want to see the world's largest electronics market",
+      "🔍 Anyone who wants to see the world's largest electronics market",
       '🚀 Startup founders, makers & hardware engineers',
       '🎥 Anyone who has watched a Huaqiangbei video and thought: "I want to see this place for myself."',
     ],
     insiderTip:
-      "Set up Alipay or WeChat Pay before arriving in China. Most vendors in Huaqiangbei prefer QR-code payments, and having your payment app ready will make shopping much easier. If you're planning to buy something, it's best to complete the purchase when you find it, as prices and availability can change quickly.",
+      "Set up Alipay or WeChat Pay before you arrive in China. Most sellers in Huaqiangbei would rather you scan a QR code than anything else. And if you see something you want, buy it then. Prices and stock change quickly, and it may not be there when you come back.",
     accent: 'signal',
     featured: true,
   },
@@ -266,9 +267,9 @@ export const packages: TourPackage[] = [
     title: 'Dongmen Laojie',
     cn: '东门老街',
     kicker: 'Food & night market',
-    tagline: "Where Shenzhen's past meets its vibrant nightlife.",
+    tagline: "The old downtown, after the grills come out.",
     summary:
-      "Dongmen Laojie is where old Shenzhen meets modern city life. Wander through lively streets filled with local snacks, hidden shops, and nonstop energy while discovering one of Shenzhen's oldest and most famous neighborhoods. Join to experience the authentic side of the city, taste local favorites, and explore Dongmen like a local.",
+      "Dongmen Laojie is the old downtown, one of the oldest and best-known neighborhoods in Shenzhen. It's a tangle of busy pedestrian streets full of snack stalls, small shops and noise. Come hungry, eat what looks good, and walk it with someone who knows their way around.",
     hoursRange: [2, 3],
     photo: '/gallery/dongmen-pagoda-street-night.webp',
     alt: 'The Dongmen pedestrian street at night, pagoda-roofed buildings lit above the crowd',
@@ -277,7 +278,7 @@ export const packages: TourPackage[] = [
     meetingPoint: 'Laojie station, on the Dongmen pedestrian street side',
     itineraryTitle: 'Dongmen Street Food & Night Market Walk',
     itinerarySubtitle:
-      'Experience old Shenzhen after dark — street food, hidden lanes, local culture, and the energy of Dongmen Laojie',
+      'Old Shenzhen after dark: street food, side lanes, and Dongmen Laojie at its busiest',
     itineraries: [
       {
         hours: 2,
@@ -286,27 +287,27 @@ export const packages: TourPackage[] = [
           {
             at: '0:00',
             title: "Welcome to Old Shenzhen",
-            body: "Meet your local guide and discover the district that existed long before Shenzhen's skyscrapers. Get a quick introduction before heading into the pedestrian streets.",
+            body: "Meet your buddy and hear about the part of town that was here long before Shenzhen's skyscrapers. A quick introduction, then into the pedestrian streets.",
           },
           {
             at: '0:20',
-            title: "Explore the Main Street",
-            body: "Walk through the lively heart of Dongmen, surrounded by shops, traditional-style buildings, neon lights, and the energy that makes this one of Shenzhen's most famous districts.",
+            title: "The Main Street",
+            body: "Walk the middle of Dongmen: shops, traditional-style buildings, neon, and a lot of people. This is the part everyone in Shenzhen knows.",
           },
           {
             at: '0:50',
-            title: "Street Food Discovery",
-            body: "Browse the food streets and learn about local favorites. Feel free to stop and buy snacks that catch your eye, from grilled skewers to sweet treats and local specialties.",
+            title: "Street Food",
+            body: "Work through the food streets and hear what locals actually eat. Stop and buy whatever catches your eye: grilled skewers, sweets, local specialties.",
           },
           {
             at: '1:20',
-            title: "Hidden Lanes & Local Life",
-            body: "Step away from the busiest streets and explore smaller alleys filled with local shops, old market culture, and unexpected finds.",
+            title: "Side Lanes & Local Life",
+            body: "Step off the busy streets into the smaller alleys: local shops, the old market trades, and things you didn't expect.",
           },
           {
             at: '1:45',
-            title: "Night Views & Photos",
-            body: "Finish with a relaxed walk through the brightest parts of Dongmen, taking photos and enjoying the atmosphere before the tour ends.",
+            title: "Lights & Photos",
+            body: "An easy last loop through the brightest part of Dongmen, stopping for photos on the way.",
           },
           {
             at: '2:00',
@@ -322,32 +323,32 @@ export const packages: TourPackage[] = [
           {
             at: '0:00',
             title: "Welcome to Dongmen",
-            body: "Meet your local guide and hear the story of Shenzhen's oldest commercial district before beginning the walk.",
+            body: "Meet your buddy and hear how Shenzhen's oldest commercial district got started, then set off.",
           },
           {
             at: '0:20',
             title: "The Main Pedestrian Street",
-            body: "Explore the busiest part of Dongmen, packed with shops, street performers, local life, and classic Shenzhen energy.",
+            body: "The busiest part of Dongmen: shops, street performers and crowds.",
           },
           {
             at: '0:50',
-            title: "Street Food Adventure",
-            body: "Discover food streets filled with local snacks and desserts. Buy and try anything that looks interesting at your own pace.",
+            title: "Street Food",
+            body: "The food streets, full of local snacks and desserts. Buy and try whatever looks good, at your own pace.",
           },
           {
             at: '1:30',
-            title: "Hidden Corners & Shopping Streets",
-            body: "Wander through side streets, local markets, and lesser-known areas that many visitors miss. Great for people-watching and photos.",
+            title: "Side Streets & Markets",
+            body: "Wander the side streets and local markets that a lot of visitors miss. Good for people-watching and photos.",
           },
           {
             at: '2:00',
             title: "Optional Arcade Stop",
-            body: "If you'd like, we can visit a local arcade to try claw machines, rhythm games, racing games, or other popular favorites. Game credits are optional and paid directly by you.",
+            body: "If you're up for it, we stop at a local arcade for claw machines, rhythm games or racing games. Game credits are optional, and you pay for them yourself.",
           },
           {
             at: '2:30',
             title: "Night Lights & Photo Walk",
-            body: "Enjoy the evening atmosphere, neon signs, traditional-style architecture, and some of the best photo spots in Dongmen.",
+            body: "Neon signs, lit-up traditional rooflines, and some of the best photo spots in Dongmen.",
           },
           {
             at: '3:00',
@@ -374,11 +375,11 @@ export const packages: TourPackage[] = [
       "🍢 Street food lovers",
       "🌏 Travelers who don't speak Mandarin",
       "🚶 People who enjoy walking and exploring local neighborhoods",
-      "📸 Anyone looking to experience Shenzhen after dark",
+      "📸 Anyone who wants to see Shenzhen after dark",
     ],
     insiderTipLead: "Dongmen is best enjoyed slowly.",
     insiderTip:
-      "Save room for later stops, because some of the most popular snacks and dessert stalls are hidden deeper inside the neighborhood. The fun isn't just eating—it's wandering, discovering, and seeing where the night takes you.",
+      "Save room. Some of the most popular snack and dessert stalls are further in, away from the main street. Half the fun is just wandering and seeing where you end up.",
     accent: 'ember',
   },
   {
@@ -387,10 +388,10 @@ export const packages: TourPackage[] = [
     cn: '福田CBD',
     kicker: 'Views & city lights',
     tagline:
-      'Futuristic skylines, glowing landmarks, and night shows light up the city after dark.',
+      'The business district after dark, when the towers light up.',
     hoursRange: [2, 3],
     summary:
-      "Futian is the modern heart of Shenzhen. As the sun goes down, the business district transforms into a landscape of glowing towers, giant LED displays, public art, and busy city streets.\n\nSee Shenzhen after dark through illuminated skyscrapers, futuristic architecture, lively plazas, and the city's most famous skyline views.",
+      "Futian is Shenzhen's business district, and it looks best at night. Once the sun goes down the towers light up, the giant LED screens come on, and the streets and plazas fill with people.\n\nThis walk takes you through it after dark: the lit-up skyscrapers, the public art, and the skyline views the city is known for.",
     photo: '/gallery/futian-cbd-street-night.webp',
     alt: 'A Futian CBD street at night, towers and a mall facade lit red and blue above a glass skybridge',
     district: 'Futian',
@@ -405,32 +406,32 @@ export const packages: TourPackage[] = [
           {
             at: '0:00',
             title: "Meet in Futian CBD",
-            body: "Meet near Civic Center or Shenzhen Library. Quick introduction and overview of the route before heading into the city lights.",
+            body: "Meet near Civic Center or Shenzhen Library. A quick introduction and a look at the route, then out into the lights.",
           },
           {
             at: '0:20',
             title: "The skyline walk begins",
-            body: "Walk through Shenzhen's modern downtown, passing some of the city's most recognizable skyscrapers, plazas, and public spaces.",
+            body: "Walk through the new downtown, past some of the best-known towers, plazas and public spaces in the city.",
           },
           {
             at: '0:50',
             title: "Best photo spots",
-            body: "Stop at some of Futian's most photogenic locations for skyline views, architecture shots, and evening city-light photos.",
+            body: "Stop at the best places in Futian for skyline views, architecture shots and night photos.",
           },
           {
             at: '1:20',
             title: "The heart of Shenzhen",
-            body: "Walk along the city's central axis while learning how Shenzhen grew from a small fishing village into one of the world's fastest-growing cities.",
+            body: "Walk the city's central axis and hear how Shenzhen went from a small fishing village to one of the fastest-growing cities in the world.",
           },
           {
             at: '1:40',
             title: "City lights and local stories",
-            body: "Explore the streets after dark, see giant LED displays and modern architecture, and hear stories about life in Shenzhen today.",
+            body: "Back into the streets for the giant LED screens and the lit-up buildings, and stories about what life in Shenzhen is like now.",
           },
           {
             at: '2:00',
             title: "Tour ends",
-            body: "Finish in the heart of Futian CBD with recommendations for dinner, shopping, nightlife, or places to continue exploring on your own.",
+            body: "You finish in the middle of Futian CBD, with ideas for dinner, shopping, bars, or where to go next on your own.",
           },
         ],
       },
@@ -441,50 +442,50 @@ export const packages: TourPackage[] = [
           {
             at: '0:00',
             title: "Meet in Futian CBD",
-            body: "Meet near Civic Center or Shenzhen Library. Quick introduction and overview of the route before heading into the city lights.",
+            body: "Meet near Civic Center or Shenzhen Library. A quick introduction and a look at the route, then out into the lights.",
           },
           {
             at: '0:20',
             title: "The skyline walk begins",
-            body: "Walk through Shenzhen's modern downtown, passing some of the city's most recognizable skyscrapers, plazas, and public spaces.",
+            body: "Walk through the new downtown, past some of the best-known towers, plazas and public spaces in the city.",
           },
           {
             at: '0:50',
             title: "Best photo spots",
-            body: "Stop at some of Futian's most photogenic locations for skyline views, architecture shots, and evening city-light photos.",
+            body: "Stop at the best places in Futian for skyline views, architecture shots and night photos.",
           },
           {
             at: '1:20',
             title: "The heart of Shenzhen",
-            body: "Walk along the city's central axis while learning how Shenzhen grew from a small fishing village into one of the world's fastest-growing cities.",
+            body: "Walk the city's central axis and hear how Shenzhen went from a small fishing village to one of the fastest-growing cities in the world.",
           },
           {
             at: '1:50',
             title: "Toward Coco Park",
-            body: "Leave the business district behind and walk toward Coco Park, one of Shenzhen's most popular evening destinations.",
+            body: "Leave the business district and walk over to Coco Park, where a lot of Shenzhen goes in the evening.",
           },
           {
             at: '2:10',
             title: "Coco Park at night",
-            body: "Explore the outdoor streets, cafés, restaurants, bars, and lively atmosphere. Plenty of opportunities for photos and people-watching.",
+            body: "Outdoor streets, cafés, restaurants and bars. Plenty to photograph, and good people-watching.",
           },
           {
             at: '2:40',
             title: "A relaxed finish",
-            body: "Optional stop for a coffee, dessert, drink, or snack if you'd like to buy something. Otherwise, enjoy the atmosphere and local recommendations before the tour ends.",
+            body: "Stop for a coffee, a dessert, a drink or a snack if you want one. If not, just hang around and get some recommendations before the tour ends.",
           },
           {
             at: '3:00',
             title: "Tour ends",
-            body: "Finish at Coco Park, with plenty of options to continue your evening in Shenzhen.",
+            body: "You finish at Coco Park, with plenty of places to carry on the evening.",
           },
         ],
       },
     ],
     includes: [
-      "2–3 hours one-on-one with a local guide",
+      "2–3 hours with a local guide, no group",
       "Walking route through Futian CBD's best night views",
-      "Local insights about Shenzhen and its development",
+      "Local stories about how Shenzhen grew",
       "Photo stops at major landmarks",
       "Help with directions, transportation, and local recommendations",
     ],
@@ -502,7 +503,7 @@ export const packages: TourPackage[] = [
       "✨ Anyone curious about modern Shenzhen",
     ],
     insiderTip:
-      'The best part of Futian happens after sunset. Buildings, plazas, and public spaces come alive with lights, making the evening far more impressive than the daytime view.',
+      'Futian is at its best after sunset. The buildings, plazas and public spaces light up, and it looks far better than it does in the daytime.',
     accent: 'violet',
   },
   {
@@ -511,9 +512,9 @@ export const packages: TourPackage[] = [
     cn: '人才公园',
     kicker: 'Night walk & skyline',
     tagline:
-      'A stroll into the future, with stunning night views of Shenzhen’s entrepreneurial skyline.',
+      'A lakeside walk with the Nanshan skyline lighting up across the water.',
     summary:
-      "Talent Park is where Shenzhen slows down for a moment. Lakes, waterfront paths, skyline views, and some of the city's best sunset spots come together in one easy walk. This experience is less about rushing between attractions and more about enjoying the views, taking photos, and seeing how nature and one of China's most futuristic skylines share the same space.",
+      "Talent Park is one of the calmer places in Shenzhen: lakes, waterfront paths, skyline views and some of the city's best sunset spots, all on one easy walk. There's no rushing between sights. It's mostly walking, looking and taking photos, with the park on one side of the water and the towers on the other.",
     photo: '/gallery/talent-park-skyline-night.webp',
     alt: 'The Nanshan skyline at night across the lake in Shenzhen Talent Park, with a footbridge lit bright blue along the water',
     district: 'Nanshan',
@@ -522,7 +523,7 @@ export const packages: TourPackage[] = [
     meetingPoint: 'Talent Park — the exact entrance is sent the day before',
     itineraryTitle: 'Shenzhen Night Skyline Walk at Talent Park',
     itinerarySubtitle:
-      "Explore one of Shenzhen's most vibrant waterfront destinations, where nature, innovation, and culture come together. Enjoy scenic walking trails, stunning city views, and inspiring spaces that celebrate the city's entrepreneurial spirit and talent.",
+      "A waterfront park the city built to celebrate its entrepreneurs and talent, with easy walking paths and big views of the skyline.",
     itineraryNote:
       'Times are measured from our meeting point. The route may vary slightly depending on weather, crowds, and sunset time.',
     hours: 2,
@@ -533,27 +534,27 @@ export const packages: TourPackage[] = [
           {
             at: '0:00',
             title: 'Meet at Talent Park',
-            body: "Meet your local guide and get a quick introduction to Shenzhen, Nanshan, and the skyline you'll be seeing throughout the walk.",
+            body: "Meet your buddy and get a quick introduction to Shenzhen, Nanshan, and the skyline you'll be looking at for the rest of the walk.",
           },
           {
             at: '0:20',
             title: 'The Lake & Skyline Walk',
-            body: 'Take an easy stroll around the lakeside paths while enjoying views of the Houhai skyline, Shenzhen Bay, and the famous Spring Bamboo tower.',
+            body: 'An easy walk on the lakeside paths, looking out at the Houhai skyline, Shenzhen Bay and the Spring Bamboo tower.',
           },
           {
             at: '0:50',
             title: 'Starlight Bridge',
-            body: "Visit one of the park's most iconic landmarks and take photos overlooking the lake and city skyline. The bridge becomes especially beautiful as the lights begin to appear.",
+            body: "The park's best-known landmark. Take photos over the lake and the skyline; it looks best just as the lights start coming on.",
           },
           {
             at: '1:15',
-            title: 'Hidden Corners & Local Stories',
-            body: "Explore quieter parts of the park while learning how Shenzhen grew from a small fishing town into one of the world's leading technology hubs.",
+            title: 'Quieter Corners & Local Stories',
+            body: "Walk the quieter parts of the park and hear how Shenzhen grew from a small fishing town into one of the world's big technology hubs.",
           },
           {
             at: '1:40',
             title: 'Sunset & Photo Stop',
-            body: "Relax by the waterfront and enjoy one of Shenzhen's best sunset views. Plenty of time for photos, skyline shots, and simply taking in the atmosphere.",
+            body: "Sit by the water for one of the best sunset views in Shenzhen. Plenty of time for photos, or for just watching.",
           },
           {
             at: '2:00',
@@ -566,7 +567,7 @@ export const packages: TourPackage[] = [
     includes: [
       '2 hours exploring Talent Park with a local',
       'Easy-paced lakeside and waterfront walk',
-      "Local stories about Shenzhen's growth and innovation",
+      "Local stories about how Shenzhen grew",
       'Recommendations for nearby food, cafés, and places to visit after the tour',
       "Help taking photos if you'd like some skyline shots",
     ],
@@ -580,11 +581,11 @@ export const packages: TourPackage[] = [
       '📸 Photography lovers',
       '🌅 People who enjoy sunsets and skyline views',
       '🚶 Travelers looking for a relaxed walk',
-      '🌏 Visitors who want to understand Shenzhen beyond shopping malls',
+      '🌏 Visitors who want to see more of Shenzhen than its shopping malls',
       '❤️ Couples, friends, solo travelers, and families',
     ],
     insiderTip:
-      'Come around sunset if possible. Talent Park is beautiful during the day, but the real magic happens when the skyline lights up, reflections appear on the lake, and the city transitions from daylight to night.',
+      'Come around sunset if you can. Talent Park is nice in the daytime, but it is better when the skyline lights up, the towers reflect in the lake, and day turns into night.',
     accent: 'jade',
   },
   {
@@ -593,9 +594,9 @@ export const packages: TourPackage[] = [
     cn: '海上世界',
     kicker: 'Waterfront & evening walk',
     tagline:
-      "A relaxed evening walk through Shekou's waterfront, city lights, and local landmarks.",
+      "An easy evening walk along the Shekou waterfront.",
     summary:
-      "Sea World is where Shenzhen slows down and enjoys the waterfront. Walk past the iconic Minghua ship, explore lively plazas, enjoy sea views, and experience the lights, fountains, and atmosphere that make Shekou one of the city's favorite evening destinations. A relaxed walk filled with great views, local stories, and photo opportunities.",
+      "Sea World is Shekou's waterfront, and one of the places Shenzhen goes in the evening. Walk past the Minghua ship, through the plazas and along the sea, with the lights and fountains on. It's an easy walk, with good views, local stories and plenty to photograph.",
     photo: '/gallery/sea-world-minghua-ship-night.webp',
     alt: 'The white Minghua ship lit up at night above the Sea World plaza in Shekou, with palm trees and people strolling in front',
     district: 'Nanshan / Shekou',
@@ -604,7 +605,7 @@ export const packages: TourPackage[] = [
     meetingPoint: 'Sea World station, Exit A',
     itineraryTitle: 'Sea World After Dark',
     itinerarySubtitle:
-      "Waterfront lights, sea breezes, and one of Shenzhen's most beautiful nights.",
+      "Lights on the water and a sea breeze.",
     itineraries: [
       {
         hours: 2,
@@ -617,22 +618,22 @@ export const packages: TourPackage[] = [
           {
             at: '0:20',
             title: "The Minghua Ship",
-            body: "Explore the famous Minghua ship and the heart of Sea World Plaza while learning how this area became one of Shenzhen's most unique landmarks.",
+            body: "See the Minghua ship and the middle of Sea World Plaza, and hear how this spot became one of Shenzhen's best-known landmarks.",
           },
           {
             at: '0:50',
             title: "Waterfront Walk",
-            body: "Stroll along the waterfront promenade, enjoy sea views, public art, and some of the best photo spots in Shekou.",
+            body: "Walk the promenade by the water: sea views, public art, and some of the best photo spots in Shekou.",
           },
           {
             at: '1:20',
             title: "Lights & Fountains",
-            body: "Watch the plaza come alive after dark with illuminated buildings, fountain displays, and a lively atmosphere.",
+            body: "After dark the buildings light up, the fountains come on, and the plaza gets busy.",
           },
           {
             at: '1:50',
-            title: "The Best of Sea World",
-            body: "Take final photos, explore hidden corners of the plaza, and get recommendations for food, drinks, and places to continue your evening.",
+            title: "Last Look",
+            body: "Last photos, a few corners of the plaza people miss, and ideas for where to eat, drink or carry on the evening.",
           },
           {
             at: '2:00',
@@ -643,7 +644,7 @@ export const packages: TourPackage[] = [
       },
     ],
     includes: [
-      "2 hours one-on-one with a local",
+      "2 hours with a local, no group",
       "Stories about Sea World, Shekou, and Shenzhen",
       "Guided waterfront walk",
       "Best photo spots and viewpoints",
@@ -658,11 +659,11 @@ export const packages: TourPackage[] = [
       "🌊 First-time visitors to Shenzhen",
       "📸 Photography lovers",
       "🌃 Travelers who enjoy night views",
-      "🚶 Easy-going explorers",
+      "🚶 Anyone who likes an easy walk",
       "💑 Couples, friends, and solo travelers",
     ],
     insiderTip:
-      'The magic starts after sunset. Sea World feels completely different once the lights come on and the waterfront begins to glow.',
+      'Go after sunset. Sea World is a different place once the lights come on along the water.',
     accent: 'coral',
   },
   {
@@ -671,9 +672,9 @@ export const packages: TourPackage[] = [
     cn: '深圳湾公园',
     kicker: '🚴 Cycling & waterfront',
     tagline:
-      "Sea breeze, skyline views, and the city's favorite waterfront cycling route.",
+      "A flat ride along the bay, with Hong Kong across the water.",
     summary:
-      'Shenzhen Bay is where the city opens up to the sea. Ride along dedicated coastal cycling paths, enjoy views of the Shenzhen skyline and Hong Kong across the water, pass waterfront parks and mangroves, and discover why this is one of the most popular outdoor experiences in Shenzhen. The route is flat, beginner-friendly, and perfect for photos.',
+      'Shenzhen Bay is where the city meets the sea. You ride the coastal bike paths with the Shenzhen skyline on one side and Hong Kong across the water, past waterfront parks and mangroves. It is one of the most popular things to do outdoors in Shenzhen. The route is flat, easy for beginners, and good for photos.',
     hoursRange: [2, 3],
     photo: '/gallery/shenzhen-bay-railing-day.webp',
     alt: 'The Shenzhen Bay waterfront promenade on a clear day, a wooden railing running along green water with hills across the bay',
@@ -688,12 +689,12 @@ export const packages: TourPackage[] = [
           {
             at: '0:00',
             title: "Meet at Shenzhen Bay Park",
-            body: "Meet near Shenzhen Bay Park Station. Get your bike ready and receive a quick introduction to the route.",
+            body: "Meet near Shenzhen Bay Park Station, sort out your bike, and get a quick rundown of the route.",
           },
           {
             at: '0:15',
             title: "Coastal Ride Begins",
-            body: "Cycle along the waterfront greenway with sea views, palm trees, and dedicated cycling lanes.",
+            body: "Ride the waterfront greenway: sea views, palm trees and proper bike lanes.",
           },
           {
             at: '0:45',
@@ -703,12 +704,12 @@ export const packages: TourPackage[] = [
           {
             at: '1:10',
             title: "Waterfront Parks & Mangroves",
-            body: "Continue riding past scenic sections of the coastline while learning about Shenzhen Bay and the surrounding area.",
+            body: "Keep riding along the coast and hear about Shenzhen Bay and the area around it.",
           },
           {
             at: '1:40',
             title: "The Best Bay Views",
-            body: "Relax, take photos, enjoy the sea breeze, and explore one of the most beautiful stretches of the route.",
+            body: "Take a break, take photos, and enjoy the sea breeze on one of the best stretches of the route.",
           },
           {
             at: '2:00',
@@ -724,12 +725,12 @@ export const packages: TourPackage[] = [
           {
             at: '0:00',
             title: "Meet at Shenzhen Bay Park",
-            body: "Meet near Shenzhen Bay Park Station and prepare for a longer coastal ride.",
+            body: "Meet near Shenzhen Bay Park Station and get set up for a longer ride.",
           },
           {
             at: '0:15',
             title: "The Bay Route",
-            body: "Ride along Shenzhen's famous waterfront cycling path with uninterrupted sea views.",
+            body: "Ride Shenzhen's best-known waterfront bike path, with open sea views.",
           },
           {
             at: '0:50',
@@ -739,17 +740,17 @@ export const packages: TourPackage[] = [
           {
             at: '1:20',
             title: "Talent Park Area",
-            body: "Ride through the waterfront areas around Talent Park and enjoy some of Shenzhen's best city-meets-nature views.",
+            body: "Ride through the waterfront around Talent Park, with parkland on one side and towers on the other.",
           },
           {
             at: '1:50',
             title: "Coastal Highlights",
-            body: "Continue along the coastline, passing public art, waterfront promenades, and popular local recreation areas.",
+            body: "Carry on along the coast, past public art, promenades, and the spots where locals come to exercise and unwind.",
           },
           {
             at: '2:30',
             title: "Sunset & Sea Views",
-            body: "Enjoy the most scenic section of the route and take final photos before heading back.",
+            body: "The prettiest stretch of the ride, and a last chance for photos before heading back.",
           },
           {
             at: '3:00',
@@ -760,7 +761,7 @@ export const packages: TourPackage[] = [
       },
     ],
     includes: [
-      "2–3 hours one-on-one with a local",
+      "2–3 hours with a local, no group",
       "Guided cycling route",
       "Local stories and recommendations",
       "Best viewpoints and photo spots",
@@ -777,10 +778,10 @@ export const packages: TourPackage[] = [
       "🚴 Casual cyclists",
       "📸 Photography lovers",
       "🌇 Sunset seekers",
-      "🌍 Travelers wanting to see a different side of Shenzhen",
+      "🌍 Travelers who want an outdoor afternoon in Shenzhen",
     ],
     insiderTip:
-      "Shenzhen Bay is much longer than most visitors expect. The best experience isn't rushing from point to point—it's riding at a relaxed pace, stopping for photos, enjoying the sea breeze, and taking in the changing views along the waterfront. The route is mostly flat and beginner-friendly, making it enjoyable even if you don't cycle often.",
+      "Shenzhen Bay is a lot longer than most visitors expect, so don't try to cover all of it. Ride slowly, stop for photos, and enjoy the breeze and the changing views. It's mostly flat and easy for beginners, so it's fine even if you don't cycle much.",
     accent: 'sky',
   },
 

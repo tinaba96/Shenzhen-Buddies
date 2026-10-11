@@ -4,7 +4,9 @@ import { Avatar } from '@/components/Avatar'
 import { StarRating } from '@/components/StarRating'
 import { SubmitButton } from '@/components/SubmitButton'
 import { fill, type Dictionary } from '@/i18n'
+import { LOCALE_META, type Locale } from '@/i18n/config'
 import { getI18n } from '@/i18n/server'
+import { tagLabel } from '@/i18n/tags'
 import { avatarPublicUrl } from '@/lib/avatars'
 import { isSingleGuideMode } from '@/lib/config'
 import { scoreMatch, type MatchScore, type ProfileForMatching } from '@/lib/matching'
@@ -103,20 +105,6 @@ const HOBBY_OPTIONS = [
   'running',
 ] as const
 
-// Display label for a language/hobby/trait value. The stored value stays the
-// English tag (it is what profiles hold and what the filter matches on); only
-// the chip text is translated, and anything outside the known list — free text
-// someone typed on their profile — is shown as written. An entry that only
-// restates the key (every English one) also keeps the value as written, so
-// English chips keep whatever casing the profile used.
-function tagLabel(names: Record<string, string>, value: string): string {
-  const key = value.trim().toLowerCase()
-  // Own properties only: a profile tag of "constructor" must not resolve to
-  // Object's constructor.
-  const label = Object.hasOwn(names, key) ? names[key] : undefined
-  return label && label.toLowerCase() !== key ? label : value
-}
-
 function asArray(input: string | string[] | undefined): string[] {
   if (!input) return []
   return Array.isArray(input) ? input : [input]
@@ -128,7 +116,7 @@ export default async function BrowsePage({ searchParams }: Props) {
   if (isSingleGuideMode()) redirect('/guide')
 
   const sp = await searchParams
-  const { t } = await getI18n()
+  const { locale, t } = await getI18n()
   const b = t.browse
   const rawQ = typeof sp.q === 'string' ? sp.q : ''
   // Sanitize free-text search: strip PostgREST .or() metacharacters and cap length.
@@ -371,7 +359,7 @@ export default async function BrowsePage({ searchParams }: Props) {
 
       {/* Top picks for the AI-suggested panel, then exclude those from the
           main list below so the same profiles don't appear twice. */}
-      <AiSuggestedPicks scored={topPicks} t={t} />
+      <AiSuggestedPicks scored={topPicks} t={t} locale={locale} />
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <form
@@ -684,7 +672,7 @@ export default async function BrowsePage({ searchParams }: Props) {
                     {p.role === 'guide' ? t.buddy.roleGuide : t.buddy.roleTourist}
                   </span>
                 </div>
-                <p className="text-xs text-zinc-500">{p.city}</p>
+                <p className="text-xs text-zinc-500">{tagLabel(b.cityNames, p.city)}</p>
                 {rating && rating.count > 0 && (
                   <div className="mt-1 flex items-center gap-1 text-xs text-zinc-600 dark:text-zinc-400">
                     <StarRating
@@ -693,11 +681,13 @@ export default async function BrowsePage({ searchParams }: Props) {
                       label={fill(t.stars.outOf, { value: rating.avg.toFixed(1) })}
                     />
                     <span>
-                      {rating.avg.toFixed(1)} · {rating.count}
+                      {rating.avg.toFixed(1)}
+                      {LOCALE_META[locale].sep}
+                      {rating.count}
                     </span>
                   </div>
                 )}
-                {myProfile && <MatchBadge score={score} b={b} />}
+                {myProfile && <MatchBadge score={score} b={b} sep={LOCALE_META[locale].sep} />}
               </div>
             </div>
 
@@ -787,9 +777,11 @@ function ChipGroup({
 function AiSuggestedPicks({
   scored,
   t,
+  locale,
 }: {
   scored: { profile: ProfileRow; score: MatchScore; rating: RatingStats | null }[]
   t: Dictionary
+  locale: Locale
 }) {
   if (scored.length === 0) return null
   const b = t.browse
@@ -841,7 +833,7 @@ function AiSuggestedPicks({
                     {p.role === 'guide' ? t.buddy.roleGuide : t.buddy.roleTourist}
                   </span>
                 </div>
-                <p className="truncate text-xs text-zinc-500">{p.city}</p>
+                <p className="truncate text-xs text-zinc-500">{tagLabel(b.cityNames, p.city)}</p>
                 {rating && rating.count > 0 && (
                   <div className="mt-1 flex items-center gap-1 text-[11px] text-zinc-600 dark:text-zinc-400">
                     <StarRating
@@ -850,7 +842,9 @@ function AiSuggestedPicks({
                       label={fill(t.stars.outOf, { value: rating.avg.toFixed(1) })}
                     />
                     <span>
-                      {rating.avg.toFixed(1)} · {rating.count}
+                      {rating.avg.toFixed(1)}
+                      {LOCALE_META[locale].sep}
+                      {rating.count}
                     </span>
                   </div>
                 )}
@@ -866,7 +860,7 @@ function AiSuggestedPicks({
             <SharedChips score={score} b={b} />
 
             <p className="mt-3 flex-1 text-xs italic text-zinc-600 dark:text-zinc-400">
-              {describeMatch(score, b)}
+              {describeMatch(score, b, locale)}
             </p>
 
             <form action={startConversationWith} className="relative z-10 mt-4">
@@ -916,7 +910,11 @@ function SharedChips({ score, b }: { score: MatchScore; b: BrowseCopy }) {
   )
 }
 
-function describeMatch(score: MatchScore, b: BrowseCopy): string {
+function describeMatch(
+  score: MatchScore,
+  b: BrowseCopy,
+  locale: Locale,
+): string {
   const list = (items: string[], names: Record<string, string>) =>
     formatList(
       items.slice(0, 2).map((it) => tagLabel(names, it)),
@@ -924,19 +922,21 @@ function describeMatch(score: MatchScore, b: BrowseCopy): string {
     )
   const parts: string[] = []
   if (score.sharedLanguages.length > 0) {
-    parts.push(fill(b.whySpeaks, { list: list(score.sharedLanguages, b.languageNames) }))
+    parts.push(fill(b.whySpeaks, { list: list(score.sharedLanguages, b.languageNames) }, locale))
   }
   if (score.sharedHobbies.length > 0) {
-    parts.push(fill(b.whyInto, { list: list(score.sharedHobbies, b.hobbyNames) }))
+    parts.push(fill(b.whyInto, { list: list(score.sharedHobbies, b.hobbyNames) }, locale))
   }
   if (score.sharedTraits.length > 0 && parts.length < 2) {
-    parts.push(fill(b.whyFeels, { list: list(score.sharedTraits, b.traitNames) }))
+    parts.push(fill(b.whyFeels, { list: list(score.sharedTraits, b.traitNames) }, locale))
   }
   if (score.sameCity) {
     parts.push(b.whySameCity)
   }
   if (parts.length === 0) return b.whyAllRound
-  return fill(b.why, { reasons: parts.join(' · ') })
+  // ' · ' is an English list style; CJK copy joins clauses with its own marks.
+  const sep = locale === 'ja' ? '、' : locale === 'en' ? ' · ' : '，'
+  return fill(b.why, { reasons: parts.join(sep) }, locale)
 }
 
 function formatList(items: string[], join: string): string {
@@ -945,7 +945,15 @@ function formatList(items: string[], join: string): string {
   return items.join(join)
 }
 
-function MatchBadge({ score, b }: { score: MatchScore; b: BrowseCopy }) {
+function MatchBadge({
+  score,
+  b,
+  sep,
+}: {
+  score: MatchScore
+  b: BrowseCopy
+  sep: string
+}) {
   if (score.total <= 0) return null
   const shared =
     score.sharedHobbies.length +
@@ -957,7 +965,7 @@ function MatchBadge({ score, b }: { score: MatchScore; b: BrowseCopy }) {
   return (
     <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
       <span aria-hidden>✦</span>
-      {bits.join(' · ') || b.badgeMatch}
+      {bits.join(sep) || b.badgeMatch}
     </p>
   )
 }

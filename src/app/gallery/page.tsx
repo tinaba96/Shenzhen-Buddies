@@ -4,7 +4,6 @@ import {
   galleryChipLocations,
   galleryItemsFor,
   galleryPhotoIndex,
-  locationLabel,
   resolveLocationFilter,
   ogImageSrc,
   thumbnailSrc,
@@ -23,12 +22,7 @@ import { GalleryGrid } from './GalleryGrid'
 // is actually in the library, not the neighbourhoods we hope to shoot. It is
 // the search snippet and the share card, so a district listed there that has
 // no photos behind it is a promise the page breaks on arrival. Update it when
-// the mix changes, not when the plan does.
-//
-// The JSON-LD below stays English, like every other page's structured data:
-// it describes the photos to a crawler, and the crawler sees the English page.
-const DESCRIPTION =
-  'Real photos of Shenzhen from the people who live here — night skylines, street-food stalls, workbenches mid-project. No stock imagery.'
+// the mix changes, not when the plan does. The page's JSON-LD reuses it.
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
@@ -65,7 +59,7 @@ export async function generateMetadata({
 }: {
   searchParams: SearchParams
 }): Promise<Metadata> {
-  const [{ photoItem: basePhoto }, { locale, t }] = await Promise.all([
+  const [{ photoItem: basePhoto }, { locale, meta, t }] = await Promise.all([
     readParams(searchParams),
     getI18n(),
   ])
@@ -102,6 +96,7 @@ export async function generateMetadata({
     // convention goes with it — so omitting this shares the gallery as a grey
     // box. See the note on DEFAULT_OG_IMAGE in src/lib/config.ts.
     openGraph: {
+      locale: meta.ogLocale,
       title: seo.title,
       description: seo.description,
       url: '/gallery',
@@ -131,6 +126,7 @@ export async function generateMetadata({
     title: fill(seo.photoTitle, { title: photoItem.title }),
     description,
     openGraph: {
+      locale: meta.ogLocale,
       title: photoItem.title,
       description,
       // Deliberately not the canonical. og:url is the identity of the thing
@@ -162,8 +158,8 @@ export default async function GalleryPage({
   // page as before — nothing here is behind a session.
   const isAdmin = await isAdminViewer()
   const { locale, t } = await getI18n()
-  // Titles, captions and alt text in the reader's language. Only the grid gets
-  // these; the JSON-LD below is built from the English `items`.
+  // Titles, captions and alt text in the reader's language — for the grid and
+  // the JSON-LD alike, which describe the same photos on the same page.
   const shown = items.map((item) => localizeGalleryItem(item, locale))
 
   // Anonymous visitors get the read-only /guide preview, so this is not
@@ -177,15 +173,16 @@ export default async function GalleryPage({
       ? {
           '@context': 'https://schema.org',
           '@type': 'ImageGallery',
+          // Brand name, the same in every language.
           name: 'Shenzhen Buddies — photo gallery',
-          description: DESCRIPTION,
+          description: t.seo.gallery.description,
           url: `${base}/gallery`,
-          image: items.map((item) => ({
+          image: shown.map((item) => ({
             '@type': 'ImageObject',
             contentUrl: `${base}${thumbnailSrc(item)}`,
             name: item.title,
             description: item.caption ?? item.alt,
-            contentLocation: locationLabel(item.location),
+            contentLocation: t.gallery.locations[item.location].label,
           })),
         }
       : null

@@ -34,7 +34,9 @@ import {
 import { bookingNoteFor } from '@/content/packages'
 import { localizedCn, localizedPackage } from '@/content/packages-i18n'
 import { fill, type Dictionary } from '@/i18n'
+import type { Locale } from '@/i18n/config'
 import { getI18n } from '@/i18n/server'
+import { tagLabel } from '@/i18n/tags'
 import { DEFAULT_OG_IMAGE, isSingleGuideMode, officialGuideId } from '@/lib/config'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -57,12 +59,14 @@ import { AvailabilityEditor } from './AvailabilityEditor'
 // instruction to index that page instead of this one.
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = (await getI18n()).t.seo.guide
+  const { meta, t } = await getI18n()
+  const seo = t.seo.guide
   return {
     title: seo.title,
     description: seo.description,
     alternates: { canonical: '/guide' },
     openGraph: {
+      locale: meta.ogLocale,
       title: seo.title,
       description: seo.description,
       url: '/guide',
@@ -415,7 +419,7 @@ export default async function GuidePage({ searchParams }: Props) {
           src={
             avatarPublicUrl(guide.cover_path, guide.updated_at) ?? DEFAULT_COVER
           }
-          alt={fill(b.coverAlt, { name: guide.display_name })}
+          alt={fill(b.coverAlt, { name: guide.display_name }, locale)}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/55 to-black/85" />
@@ -453,7 +457,9 @@ export default async function GuidePage({ searchParams }: Props) {
               {guide.display_name}
             </h1>
             <p className="mt-1 text-sm text-white/85">
-              📍 {fill(b.withBrand, { city: guide.city })}
+              📍 {fill(b.withBrand, {
+                city: tagLabel(i18n.browse.cityNames, guide.city),
+              }, locale)}
             </p>
 
             {reviewCount > 0 ? (
@@ -461,18 +467,19 @@ export default async function GuidePage({ searchParams }: Props) {
                 <StarRating
                   value={avgStars}
                   size={16}
-                  label={fill(i18n.stars.outOf, { value: avgStars.toFixed(1) })}
+                  label={fill(i18n.stars.outOf, { value: avgStars.toFixed(1) }, locale)}
                 />
                 <span className="text-white/90">
-                  {avgStars.toFixed(1)} ·{' '}
+                  {avgStars.toFixed(1)}
+                  {meta.sep}
                   {fill(reviewCount === 1 ? b.reviewOne : b.reviewMany, {
                     n: reviewCount,
-                  })}
+                  }, locale)}
                 </span>
               </div>
             ) : (
               <span className="mt-3 rounded-full bg-white/15 px-3 py-0.5 text-xs font-medium backdrop-blur">
-                ✨ {fill(b.newGuide, { name: firstName })}
+                ✨ {fill(b.newGuide, { name: firstName }, locale)}
               </span>
             )}
 
@@ -483,7 +490,7 @@ export default async function GuidePage({ searchParams }: Props) {
                     key={l}
                     className="rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-xs font-medium backdrop-blur"
                   >
-                    {l}
+                    {tagLabel(i18n.browse.languageNames, l)}
                   </span>
                 ))}
               </div>
@@ -506,7 +513,7 @@ export default async function GuidePage({ searchParams }: Props) {
             <Highlight
               icon="🗺️"
               title={b.highlights.localTitle}
-              body={fill(b.highlights.localBody, { name: firstName })}
+              body={fill(b.highlights.localBody, { name: firstName }, locale)}
             />
             <Highlight
               icon="💬"
@@ -517,6 +524,7 @@ export default async function GuidePage({ searchParams }: Props) {
                         ? b.highlights.speaksOne
                         : b.highlights.speaksMany,
                       { n: guide.languages.length },
+                      locale,
                     )
                   : b.highlights.easyTalk
               }
@@ -561,7 +569,7 @@ export default async function GuidePage({ searchParams }: Props) {
             {Number(sp.refund_cents) > 0
               ? fill(b.banners.refund, {
                   amount: formatMoney(Number(sp.refund_cents)),
-                })
+                }, locale)
               : FREE_TOURS
                 ? b.banners.reopened
                 : b.banners.noRefund}
@@ -576,7 +584,7 @@ export default async function GuidePage({ searchParams }: Props) {
         {/* About the guide */}
         <section className="mt-6 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-lg font-semibold">
-            {fill(b.about, { name: firstName })}
+            {fill(b.about, { name: firstName }, locale)}
           </h2>
           {guide.bio && (
             <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
@@ -587,11 +595,22 @@ export default async function GuidePage({ searchParams }: Props) {
             guide.languages.length > 0 ||
             guide.personality_traits.length > 0) && (
             <div className="mt-6 grid gap-5 sm:grid-cols-3">
-              <InterestGroup label={b.hobbies} items={guide.hobbies} tone="amber" />
-              <InterestGroup label={b.languages} items={guide.languages} tone="sky" />
+              <InterestGroup
+                label={b.hobbies}
+                items={guide.hobbies}
+                names={i18n.browse.hobbyNames}
+                tone="amber"
+              />
+              <InterestGroup
+                label={b.languages}
+                items={guide.languages}
+                names={i18n.browse.languageNames}
+                tone="sky"
+              />
               <InterestGroup
                 label={b.personality}
                 items={guide.personality_traits}
+                names={i18n.browse.traitNames}
                 tone="rose"
               />
             </div>
@@ -603,7 +622,7 @@ export default async function GuidePage({ searchParams }: Props) {
           <section className="mt-8">
             <h2 className="text-xl font-semibold">{b.ideasTitle}</h2>
             <p className="mt-1 text-sm text-zinc-500">
-              {fill(b.ideasBody, { name: firstName })}
+              {fill(b.ideasBody, { name: firstName }, locale)}
             </p>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {IDEAS.map((idea, i) => (
@@ -682,7 +701,7 @@ export default async function GuidePage({ searchParams }: Props) {
           <p className="mt-1 text-sm text-zinc-500">
             {FREE_TOURS
               ? selectedPackage?.hours
-                ? fill(b.introFreeFixed, { n: selectedPackage.hours })
+                ? fill(b.introFreeFixed, { n: selectedPackage.hours }, locale)
                 : b.introFreeChoice
               : fill(b.introPaid, {
                   min: MIN_BOOKING_HOURS,
@@ -690,7 +709,7 @@ export default async function GuidePage({ searchParams }: Props) {
                   rate: formatMoney(HOURLY_RATE_CENTS),
                   low: formatMoney(amountCentsForHours(MIN_BOOKING_HOURS)),
                   high: formatMoney(amountCentsForHours(MAX_BOOKING_HOURS)),
-                })}
+                }, locale)}
           </p>
 
           {user && !isTourist ? (
@@ -712,7 +731,7 @@ export default async function GuidePage({ searchParams }: Props) {
                 {fill(b.dateTime, {
                   date: localDay(myLiveBooking.day),
                   time: formatHourRange(myLiveBooking.start_hour, myLiveBooking.end_hour),
-                })}
+                }, locale)}
               </span>
               {b.checkout.middle}
               <Link
@@ -737,7 +756,7 @@ export default async function GuidePage({ searchParams }: Props) {
                 {fill(b.dateTime, {
                   date: localDay(myLiveBooking.day),
                   time: formatHourRange(myLiveBooking.start_hour, myLiveBooking.end_hour),
-                })}
+                }, locale)}
               </span>
               {b.live.suffix}
             </div>
@@ -773,8 +792,8 @@ export default async function GuidePage({ searchParams }: Props) {
                       date: localDay(selectedDay.day),
                       ranges: selectedDay.segments
                         .map((s) => formatHourRange(s.start, s.end))
-                        .join(' · '),
-                    })}
+                        .join(meta.sep),
+                    }, locale)}
                   </p>
 
                   {!user ? (
@@ -783,6 +802,7 @@ export default async function GuidePage({ searchParams }: Props) {
                       firstName={firstName}
                       labels={b.anon}
                       logIn={i18n.common.logIn}
+                      locale={locale}
                       guestHref={
                         GUEST_REQUESTS
                           ? `/book${selectedPackage ? `?package=${selectedPackage.slug}` : ''}`
@@ -796,6 +816,7 @@ export default async function GuidePage({ searchParams }: Props) {
                       <FreeBookingFields
                         startOptions={startOptions}
                         labels={b.fields}
+                        sep={meta.sep}
                         lengths={
                           selectedPackage?.hours
                             ? [selectedPackage.hours]
@@ -808,11 +829,12 @@ export default async function GuidePage({ searchParams }: Props) {
                         minHours={MIN_BOOKING_HOURS}
                         maxHours={MAX_BOOKING_HOURS}
                         labels={b.fields}
+                        sep={meta.sep}
                       />
                     )}
                     <label className="block">
                       <span className="text-sm font-medium">
-                        {fill(b.noteLabel, { name: guide.display_name })}
+                        {fill(b.noteLabel, { name: guide.display_name }, locale)}
                       </span>
                       <span className="ml-1 text-xs text-zinc-500">
                         {b.optional}
@@ -884,7 +906,7 @@ export default async function GuidePage({ searchParams }: Props) {
                         ? b.submit.noteFree
                         : fill(b.submit.notePaid, {
                             rate: formatMoney(HOURLY_RATE_CENTS),
-                          })}
+                          }, locale)}
                       {b.agree.prefix}
                       <Link
                         href="/terms"
@@ -973,7 +995,8 @@ export default async function GuidePage({ searchParams }: Props) {
                   >
                     <div>
                       <p className="text-sm font-medium">
-                        {localDay(b.day)} ·{' '}
+                        {localDay(b.day)}
+                        {meta.sep}
                         {formatHourRange(b.start_hour, b.end_hour)}
                         {b.amount_cents != null && (
                           <span className="ml-2 font-normal text-zinc-500">
@@ -982,7 +1005,7 @@ export default async function GuidePage({ searchParams }: Props) {
                               : b.status === 'rejected'
                                 ? fill(i18n.booking.mine.refunded, {
                                     amount: formatMoney(b.amount_cents, b.currency ?? undefined),
-                                  })
+                                  }, locale)
                                 : formatMoney(b.amount_cents, b.currency ?? undefined)}
                           </span>
                         )}
@@ -1012,7 +1035,7 @@ export default async function GuidePage({ searchParams }: Props) {
                             pendingLabel={i18n.booking.mine.opening}
                             className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
                           >
-                            {fill(i18n.booking.mine.message, { name: firstName })}
+                            {fill(i18n.booking.mine.message, { name: firstName }, locale)}
                           </SubmitButton>
                         </form>
                       )}
@@ -1036,7 +1059,7 @@ export default async function GuidePage({ searchParams }: Props) {
                               : pct === 100
                                 ? i18n.booking.mine.cancelFullRefund
                                 : pct > 0
-                                  ? fill(i18n.booking.mine.cancelFee, { pct: 100 - pct })
+                                  ? fill(i18n.booking.mine.cancelFee, { pct: 100 - pct }, locale)
                                   : i18n.booking.mine.cancelNoRefund}
                           </SubmitButton>
                         </form>
@@ -1062,9 +1085,12 @@ function AnonBookingCta({
   labels: l,
   logIn,
   guestHref,
+  locale,
 }: {
   nextPath: string
   firstName: string
+  // For fill(): Chinese spaces a Latin name off from the text around it.
+  locale: Locale
   labels: Dictionary['booking']['anon']
   logIn: string
   // While guest requests are on: the no-account form, offered first.
@@ -1082,7 +1108,7 @@ function AnonBookingCta({
             {l.guest}
           </Link>
           <p className="text-center text-xs text-zinc-500">
-            {fill(l.guestNote, { name: firstName })}
+            {fill(l.guestNote, { name: firstName }, locale)}
           </p>
         </>
       )}
@@ -1106,7 +1132,7 @@ function AnonBookingCta({
         </Link>
         {FREE_TOURS
           ? l.loginSuffixFree
-          : fill(l.loginSuffixPaid, { name: firstName })}
+          : fill(l.loginSuffixPaid, { name: firstName }, locale)}
       </p>
     </div>
   )
@@ -1293,10 +1319,13 @@ function Highlight({
 function InterestGroup({
   label,
   items,
+  names,
   tone,
 }: {
   label: string
   items: string[]
+  // A t.browse.*Names map; values are stored English and shown translated.
+  names: Record<string, string>
   tone: 'amber' | 'sky' | 'rose'
 }) {
   if (!items || items.length === 0) return null
@@ -1316,7 +1345,7 @@ function InterestGroup({
             key={it}
             className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${chip}`}
           >
-            {it}
+            {tagLabel(names, it)}
           </span>
         ))}
       </div>

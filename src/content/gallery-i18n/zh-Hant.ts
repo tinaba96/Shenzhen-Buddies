@@ -7,7 +7,7 @@ import type { GalleryTranslations } from './types'
 export const galleryZhHant: GalleryTranslations = {
   'huaqiangbei-electronic-world-night': {
     title: '入夜後的華強電子世界',
-    alt: '夜色中華強電子世界亮燈的入口，佈滿 LED 的外牆和大屏幕下方，就是華強北地鐵站出入口。',
+    alt: '夜色中華強電子世界亮燈的入口，佈滿 LED 的外牆和屏幕下方，就是華強北地鐵站出入口。',
     caption:
       '綿延四十個街區的電子元件，由這裏開始。看地鐵站口那些夜市招牌就知道：寫字樓關門了，這裏的買賣卻沒有停。',
   },
@@ -50,16 +50,16 @@ export const galleryZhHant: GalleryTranslations = {
   },
   'dongmen-pagoda-street-night': {
     title: '入夜後的東門',
-    alt: '夜晚的東門步行街，飛簷屋頂的樓房以燈光勾勒出輪廓，下方是逛街的人潮，右邊是亮着燈、頂着寶塔式屋頂的麥當勞。',
+    alt: '夜晚的東門步行街，寶塔式屋頂的樓房以燈光勾勒出輪廓，下方是逛街的人潮，右邊亮着燈的是麥當勞的寶塔式大樓。',
     caption: '舊城區替樓房都披上了飛簷和串燈。連麥當勞也分到一個寶塔頂。',
   },
   'crayfish-noodles-lift': {
     title: '又到小龍蝦季節',
     alt: '筷子從粉紅色碟子夾起一團深色麵條，旁邊是一碗蒜蓉小龍蝦，配青辣椒和木耳。',
-    caption: '蒜蓉小龍蝦，再來一碟麵，把碗裏剩下的湯汁拌得一乾二淨。',
+    caption: '蒜蓉小龍蝦，再來一碟麵，把碗裏剩下的湯汁蘸個精光。',
   },
   'maker-desk-dev-boards': {
-    title: '再平常不過的平日桌面',
+    title: '再普通不過的平日桌面',
     alt: '淺色木桌上疊着兩塊單板電腦，可見 USB 插口和排針，旁邊有杜邦線和一個 GPS 模組。',
     caption: '開發板、杜邦線、GPS 模組。別的城市在拆包裹，這座城市在造包裹裏的東西。',
   },
@@ -85,7 +85,7 @@ export const galleryZhHant: GalleryTranslations = {
   },
   'chicken-rice-table': {
     title: '大概是兩人份的午餐',
-    alt: '一張燒木紋桌上，放着一碗白切雞飯、一碗麵，還有一小碟炸腐皮和肉丸。',
+    alt: '一張碳化木桌上，放着一碗白切雞飯、一碗麵，還有一小碟炸腐皮和肉丸。',
     caption: '兩份主食，一碟小菜，不講排場。這裏的午餐，二十分鐘就解決。',
   },
   'noodle-shop-table': {

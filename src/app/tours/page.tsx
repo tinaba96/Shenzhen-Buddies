@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { PackageCard } from '@/components/PackageCard'
-import { packagePrice, PACKAGE_HOURS } from '@/content/packages'
+import { packagePrice } from '@/content/packages'
 import {
   localizedFeaturedPackage,
   localizedOtherPackages,
@@ -14,7 +14,7 @@ import { DEFAULT_OG_IMAGE, siteUrl } from '@/lib/config'
 import { HeroImage } from '@/components/HeroImage'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getI18n()
+  const { meta, t } = await getI18n()
   return {
     title: t.seo.toursTitle,
     description: t.seo.toursDescription,
@@ -24,6 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // generic title, description and an og:url pointing at the homepage.
     // `images` is not redundant here; see DEFAULT_OG_IMAGE in lib/config.
     openGraph: {
+      locale: meta.ogLocale,
       title: t.seo.toursTitle,
       description: t.seo.toursDescription,
       url: '/tours',
@@ -145,8 +146,7 @@ export default async function ToursPage() {
             {t.home.finalCta.titleAnon}
           </h2>
           <p className="mt-4 text-sm text-zinc-400">
-            {t.home.packages.priceNote.replace('{price}', price)} ·{' '}
-            {t.common.hours.replace('{n}', String(PACKAGE_HOURS))}
+            {t.home.packages.priceNote.replace('{price}', price)}
           </p>
           <Link
             href="/guide"

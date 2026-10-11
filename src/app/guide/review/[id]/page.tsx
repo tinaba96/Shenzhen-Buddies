@@ -104,7 +104,7 @@ export default async function ReviewPage({ params, searchParams }: Props) {
           day: 'numeric',
           year: 'numeric',
         })
-  const when = `${day} · ${formatHourRange(booking.start_hour, booking.end_hour)}`
+  const when = `${day}${meta.sep}${formatHourRange(booking.start_hour, booking.end_hour)}`
 
   // The tip step opens once a thumb has landed — either just now (?thanks=)
   // or on an earlier visit (a stored review).
@@ -131,7 +131,7 @@ export default async function ReviewPage({ params, searchParams }: Props) {
         {r.title}
       </h1>
       <p className="mt-2 text-sm text-zinc-500">
-        {fill(r.when, { when, name: guideName })}
+        {fill(r.when, { when, name: guideName }, locale)}
       </p>
 
       {sp.error && (
@@ -141,7 +141,7 @@ export default async function ReviewPage({ params, searchParams }: Props) {
       )}
       {sp.tipped && (
         <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-          {fill(r.tipped, { name: firstName })}
+          {fill(r.tipped, { name: firstName }, locale)}
         </p>
       )}
       {sp.thanks && !sp.tipped && (
@@ -204,7 +204,7 @@ export default async function ReviewPage({ params, searchParams }: Props) {
               />
             </label>
             <p className="mt-3 text-xs text-zinc-500">
-              {fill(r.note, { name: firstName })}
+              {fill(r.note, { name: firstName }, locale)}
             </p>
           </form>
 
@@ -212,10 +212,10 @@ export default async function ReviewPage({ params, searchParams }: Props) {
           {reviewed && (supportConfigured() || showPaypal) && (
             <section className="mt-6 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-rose-50 p-6 dark:border-amber-900/40 dark:from-amber-950/20 dark:to-rose-950/20">
               <p className="text-sm font-semibold">
-                {fill(r.tipTitle, { name: firstName })}
+                {fill(r.tipTitle, { name: firstName }, locale)}
               </p>
               <p className="mt-1 mb-4 text-xs text-zinc-600 dark:text-zinc-400">
-                {fill(r.tipBody, { name: firstName })}
+                {fill(r.tipBody, { name: firstName }, locale)}
               </p>
               <SupportPanel
                 kind="tip"

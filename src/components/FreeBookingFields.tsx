@@ -29,9 +29,12 @@ export function FreeBookingFields({
   startOptions,
   lengths = FREE_TOUR_LENGTHS,
   labels: t,
+  sep,
 }: {
   startOptions: StartOption[]
   labels: Labels
+  // The locale's meta-line separator (LOCALE_META[locale].sep).
+  sep: string
   // The lengths to show. A package sold at one length only (its `hours`)
   // narrows this to that one; otherwise every free length is on offer.
   lengths?: number[]
@@ -118,7 +121,7 @@ export function FreeBookingFields({
             <path d="m12 5 7 7-7 7" />
           </svg>
           <span className="font-semibold">{formatHour(endHour)}</span>
-          <span className="text-zinc-500">· {t.hours.replace('{n}', String(length))}</span>
+          <span className="text-zinc-500">{sep.trimStart()}{t.hours.replace('{n}', String(length))}</span>
         </div>
         <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
           {t.free}

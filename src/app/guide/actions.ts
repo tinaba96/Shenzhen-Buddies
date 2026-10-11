@@ -277,12 +277,20 @@ export async function requestBooking(formData: FormData) {
             year: 'numeric',
           })
     fail(
-      fill(e.liveBooked, {
-        when: fill(t.booking.dateTime, {
-          date: when,
-          time: formatHourRange(live.start_hour, live.end_hour),
-        }),
-      }),
+      fill(
+        e.liveBooked,
+        {
+          when: fill(
+            t.booking.dateTime,
+            {
+              date: when,
+              time: formatHourRange(live.start_hour, live.end_hour),
+            },
+            locale,
+          ),
+        },
+        locale,
+      ),
       day,
     )
   }

@@ -26,13 +26,46 @@ export function getDictionary(locale: Locale): Dictionary {
 // Values are stringified and substituted verbatim: everything that goes
 // through here is rendered as a React text child, never as HTML, so there is
 // nothing to escape. Do not change that without revisiting this line.
+//
+// Pass `locale` wherever a value can be Latin text or digits — a name, a
+// city, a date. Chinese typesetting puts a space between Latin and Chinese
+// ("关于 Bryan"), but whether one is needed depends on the value: "关于王明"
+// takes none. So zh dictionaries write placeholders flush against the Chinese
+// around them and the space is added here, only at a Latin/CJK boundary and
+// never next to an existing space or punctuation. Japanese sets Latin flush
+// ("Bryanさん"), so only zh-Hans and zh-Hant are spaced.
+const CJK = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u
+const LATIN_OR_DIGIT = /[\p{Script=Latin}\p{Nd}]/u
+
 export function fill(
   template: string,
   values: Record<string, string | number>,
+  locale?: Locale,
 ): string {
-  return template.replace(/\{(\w+)\}/g, (whole, key: string) =>
-    key in values ? String(values[key]) : whole,
-  )
+  const spaced = locale === 'zh-Hans' || locale === 'zh-Hant'
+  return template.replace(/\{(\w+)\}/g, (whole, key: string, offset: number) => {
+    if (!Object.hasOwn(values, key)) return whole
+    let value = String(values[key])
+    if (spaced && value) {
+      const before = template[offset - 1] ?? ''
+      const after = template[offset + whole.length] ?? ''
+      const first = value[0]
+      const last = value[value.length - 1]
+      if (
+        (CJK.test(before) && LATIN_OR_DIGIT.test(first)) ||
+        (LATIN_OR_DIGIT.test(before) && CJK.test(first))
+      ) {
+        value = ` ${value}`
+      }
+      if (
+        (LATIN_OR_DIGIT.test(last) && CJK.test(after)) ||
+        (CJK.test(last) && LATIN_OR_DIGIT.test(after))
+      ) {
+        value = `${value} `
+      }
+    }
+    return value
+  })
 }
 
 // ---------------------------------------------------------------------------

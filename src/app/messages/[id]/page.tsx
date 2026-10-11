@@ -92,7 +92,7 @@ export default async function ThreadPage({ params, searchParams }: Props) {
           </p>
           <p className="truncate text-xs text-zinc-500">
             {other
-              ? `${other.role === 'guide' ? t.buddy.roleGuide : t.buddy.roleTourist} · ${other.city}`
+              ? `${other.role === 'guide' ? t.buddy.roleGuide : t.buddy.roleTourist}${meta.sep}${other.city}`
               : ''}
           </p>
         </div>

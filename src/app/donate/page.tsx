@@ -16,12 +16,14 @@ import { startDonationCheckout } from './actions'
 // and buttons live in SupportPanel, the card checkout in ./actions.
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = (await getI18n()).t.seo.donate
+  const { meta, t } = await getI18n()
+  const seo = t.seo.donate
   return {
     title: seo.title,
     description: seo.description,
     alternates: { canonical: '/donate' },
     openGraph: {
+      locale: meta.ogLocale,
       title: seo.title,
       description: seo.description,
       url: '/donate',

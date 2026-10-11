@@ -12,7 +12,7 @@ type Props = {
 
 
 export default async function SignupPage({ searchParams }: Props) {
-  const [{ error, check_email, next }, { t }] = await Promise.all([
+  const [{ error, check_email, next }, { t, locale }] = await Promise.all([
     searchParams,
     getI18n(),
   ])
@@ -84,7 +84,7 @@ export default async function SignupPage({ searchParams }: Props) {
           </SubmitButton>
 
           <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-            {t.auth.signup.haveAccount}{' '}
+            {t.auth.signup.haveAccount}{locale === 'en' ? ' ' : ''}
             <Link href={loginHref} className="font-medium underline">
               {t.auth.signup.loginLink}
             </Link>

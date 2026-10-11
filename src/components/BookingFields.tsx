@@ -24,11 +24,14 @@ export function BookingFields({
   minHours,
   maxHours,
   labels: l,
+  sep,
 }: {
   startOptions: StartOption[]
   minHours: number
   maxHours: number
   labels: Labels
+  // The locale's meta-line separator (LOCALE_META[locale].sep).
+  sep: string
 }) {
   const firstStart = startOptions[0]?.hour ?? 0
   const [startHour, setStartHour] = useState(firstStart)
@@ -95,7 +98,7 @@ export function BookingFields({
             <path d="m12 5 7 7-7 7" />
           </svg>
           <span className="font-semibold">{formatHour(effectiveEnd)}</span>
-          <span className="text-zinc-500">· {l.hours.replace('{n}', String(duration))}</span>
+          <span className="text-zinc-500">{sep.trimStart()}{l.hours.replace('{n}', String(duration))}</span>
         </div>
         <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
           {formatMoney(priceCents)}

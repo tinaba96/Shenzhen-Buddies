@@ -33,9 +33,17 @@ export type LocaleMeta = {
   htmlLang: string
   // Passed to Intl for dates and currency in that locale.
   intlLocale: string
+  // og:locale, which wants language_TERRITORY with an underscore. Traditional
+  // Chinese is zh_HK: Hong Kong is who the zh-Hant copy is written for.
+  ogLocale: string
   // Right-to-left is not in play yet, but the flag being present means adding
   // Arabic later is a data change rather than a layout audit.
   dir: 'ltr' | 'rtl'
+  // Joins items in a meta line ("2–3 hours · 1-on-1 · Luohu"). Japanese uses
+  // a full-width 「・」 with no spaces; the spaced middle dot reads as Western
+  // typography there. Callers rendering it between gapped flex items should
+  // use sep.trim() so the spacing comes from the gap, not the string.
+  sep: string
 }
 
 export const LOCALE_META: Record<Locale, LocaleMeta> = {
@@ -45,7 +53,9 @@ export const LOCALE_META: Record<Locale, LocaleMeta> = {
     short: 'EN',
     htmlLang: 'en',
     intlLocale: 'en-CA',
+    ogLocale: 'en_US',
     dir: 'ltr',
+    sep: ' · ',
   },
   'zh-Hans': {
     id: 'zh-Hans',
@@ -53,7 +63,9 @@ export const LOCALE_META: Record<Locale, LocaleMeta> = {
     short: '简',
     htmlLang: 'zh-Hans',
     intlLocale: 'zh-Hans-CN',
+    ogLocale: 'zh_CN',
     dir: 'ltr',
+    sep: ' · ',
   },
   'zh-Hant': {
     id: 'zh-Hant',
@@ -61,7 +73,9 @@ export const LOCALE_META: Record<Locale, LocaleMeta> = {
     short: '繁',
     htmlLang: 'zh-Hant',
     intlLocale: 'zh-Hant-HK',
+    ogLocale: 'zh_HK',
     dir: 'ltr',
+    sep: ' · ',
   },
   ja: {
     id: 'ja',
@@ -69,7 +83,9 @@ export const LOCALE_META: Record<Locale, LocaleMeta> = {
     short: 'JA',
     htmlLang: 'ja',
     intlLocale: 'ja-JP',
+    ogLocale: 'ja_JP',
     dir: 'ltr',
+    sep: '・',
   },
 }
 

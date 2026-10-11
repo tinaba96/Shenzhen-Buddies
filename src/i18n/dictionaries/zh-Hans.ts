@@ -8,10 +8,10 @@ export const zhHans: Dictionary = {
   seo: {
     siteTitle: 'Shenzhen Buddies',
     siteDescription:
-      '在深圳，匹配一位和你兴趣相投的本地伙伴。随性、实惠、有人情味。',
+      '匹配一位和你兴趣相投的深圳本地人，带你玩两小时或三小时，不拼团，想带个朋友一起也行。试运营期间免费。',
     toursTitle: '深圳免费本地体验 — Shenzhen Buddies',
     toursDescription:
-      '六个一对一的深圳体验，试运营期间免费——华强北电子市场、东门小吃、入夜后的天际线，以及从香港过关后的头几个小时。',
+      '六个不拼团的深圳体验，试运营期间免费：华强北电子市场、东门小吃、入夜后的福田、人才公园、蛇口海滨，还有沿着深圳湾骑一趟车。',
     about: {
       title: '关于我们 — Shenzhen Buddies',
       description: '献给爱探索的旅人，也献给热爱自己城市的本地人。我们为什么做 Shenzhen Buddies，它又是怎么运作的。',
@@ -56,9 +56,9 @@ export const zhHans: Dictionary = {
 
   common: {
     hours: '{n} 小时',
-    hoursRange: '{a}–{b} 小时',
+    hoursRange: '{a} 小时或 {b} 小时',
     free: '免费',
-    oneOnOne: '一对一',
+    oneOnOne: '不拼团 · 1–2 人',
     perPerson: '每人',
     from: '起',
     readMore: '继续阅读',
@@ -77,6 +77,7 @@ export const zhHans: Dictionary = {
     signUp: '注册',
     exploreFirst: '先逛逛深圳',
     freeDuringPilot: '试运营期间免费',
+    wechatId: '微信 · {id}',
   },
 
   nav: {
@@ -108,7 +109,7 @@ export const zhHans: Dictionary = {
       badge: '深圳，现已开放匹配',
       titleLead: '和一个懂你的人',
       titleAccent: '一起看深圳。',
-      body: '别挤旅游大巴了。和一位跟你兴趣相投的本地人免费待上几个小时——数码、美食、天际线、清晨——这座城市，你终于看懂了。',
+      body: '别挤旅游大巴了。花两小时或三小时，免费跟一位和你爱好一样的本地人出去转转：数码、美食、天际线，还有一大早的深圳。',
       primaryCta: '查看免费体验',
       secondaryCta: '成为向导',
       scroll: '向下滑动',
@@ -117,12 +118,12 @@ export const zhHans: Dictionary = {
       verified: '实名认证的本地人',
       refund: '试运营期间免费',
       reviewed: '评价来自社区用户',
-      noGroups: '从不跟团',
+      noGroups: '绝不是跟团游',
     },
     packages: {
       kicker: '几个小时，一位本地人',
-      title: '你的三小时，你来挑。',
-      body: '下面每个体验都是一对一，试运营期间免费——两小时或三小时，只把一件事做透，而不是隔着大巴车窗瞄六个地方。',
+      title: '两小时还是三小时，你来挑。',
+      body: '下面每个体验都只有你（愿意的话再带个朋友）和一位本地人，试运营期间免费。大多数可以选两小时或三小时，人才公园和蛇口固定两小时。每一趟只把一件事做透，而不是隔着大巴车窗瞄六个地方。',
       featuredLabel: '最多人预约',
       allLink: '全部体验',
       priceNote: '试运营期间{price}——伙伴的时间不收钱，你吃的、坐的都按本地价自己付。',
@@ -139,15 +140,15 @@ export const zhHans: Dictionary = {
       travelerTitle: '给旅行者',
       travelerSubtitle: '来深圳玩',
       travelerPoints: [
-        '跨过语言这道坎——按共同语言匹配',
-        '找到只有本地人才知道的地方',
-        '有人情味、随性，而且实惠',
+        '沟通不成问题——按共同语言匹配',
+        '去本地人真正常去的地方',
+        '就你一个人，或者再带个朋友，绝不是跟团游',
       ],
       localTitle: '给本地人',
       localSubtitle: '住在深圳',
       localPoints: [
         '认识来自世界各地的人',
-        '分享你最喜欢的地方和故事',
+        '带人去你自己真心喜欢的地方',
         '时间、话题、节奏都由你定',
       ],
     },
@@ -178,7 +179,7 @@ export const zhHans: Dictionary = {
         },
         {
           title: '真的免费',
-          body: '试运营期间预约不花一分钱——不用绑卡，也不交订金。如果没能确认你约的日子，我们会马上告诉你，反正从头到尾都没扣过钱。',
+          body: '试运营期间预约不花一分钱——不用绑卡，也不交订金。要是你约的那天确认不了，我们会马上告诉你，从头到尾都没收过你的钱。',
         },
       ],
     },
@@ -193,7 +194,7 @@ export const zhHans: Dictionary = {
       steps: [
         {
           title: '选体验',
-          body: '选一个现成的体验，或者说说你喜欢什么，让伙伴围绕它来安排这一天。',
+          body: '挑一个现成的体验，或者说说你喜欢什么，让伙伴照着你的喜好来安排这一天。',
         },
         {
           title: '选日子',
@@ -201,14 +202,14 @@ export const zhHans: Dictionary = {
         },
         {
           title: '碰面，出发',
-          body: '出发前先发消息聊聊，在约好的地点碰头，然后开逛。结束后留个评价。',
+          body: '提前发消息聊聊，在约好的地点见面，然后开逛。结束后留个评价。',
         },
       ],
     },
     testimonials: {
       kicker: '评价',
-      title: '还没有评价——我们才刚开始。',
-      body: '这个网站上的每一条评价，都只会来自真实完成的预约。我们不会自己写，也不会花钱买。试运营期间约上一天，这里的第一条评价也许就出自你——好评差评都算。',
+      title: '还没有评价——我们才刚开张。',
+      body: '这里的每一条评价，都只会来自真正走完的行程。我们不自己写，也不花钱买。试运营期间约上一天，第一条评价说不定就是你写的——好评差评都行。',
     },
     journal: {
       kicker: '专栏',
@@ -218,8 +219,8 @@ export const zhHans: Dictionary = {
     },
     moments: {
       kicker: '瞬间',
-      title: '全是我们自己拍的，没有一张图库照。',
-      body: '这个网站上的每一张照片，都是我们在这座城市里拍的。',
+      title: '全是实拍，不用图库。',
+      body: '相册里的每一张照片，都是我们自己在深圳拍的。',
       cta: '打开相册',
     },
     finalCta: {
@@ -236,25 +237,25 @@ export const zhHans: Dictionary = {
       heroAlt: '黄昏时分的深圳湾天际线，亮起灯的高楼倒映在水中',
       kicker: '体验',
       title: '几个小时，好好玩透。',
-      body: '六个一对一体验，试运营期间免费，每次两小时或三小时。你约的是一位深圳本地人的一个下午，而不是大巴上的一个座位，所以当天怎么走，随你。',
-      priceLine: '{price} · 两小时或三小时 · 一对一',
+      body: '六个体验，每次只接待一到两位，不拼团，试运营期间免费。有的固定两小时，其余的可以选两小时或三小时。你约的是一位深圳本地人的一个下午，而不是大巴上的一个座位，所以当天怎么走，随你。',
+      priceLine: '{price} · 1–2 人 · 两小时或三小时，视行程而定',
       countLine: '{n} 个体验',
       notATour: {
         title: '我们不是旅行社。',
-        body: '没有大巴、没有团、没有小旗子，也没有回扣。你约的是一位深圳本地人的几个小时——试运营期间免费；那天你吃的、坐的、买的，都按本地价直接付给店家。',
+        body: '没有大巴、没有团、没有小旗子，也没有回扣。深圳本地人陪你的这几个小时，试运营期间免费；当天吃的、坐的、买的，都按本地价自己直接付。',
       },
     },
     detail: {
       readMoreTitle: '完整攻略：{title}',
       moreBeats: '后面还有 {n} 站',
       itinerary: '这一天怎么走',
-      itineraryNote: '时间是从碰面开始算的，不是具体钟点——出发时间预约时你自己选。',
+      itineraryNote: '时间从碰面那一刻算起，不是具体钟点；几点出发，预约时你自己定。',
       tourLength: '行程时长',
-      customizable: '行程可以按每位旅行者的需要调整——预约时尽管告诉我们你的想法。',
-      includes: '包含什么',
-      notIncluded: '不包含什么',
+      customizable: '每个行程都能按你的情况调整，预约时把你的想法告诉我们就行。',
+      includes: '行程包含',
+      notIncluded: '行程不含',
       goodFor: '适合谁',
-      insiderTip: '有件事值得先知道',
+      insiderTip: '小贴士',
       meetingPoint: '碰面地点',
       bestStart: '建议出发时间',
       district: '所在区',
@@ -263,12 +264,12 @@ export const zhHans: Dictionary = {
       groupSizeValue: '1–2 人',
       price: '价格',
       priceNote: '试运营期间免费——预约不用花一分钱。当天你吃的、坐的、买的按本地价自己付。',
-      readMore: '阅读完整攻略',
+      readMore: '查看完整介绍',
       otherExperiences: '其他体验',
       bookCta: '立即预约',
-      bookNote: '下一步选日期、时长（两小时或三小时）和出发时间。全程不用付款。',
-      bookNoteFixed: '下一步选日期和出发时间。这个体验时长为 {n} 小时。全程不用付款。',
-      bookNoteGuest: '无需注册账号。留下 WhatsApp、微信或邮箱，你的伙伴会联系你敲定日期。全程不用付款。',
+      bookNote: '下一步选日期、时长（两小时或三小时）和出发时间。',
+      bookNoteFixed: '下一步选日期和出发时间。这个体验固定 {n} 小时。',
+      bookNoteGuest: '无需注册账号。留下 WhatsApp、微信或邮箱，你的伙伴会联系你敲定日期。',
       backToAll: '全部体验',
     },
   },
@@ -302,7 +303,7 @@ export const zhHans: Dictionary = {
   request: {
     title: '申请这个体验',
     kicker: '无需注册账号',
-    intro: '留下你的联系方式，你的伙伴会主动联系你，一起敲定日期和时间。全程不用付款。',
+    intro: '留下联系方式，伙伴会主动发消息给你，一起敲定日期和时间。',
     name: '你的名字',
     namePlaceholder: '我们该怎么称呼你？',
     contactHeading: '怎么联系你？',
@@ -310,14 +311,14 @@ export const zhHans: Dictionary = {
     whatsapp: 'WhatsApp',
     whatsappPlaceholder: '+1 555 123 4567',
     wechat: '微信号',
-    wechatPlaceholder: 'your_wechat_id',
+    wechatPlaceholder: '你的微信号',
     phone: '电话',
     phonePlaceholder: '+86 ...',
     email: '邮箱',
     emailPlaceholder: 'you@example.com',
     length: '行程时长',
     hours: '{n} 小时',
-    when: '大概什么时候来？',
+    when: '打算什么时候来？',
     whenPlaceholder: '例如：10 月 18 到 20 日，哪天晚上都行',
     whenHint: '选填。大概说一下就好，具体时间你和伙伴再一起定。',
     message: '还有什么想说的？',
@@ -342,7 +343,7 @@ export const zhHans: Dictionary = {
       pledge: '请勾选同意在行程结束后留下评价。',
     },
     thanksTitle: '预约申请已发送！',
-    thanksBody: '你的伙伴通常会在一天内，通过你留下的联系方式联系你，一起敲定日期和时间。',
+    thanksBody: '你的伙伴会通过你留下的联系方式找你，一起敲定日期和时间。我们会在 3 个工作日内确认。',
     thanksFaster: '想更快得到回复？直接联系我们：',
     thanksBack: '返回体验页面',
     thanksMore: '全部体验',
@@ -350,7 +351,7 @@ export const zhHans: Dictionary = {
     accountLogin: '登录',
     accountOr: '或',
     accountSignup: '注册',
-    accountSuffix: '后可以直接选定具体时间，并在网站内给你的伙伴发消息。',
+    accountSuffix: '后，可以直接选好具体时间，还能在站内给伙伴发消息。',
   },
 
   partner: {
@@ -383,7 +384,7 @@ export const zhHans: Dictionary = {
     fullProfile: '完整资料和评价',
     highlights: {
       localTitle: '真正的本地人',
-      localBody: '陪你过这一天的是{name}本人，不是一套导游词。',
+      localBody: '陪你这几个小时的是{name}本人，不是一套导游词。',
       speaksOne: '会说 {n} 种语言',
       speaksMany: '会说 {n} 种语言',
       easyTalk: '聊得来',
@@ -410,13 +411,13 @@ export const zhHans: Dictionary = {
     ideasBody: '下面是{name}可以带你玩的几种方式。说说你喜欢什么，一起把这一天定下来。',
     ideas: [
       '街头小吃和早茶',
-      '电子市场和创客空间',
+      '电子和创客市场',
       '天际线和城市风景',
       '面包店和咖啡馆',
     ],
     bookTitle: '约一天，一起逛',
-    introFreeFixed: '试运营期间行程免费——这次行程是 {n} 小时，不用付款，也不用绑卡。为了让大家都有机会，每人同一时间只能约一次免费行程。选好日期提交申请，我们会发邮件确认。',
-    introFreeChoice: '试运营期间行程免费——可以选 2 小时或 3 小时，不用付款，也不用绑卡。为了让大家都有机会，每人同一时间只能约一次免费行程。选好日期提交申请，我们会发邮件确认。',
+    introFreeFixed: '试运营期间行程免费——这一趟固定 {n} 小时，不用付款，也不用绑卡。为了让大家都有机会，每人同一时间只能约一个免费行程。选好日期提交申请，我们会发邮件确认。',
+    introFreeChoice: '试运营期间行程免费——可以选两小时或三小时，不用付款，也不用绑卡。为了让大家都有机会，每人同一时间只能约一个免费行程。选好日期提交申请，我们会发邮件确认。',
     introPaid: '每次行程 {min} 到 {max} 小时，每小时 {rate}（共 {low}–{high}）。预约时付款；如果我们没能确认，全额退款。',
     touristsOnly: '只有旅行者账号可以预约。',
     createProfileLink: '创建个人资料',
@@ -427,7 +428,7 @@ export const zhHans: Dictionary = {
       middle: '。每人同一时间只能有一个预约，请先',
       finish: '完成付款',
       or: '，或者',
-      release: '释放这个时段',
+      release: '把这个时段让出来',
       suffix: '，再选别的时间。',
     },
     live: {
@@ -456,7 +457,7 @@ export const zhHans: Dictionary = {
       paid: '去付款',
       pendingFree: '正在发送申请…',
       pendingPaid: '正在跳转付款…',
-      noteFree: '不用付款，我们会在 3 个工作日内发邮件确认。',
+      noteFree: '预约不用付款，我们会在 3 个工作日内发邮件确认。',
       notePaid: '现在按每小时 {rate} 付款，先把这一天留下来。我们会在 3 个工作日内确认，没能确认的话全额退款。',
     },
     agree: {
@@ -468,7 +469,7 @@ export const zhHans: Dictionary = {
     },
     support: {
       lead: '行程是免费的。',
-      body: '如果你喜欢我们在做的事，可以赞助一点，让试运营继续下去。',
+      body: '如果你喜欢我们在做的事，可以随手捐一点，让试运营继续办下去。',
       cta: '支持试运营 →',
     },
     mine: {
@@ -499,8 +500,8 @@ export const zhHans: Dictionary = {
       guestNote: '留下 WhatsApp、微信或邮箱，{name}会联系你约时间。想现在就选好具体时段的话：',
       signup: '注册并预约这一天',
       loginPrefix: '不到一分钟就能搞定。已经有账号？',
-      loginSuffixFree: '。办完回来，这一天照样可以约——而且试运营期间行程免费。',
-      loginSuffixPaid: '。办完回来，这一天照样可以约；如果{name}那天没能确认，全额退款。',
+      loginSuffixFree: '。注册或登录完回来，这一天照样能约——而且试运营期间行程免费。',
+      loginSuffixPaid: '。注册或登录完回来，这一天照样能约；如果{name}那天没能确认，全额退款。',
     },
     errors: {
       touristsOnly: '只有旅行者账号可以预约。请在个人资料里把身份设为“旅行者”。',
@@ -517,7 +518,7 @@ export const zhHans: Dictionary = {
       slotTaken: '{range} 这个时段约不了——不在向导的空闲时间内，或者离其他预约太近。请从列出的时段里选。',
       justBooked: '不好意思，这个时间刚刚被别人约走了。',
       alreadyBooked: '你已经有一个预约了。行程免费，每人同一时间只能有一个预约——想换的话，请先取消原来那个。',
-      createFailed: '预约没能创建成功。',
+      createFailed: '预约没成功。',
       cancelMissing: '缺少预约编号。',
       cancelNotFound: '找不到这个预约。',
       cancelNotYours: '这不是你的预约。',
@@ -537,23 +538,23 @@ export const zhHans: Dictionary = {
     channels: {
       email: {
         title: '打个招呼',
-        description: '问题、反馈、合作想法，或者只是来打声招呼都行。每条消息我们都会看。',
+        description: '问题、反馈、合作想法，或者只是来问声好，都行。每条消息我们都会看。',
         cta: '发邮件给我们',
       },
       whatsapp: {
         title: 'WhatsApp',
-        description: '出发前或旅途中，这是找到我们最快的方式。发条消息过来，我们在深圳回复，一般当天就有回音。',
+        description: '出发前或旅途中，这是找到我们最快的方式。发条消息过来，我们人就在深圳，一般当天就回你。',
         cta: '在 WhatsApp 上聊',
       },
       wechat: {
         title: '微信',
-        description: '已经在用微信？搜 ID 加创始人 Bryan，顺手打个招呼，让我们知道你是谁。',
-        copy: '复制 ID',
+        description: '已经在用微信？搜微信号加创始人 Bryan，顺手打个招呼，让我们知道你是谁。',
+        copy: '复制微信号',
         copied: '已复制',
       },
       guide: {
         title: '成为向导',
-        description: '住在深圳，想带外地来的朋友逛逛？提交申请，我们会优先审核你的资料。',
+        description: '住在深圳，想带来玩的旅行者逛逛？提交申请，我们会优先审核你的资料。',
         cta: '申请',
       },
       press: {
@@ -590,26 +591,26 @@ export const zhHans: Dictionary = {
       badge: '试运营 · 深圳起步',
       titleLead: '献给爱探索的旅人，也献给',
       titleAccent: '热爱自己城市的本地人。',
-      body: 'Shenzhen Buddies 帮旅行者找到兴趣相投的本地人。随性、实惠、有人情味——和旅游大巴正好相反。',
-      imageAlt: '深圳餐桌上的一盆小龙虾，一筷子刚夹起的面条',
+      body: 'Shenzhen Buddies 帮旅行者找到兴趣相投的本地人。只有你（想的话再带个朋友）和一位本地人，不坐旅游大巴。',
+      imageAlt: '深圳餐桌上的一碗小龙虾，一筷子刚夹起的面条',
     },
     why: {
       kicker: '我们为什么做这件事',
       title: '旅行，不该只有旅游大巴。',
-      body: '朋友们总说，这里的东西好吃得不得了，人也热情——可一趟下来，一半时间都在翻译菜单、跟地图软件较劲。缺的不是一个更花哨的预订网站，而是一个人。',
+      body: '朋友们总说，这里的东西好吃得不得了，人也热情——可一趟下来，一半时间都在翻译菜单、跟地图软件较劲。缺的不是一个更花哨的预约网站，而是一个人。',
     },
     pillars: {
       interests: {
         title: '按兴趣匹配',
-        body: '不是一张排满日期的表，而是一个真人——和你一样在乎美食、艺术、数码或者徒步。',
+        body: '不是一串可约的日期，而是一个真人——和你一样在乎美食、艺术、数码或者徒步。',
       },
       casual: {
         title: '随性，不商业',
-        body: '这里的本地人不是持证导游，而是街坊邻居——就像有朋友来玩时，带着四处转转一样。',
+        body: '这里的本地人不是持证导游，而是街坊邻居——平时有朋友来玩怎么带，就怎么带你。',
       },
       trust: {
         title: '信任靠积累',
-        body: '主页的互动攒够了，评价才会显示出来。这样第一印象才足够真实。',
+        body: '主页的互动攒够了，评价才会公开显示，第一印象也就更真实。',
       },
     },
     team: {
@@ -631,12 +632,12 @@ export const zhHans: Dictionary = {
       sunsetAlt: '日落时分，Bryan 和 Takahiro 在水边',
       sunsetCaption: '湖边看日落',
       bbqAlt: 'Bryan 和 Takahiro 在吃韩式烤肉',
-      bbqCaption: '边吃烤肉边商量大计',
+      bbqCaption: '边吃韩式烤肉边商量大计',
     },
     quote: '我们在陌生城市度过的每一个好日子，开头都一样：一个住在那儿的人说，“走，我带你去。”',
     cta: {
       title: '趁我们还小，一起来吧。',
-      body: '试运营期的价格，创始人亲自照顾每一位新用户，产品往哪儿走，也由早期用户说了算。',
+      body: '试运营期间行程免费，每一位新注册的用户我们两个都会亲自看，接下来做什么，由早期用户的需求来定。',
       join: '加入试运营',
       talk: '和我们聊聊',
     },
@@ -655,7 +656,7 @@ export const zhHans: Dictionary = {
       nanshan: {
         name: '南山区',
         sub: 'Nanshan',
-        blurb: '深圳的科技区，也是绿化最好的一块。内陆是大公司总部和高校，海边是深圳湾和滨海公园，再往西，是蛇口老外扎堆的酒吧和轮渡码头。',
+        blurb: '深圳的科技区，也是绿化最好的一块。离海远些的地方是大公司总部和高校，海边是深圳湾和滨海公园，再往西，是蛇口老外扎堆的酒吧和轮渡码头。',
         alt: '南山深圳湾体育中心贝壳状的镂空屋顶，背后是晴朗的天空',
       },
       futian: {
@@ -667,25 +668,25 @@ export const zhHans: Dictionary = {
       luohu: {
         name: '罗湖区',
         sub: 'Luohu',
-        blurb: '深圳起步的地方，也是大多数人第一次落脚的地方——出了罗湖口岸，走几步就是老城区。东门那几条老商业街就在这里，吃的比西边高楼底下更有年头，也更便宜。',
+        blurb: '深圳起步的地方，也是大多数人初来乍到的第一站——出了罗湖口岸，走几步就是老城区。东门那几条老商业街就在这里，吃的比西边高楼底下更有年头，也更便宜。',
         alt: '罗湖站广深城际铁路的入口和蓝色指示牌',
       },
       baoan: {
         name: '宝安区',
         sub: "Bao'an",
         blurb: '机场所在的区，也是真正“造东西”的地方——给市区各大市场供货的作坊和工厂都在这儿。海边一带已经改造成公园和滨海步道，值得专程跑一趟。',
-        alt: '俯瞰深圳宝安国际机场 T3 航站楼，白色镂空屋顶铺满整片停机坪',
+        alt: '俯瞰深圳宝安国际机场 T3 航站楼，白色镂空屋顶在停机坪之间舒展开来',
       },
       longhua: {
         name: '龙华区',
         sub: 'Longhua',
-        blurb: '高铁门户——半小时到广州，去全国大部分地方也都从同一个候车大厅出发。车站周边是制造业和密密麻麻的新楼盘，房价不高，吸引了不少年轻人往北搬。',
+        blurb: '高铁枢纽——半小时到广州，去全国大部分地方也都从同一个候车大厅出发。车站周边是制造业和密密麻麻的新楼盘，房价不高，吸引了不少年轻人往北搬。',
         alt: '龙华深圳北站的屋顶轮廓，上面是红色的“深圳北站”四个大字',
       },
       longgang: {
         name: '龙岗区',
         sub: 'Longgang',
-        blurb: '城市东边的外围——有为 2011 年大运会建的场馆、大型科技园区，再往外，城市就慢慢散进山和水库里。离口岸最远，也是六个区里游客最少的。',
+        blurb: '深圳东边的外围——为 2011 年大运会建的场馆、大型科技园区都在这儿；再往外，城市就慢慢散进山和水库里。离口岸最远，也是六个区里游客最少的。',
         alt: '龙岗大运中心多面体的绿色“水晶”屋顶',
       },
     },
@@ -697,7 +698,7 @@ export const zhHans: Dictionary = {
       bodyTail: '逛逛。',
       alts: [
         '深圳夜市里卖昆虫串的摊位',
-        '筷子夹起面条，旁边是一盆蒜蓉小龙虾',
+        '筷子夹起面条，旁边是一碗蒜蓉小龙虾',
         '工作台上的单板电脑和杜邦线',
         '夜里亮着白光的深圳高楼，下方是人行天桥',
         '白切鸡饭，淋上姜葱油，配一份青菜',
@@ -708,7 +709,7 @@ export const zhHans: Dictionary = {
     },
     closing: {
       title: '没找到想要的？',
-      body: '告诉我们你喜欢什么——徒步、电子、深夜爵士、茶道都行——我们帮你找一位真正玩这些的本地人。',
+      body: '告诉我们你喜欢什么——徒步、数码、深夜爵士、茶道都行——我们帮你找一位真正玩这些的本地人。',
       cta: '开始匹配',
     },
     credits: {
@@ -776,7 +777,7 @@ export const zhHans: Dictionary = {
     opening: '正在打开…',
     signUpToMessage: '注册后发消息',
     aiKicker: 'AI 推荐',
-    aiTitle: '帮你挑好了：在深圳和你最合拍的人。',
+    aiTitle: '在深圳和你最合拍的人。',
     why: '推荐理由：{reasons}',
     whySpeaks: '都会说{list}',
     whyInto: '都喜欢{list}',
@@ -787,6 +788,11 @@ export const zhHans: Dictionary = {
     badgeShared: '{n} 个共同点',
     badgeSameCity: '同城',
     badgeMatch: '匹配',
+    cityNames: {
+      shenzhen: '深圳',
+      'hong kong': '香港',
+      guangzhou: '广州',
+    },
     languageNames: {
       english: '英语',
       mandarin: '普通话',
@@ -802,7 +808,7 @@ export const zhHans: Dictionary = {
     },
     hobbyNames: {
       'street food': '街头小吃',
-      'dim sum': '早茶点心',
+      'dim sum': '早茶',
       coffee: '咖啡',
       tea: '喝茶',
       hiking: '徒步',
@@ -877,33 +883,33 @@ export const zhHans: Dictionary = {
   review: {
     back: '← 我的预约',
     title: '这次行程怎么样？',
-    when: '{when} · 和 {name} 一起',
+    when: '{when} · 和{name}一起',
     yourGuide: '你的向导',
-    tipped: '小费已收到——谢谢你！这笔钱会全部交给 {name}。',
+    tipped: '小费已收到——谢谢你！这笔钱会全部交给{name}。',
     thanks: '谢谢——你的评价已提交。',
     notFinished: '行程还没结束——结束后再回到这里写评价吧。',
-    notConfirmed: '这个预约不是已确认的行程，所以没有可评价的内容。',
+    notConfirmed: '这个预约没有确认成行，所以没什么可评价的。',
     changeRating: '修改评价',
     oneTap: '点一下就够了',
     saving: '保存中…',
     words: '说几句',
     wordsHint: '（选填，10–100 字）',
     placeholder: '有什么让你印象深刻？好的坏的都可以。',
-    note: '点一下大拇指，评价就保存好了。真实的评价，不论好坏，都会公开在 {name} 的个人主页上。',
-    tipTitle: '想给 {name} 一点小费吗？',
-    tipBody: '完全自愿——给不给，行程都免费。小费会全部交给 {name}。',
+    note: '点一下大拇指，评价就保存好了。真实的评价，不论好坏，都会公开在{name}的个人主页上。',
+    tipTitle: '想给{name}一点小费吗？',
+    tipBody: '完全自愿——给不给，行程都免费。小费会全部交给{name}。',
     errors: {
       notFound: '找不到这个预约。',
       notApproved: '只有已确认的行程才能评价。',
       notFinished: '行程结束后才能评价。',
-      thumb: '请选择大拇指朝上或朝下。',
+      thumb: '请先点一下👍或👎。',
       noGuide: '没有可以评价的向导。',
       words: '文字评价需要 {min}–{max} 个词（你写了 {n} 个）。也可以不写——点个大拇指就够了。',
       chars: '文字评价需要 {min}–{max} 个字（你写了 {n} 个）。也可以不写——点个大拇指就够了。',
       rls: '行程结束后就可以写评价了。',
       generic: '评价没能保存，请再试一次。',
       tipAmount: '请选择 CA$1 到 CA$500 之间的整数小费金额。',
-      tipCheckout: '没能发起小费付款，请再试一次。',
+      tipCheckout: '小费付款页面没打开，请再试一次。',
     },
   },
 
@@ -968,7 +974,7 @@ export const zhHans: Dictionary = {
   },
 
   blog: {
-    kicker: '深圳笔记',
+    kicker: '专栏',
     title: '深圳实地笔记',
     description: '过关、付款、各个街区，还有住在这里的人——来之前值得先知道的事。',
     filterLabel: '按主题筛选文章',
@@ -982,6 +988,7 @@ export const zhHans: Dictionary = {
     readNext: '接着读',
     ctaLabel: '找个本地人带你逛',
     ctaBody: '按你真正感兴趣的来匹配，而不是走一条固定路线。',
+    ctaButton: '找个伙伴',
     lastChecked: '最后核实：{date}。过关和签证规定随时可能变化——有时效性的信息，出发前请再向官方渠道确认一次。',
     englishOnly: '这篇文章暂时只有英文版。',
     pillars: {
@@ -1009,25 +1016,25 @@ export const zhHans: Dictionary = {
     badge: '试运营中 · 所有行程免费',
     titleLead: '你在深圳的第一天，',
     titleAccent: '免费。',
-    body: '别挤旅游大巴了。花两小时或三小时，跟着真正的本地人去吃、去逛，钻进那些你自己根本找不到的街角。试运营期间，全程不花一分钱。',
+    body: '别挤旅游大巴了。花两小时或三小时，跟一个住在这儿、知道哪里有好吃的人一起逛。试运营期间，这一趟不用你掏钱。',
     ticketLabel: '试运营价',
     ticketFree: '免费',
     ticketNoCode: '无需优惠码',
     ticketNote: '不用绑卡，不交订金，也没有付款环节——选好日子就行',
     primaryCta: '免费约一天 →',
     secondaryCta: '看看有哪些体验',
-    trust: ['2 或 3 小时，全程免费', '不绑卡，不交订金', '邮件确认'],
+    trust: ['两小时或三小时的行程免费', '不绑卡，不交订金', '邮件确认'],
     deal: {
       kicker: '试运营福利',
-      titleLead: '出门玩一天，',
-      titleAccent: '一分钱不花。',
-      body: 'Shenzhen Buddies 刚刚起步，这段时间所有行程都免费——约一位本地伙伴，2 小时或 3 小时随你选。整个流程压根没有付款这一步：提交申请后，我们会在三个工作日内发邮件确认。',
+      titleLead: '伙伴陪你的这几个小时，',
+      titleAccent: '一分钱不收。',
+      body: 'Shenzhen Buddies 刚刚起步，这段时间所有行程都免费——约一位本地伙伴，两小时或三小时随你选。整个流程压根没有付款这一步：提交申请后，我们会在三个工作日内发邮件确认。',
       cta: '选个日子',
       exampleLabel: '举个例子 · 3 小时行程',
       rateNote: '平时每小时 CA$10，试运营期间全免',
       rows: {
         length: '行程时长',
-        lengthValue: '2 或 3 小时',
+        lengthValue: '两小时或三小时',
         time: '伙伴陪同',
         timeValue: '免费',
         extras: '吃饭和交通',
@@ -1042,7 +1049,7 @@ export const zhHans: Dictionary = {
       steps: [
         {
           title: '选日子',
-          body: '挑一个还有空的日期，再定 2 小时还是 3 小时，你说了算。',
+          body: '挑一个还有空的日期，再定两小时还是三小时，你说了算。',
         },
         {
           title: '免费提交申请',
@@ -1060,7 +1067,7 @@ export const zhHans: Dictionary = {
       items: [
         {
           title: '本地人，不是背稿的导游',
-          body: '陪你一整天的，是真正住在这里、也乐意带你到处转转的人。',
+          body: '和你待上几个小时的，是真正住在这里、也乐意带人到处转转的人。',
         },
         {
           title: '完全免费',
@@ -1068,14 +1075,14 @@ export const zhHans: Dictionary = {
         },
         {
           title: '零风险',
-          body: '没付过钱，自然也不存在退款。万一没法确认你的日子，我们会第一时间告诉你，你什么也不会损失。',
+          body: '本来就没付钱，也就谈不上退款。万一你约的那天确认不了，我们会第一时间告诉你，你什么也不亏。',
         },
       ],
     },
     honest: {
       kicker: '说句实话',
       title: '还没有评价。',
-      body: '我们刚开张。这里的每一条评价都只会来自真实完成的预约，我们绝不自己写。约上一天，来当第一个说说真实感受的人吧。',
+      body: '我们刚开张。这里的每一条评价，都只会来自真正走完的行程，我们绝不自己写。约上一天，来当第一个说说真实感受的人吧。',
     },
     faq: {
       kicker: '先了解一下',
@@ -1091,11 +1098,11 @@ export const zhHans: Dictionary = {
         },
         {
           q: '一次行程多长？',
-          a: '2 小时或 3 小时，你来定，全程和伙伴一对一。',
+          a: '大多数行程两小时或三小时，你来定；人才公园和蛇口固定两小时。全程不拼团：只有你（愿意的话再带个朋友）和你的伙伴。',
         },
         {
           q: '可以一次约好几个行程吗？',
-          a: '一次只能约一个。行程是免费的，所以在这次结束之前，每人只保留一个预约，好让大家都有机会。玩完之后，欢迎再约。',
+          a: '一次只能约一个。行程免费，为了让大家都轮得上，每人要等这次行程结束才能再约。玩完之后，欢迎再来。',
         },
         {
           q: '什么时候能知道约成了？',
@@ -1125,9 +1132,6 @@ export const zhHans: Dictionary = {
       signupLink: '注册',
       bannerAlt: 'SplitWhom——和朋友分摊共同开销',
       photoAlt: '夜色中的深圳',
-      quote:
-        '“Daniel 带我去了一家饺子馆，地图软件上根本搜不到。现在我们还时不时发消息聊吃的。”',
-      quoteBy: '—— Marco R.，从米兰来玩',
     },
     signup: {
       kicker: '加入我们',
@@ -1139,7 +1143,7 @@ export const zhHans: Dictionary = {
       haveAccount: '已经有账号了？',
       loginLink: '登录',
       photoAlt: '深圳夜市摊上正在烤的串',
-      panelTitle: '随性、实惠、有人情味。',
+      panelTitle: '随性、有人情味，眼下还免费。',
       panelBody:
         '按你真正喜欢的东西来匹配——语言、美食、艺术、徒步、数码——认识一个熟门熟路的本地人。',
       points: ['试运营期间免费', '随时可以取消', '评价来自社区用户'],
@@ -1180,7 +1184,7 @@ export const zhHans: Dictionary = {
     kicker: '支持试运营',
     titleLine1: '行程免费，',
     titleLine2: '运营可不免费。',
-    body: 'Shenzhen Buddies 刚起步，这段时间所有行程都免费——不收预约费，也不按小时收钱。如果和伙伴出去的那一天让你的旅程更好玩，或者你只是喜欢我们在做的事，捐一点小钱就能帮我们补贴向导的时间，让试运营继续下去。多少都行，什么时候都行，约没约过行程都可以。',
+    body: 'Shenzhen Buddies 刚起步，这段时间所有行程都免费——不收预约费，也不按小时收费。如果跟伙伴出去的那一天让你这趟旅行更尽兴，或者你只是喜欢我们在做的事，捐一点，就能帮我们给向导发点补贴，让试运营继续办下去。多少都行，什么时候都行，约没约过行程都可以。',
     thanks: '谢谢你！捐款已经收到，真的帮了我们大忙。',
     bookPrefix: '还没预约？',
     bookLink: '先约一次免费行程',
@@ -1188,7 +1192,7 @@ export const zhHans: Dictionary = {
     errors: {
       setup: '捐款功能还没开通——心意我们收到了，谢谢！',
       amount: '请选择 CA$1 到 CA$500 之间的整数金额。',
-      checkout: '支付没能发起，请再试一次。',
+      checkout: '付款页面没打开，请再试一次。',
     },
   },
 

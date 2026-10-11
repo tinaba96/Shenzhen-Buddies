@@ -6,7 +6,8 @@ import { getI18n } from '@/i18n/server'
 import type { Dictionary } from '@/i18n'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = (await getI18n()).t.seo.about
+  const { meta, t } = await getI18n()
+  const seo = t.seo.about
   return {
     title: seo.title,
     description: seo.description,
@@ -15,6 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // metadata merges per key — so a page that omits this inherits the site's
     // generic title, description and an og:url pointing at the homepage.
     openGraph: {
+      locale: meta.ogLocale,
       title: seo.title,
       description: seo.description,
       url: '/about',

@@ -13,7 +13,7 @@ import { getI18n } from '@/i18n/server'
 import { FREE_TOURS } from '@/lib/booking'
 import { isSingleGuideMode } from '@/lib/config'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import type { Locale } from '@/i18n/config'
+import { LOCALE_META, type Locale } from '@/i18n/config'
 import { HeroImage } from '@/components/HeroImage'
 
 export default async function Home() {
@@ -27,7 +27,7 @@ export default async function Home() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <Hero loggedIn={!!user} t={t} />
+      <Hero loggedIn={!!user} sep={LOCALE_META[locale].sep} t={t} />
       <Ticker locale={locale} />
       <Packages locale={locale} t={t} />
       <Promise_ t={t} />
@@ -45,7 +45,15 @@ export default async function Home() {
 
 // ---------------------------------------------------------------------------
 
-function Hero({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
+function Hero({
+  loggedIn,
+  sep,
+  t,
+}: {
+  loggedIn: boolean
+  sep: string
+  t: Dictionary
+}) {
   return (
     <section className="sb-grain relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
@@ -127,15 +135,16 @@ function Hero({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
             the primary path is now the experience catalogue. */}
         {!loggedIn && (
           <p className="mt-6 text-xs text-white/70">
-            {t.common.freeDuringPilot} ·{' '}
+            {t.common.freeDuringPilot}
+            {sep}
             <Link href="/signup?as=tourist" className="underline hover:text-white">
               {t.common.findALocal}
-            </Link>{' '}
-            ·{' '}
+            </Link>
+            {sep}
             <Link href="/explore" className="underline hover:text-white">
               {t.common.exploreFirst}
-            </Link>{' '}
-            ·{' '}
+            </Link>
+            {sep}
             <Link href="/login" className="underline hover:text-white">
               {t.common.alreadyHaveAccount}
             </Link>
@@ -215,7 +224,7 @@ const TICKER: { roman: string; cn: PlaceName }[] = [
   { roman: 'Dàpáidàng', cn: { hans: '大排档', hant: '大排檔', ja: '大排檔' } },
   { roman: 'Shenzhen Bay', cn: { hans: '深圳湾', hant: '深圳灣', ja: '深圳湾' } },
   { roman: 'Longgang', cn: { hans: '龙岗', hant: '龍崗', ja: '龍崗' } },
-  { roman: 'Baoan', cn: { hans: '宝安', hant: '寶安', ja: '宝安' } },
+  { roman: "Bao'an", cn: { hans: '宝安', hant: '寶安', ja: '宝安' } },
   { roman: 'Longhua', cn: { hans: '龙华', hant: '龍華', ja: '龍華' } },
 ]
 

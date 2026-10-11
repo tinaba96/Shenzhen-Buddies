@@ -118,9 +118,9 @@ export const shenzhenAfterDark: Post = {
     {
       k: 'ul',
       items: [
-        'The metro is superb and not nocturnal: last trains leave before midnight, and a platform you confidently rode at 22:00 is locked at 01:00. Check the last-train time at the station you plan to come home through before the evening runs away from you.',
+        'The metro is excellent, but it goes to bed: last trains leave before midnight, and a platform you confidently rode at 22:00 is locked at 01:00. Check the last-train time at the station you plan to come home through before the evening runs away from you.',
         'After the metro, the city runs on ride-hailing, and ride-hailing runs on your phone — which means on the payment setup you did before you got hungry. The steps live in [our border-crossing guide](/blog/shenzhen-from-hong-kong-day-trip); do them on wifi, in daylight.',
-        'Safety is the thing first-time visitors ask about and then feel silly for asking. We have walked guests back to their hotels at one in the morning more times than we can count, and it has never once felt tense. Keep the ordinary big-city sense about your phone and your drink, and the night is yours.',
+        'Safety is the thing first-time visitors ask about and then feel silly for asking. We have walked guests back to their hotels at one in the morning more times than we can count, and it has never once felt tense. Keep the ordinary big-city sense about your phone and your drink, and you will be fine.',
       ],
     },
     {
@@ -140,7 +140,7 @@ export const shenzhenAfterDark: Post = {
     {
       k: 'cta',
       label: 'Spend the evening with someone who lives here',
-      sub: 'Two or three hours under the towers after dark, or along the water in Shekou. Your call.',
+      sub: 'Two or three hours under the towers after dark, or two along the water in Shekou. Your call.',
     },
   ],
   faq: [

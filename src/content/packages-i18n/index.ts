@@ -94,10 +94,10 @@ export function localizedPackage(
 // but is the wrong script on a Traditional or Japanese page. Keyed by slug
 // and checked below, so a new package without its forms fails the build.
 // Not for staff-facing text — book/actions.ts emails the raw `cn` on purpose.
-const CN_FORMS: Record<string, { hant: string; ja: string }> = {
+const CN_FORMS: Record<string, { hant: string; ja: string; hans?: string }> = {
   'huaqiangbei-electronics': { hant: '華強北', ja: '華強北' },
   'dongmen-street-food': { hant: '東門老街', ja: '東門老街' },
-  'skyline-after-dark': { hant: '福田CBD', ja: '福田CBD' },
+  'skyline-after-dark': { hant: '福田 CBD', ja: '福田CBD', hans: '福田 CBD' },
   'talent-park-night': { hant: '人才公園', ja: '人才公園' },
   'shekou-sea-world': { hant: '海上世界', ja: '海上世界' },
   'shenzhen-bay-cycling': { hant: '深圳灣公園', ja: '深圳湾公園' },
@@ -111,6 +111,8 @@ export function localizedCn(
   if (!forms) return pkg.cn
   if (locale === 'zh-Hant') return forms.hant
   if (locale === 'ja') return forms.ja
+  // zh-Hans copy spaces Latin from Han; the base `cn` is unspaced for English pages.
+  if (locale === 'zh-Hans' && forms.hans) return forms.hans
   return pkg.cn
 }
 

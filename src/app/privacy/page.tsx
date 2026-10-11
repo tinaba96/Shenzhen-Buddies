@@ -1,32 +1,46 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { CONTACT_EMAIL } from '@/lib/config'
+import { PRIVACY, type PrivacySectionId } from '@/content/legal/privacy'
+import {
+  LegalNotice,
+  getLegalLocale,
+  legalMetadata,
+  type LegalSearchParams,
+} from '@/content/legal/shared'
 
-export const metadata: Metadata = {
-  title: 'Privacy — Shenzhen Buddies',
-  description: 'How Shenzhen Buddies handles your data.',
+type Props = { searchParams: LegalSearchParams }
+
+export async function generateMetadata({
+  searchParams,
+}: Props): Promise<Metadata> {
+  const legal = await getLegalLocale(searchParams)
+  return legalMetadata(legal, '/privacy', PRIVACY[legal.locale].seo)
 }
 
-const LAST_UPDATED = 'June 2026'
-
+// Order and icons only; titles and bodies live in src/content/legal/privacy.
 const SECTIONS: {
-  id: string
-  title: string
+  id: PrivacySectionId
   icon: 'shield' | 'collect' | 'use' | 'eye' | 'globe' | 'lock' | 'cookie' | 'send'
 }[] = [
-  { id: 'who', title: 'Who we are', icon: 'shield' },
-  { id: 'collect', title: 'What we collect', icon: 'collect' },
-  { id: 'use', title: 'How we use it', icon: 'use' },
-  { id: 'visibility', title: 'Who can see your profile', icon: 'eye' },
-  { id: 'third-parties', title: 'Third parties', icon: 'globe' },
-  { id: 'rights', title: 'Your rights', icon: 'lock' },
-  { id: 'cookies', title: 'Cookies', icon: 'cookie' },
-  { id: 'contact', title: 'Contact', icon: 'send' },
+  { id: 'who', icon: 'shield' },
+  { id: 'collect', icon: 'collect' },
+  { id: 'use', icon: 'use' },
+  { id: 'visibility', icon: 'eye' },
+  { id: 'third-parties', icon: 'globe' },
+  { id: 'rights', icon: 'lock' },
+  { id: 'cookies', icon: 'cookie' },
+  { id: 'contact', icon: 'send' },
 ]
 
-export default function PrivacyPage() {
+export default async function PrivacyPage({ searchParams }: Props) {
+  const legal = await getLegalLocale(searchParams)
+  const copy = PRIVACY[legal.locale]
   return (
-    <main className="flex flex-1 flex-col">
+    <main
+      className="flex flex-1 flex-col"
+      lang={legal.forcedEnglish ? 'en' : undefined}
+    >
+      <LegalNotice legal={legal} path="/privacy" />
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-white to-rose-50 dark:from-zinc-900 dark:via-black dark:to-zinc-900" />
         <div
@@ -42,16 +56,15 @@ export default function PrivacyPage() {
               <path d="M9 12l2 2 4-4" />
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
-            We don&apos;t sell your data.
+            {copy.badge}
           </span>
           <h1 className="mt-6 text-balance text-5xl font-semibold tracking-tight sm:text-6xl">
-            Privacy
+            {copy.title}
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-base text-zinc-600 dark:text-zinc-400">
-            What we collect, why, who sees it, and what you can do about it.
-            No dark patterns, no lawyer-speak.
+            {copy.lead}
           </p>
-          <p className="mt-4 text-xs text-zinc-500">Last updated · {LAST_UPDATED}</p>
+          <p className="mt-4 text-xs text-zinc-500">{copy.lastUpdated}</p>
         </div>
       </section>
 
@@ -59,7 +72,7 @@ export default function PrivacyPage() {
         <aside className="hidden lg:block">
           <nav className="sticky top-20 space-y-1 text-sm">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              On this page
+              {copy.onThisPage}
             </p>
             {SECTIONS.map((s) => (
               <a
@@ -67,7 +80,7 @@ export default function PrivacyPage() {
                 href={`#${s.id}`}
                 className="block rounded-md px-3 py-1.5 text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
               >
-                {s.title}
+                {copy.sections[s.id].title}
               </a>
             ))}
           </nav>
@@ -75,179 +88,35 @@ export default function PrivacyPage() {
 
         <article className="space-y-12 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
           <p className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
-            <strong>Pilot phase notice.</strong> Shenzhen Buddies is in pilot.
-            This page describes our intended practices and will evolve as the
-            product matures. Plain language; not a substitute for legal advice.
+            {copy.pilotNotice}
           </p>
 
-          <Section id="who" icon="shield" title="Who we are">
-            <p>
-              Shenzhen Buddies is operated by <strong>Tensai Tech Inc.</strong>,
-              a company based in Toronto, Canada with a partner team in
-              Shenzhen, China. We are the data controller for the personal
-              information you give us.
-            </p>
-          </Section>
-
-          <Section id="collect" icon="collect" title="What we collect">
-            <ul className="ml-5 list-disc space-y-2">
-              <li>
-                <strong>Account info</strong> — email and a salted/hashed
-                password (managed by Supabase Auth on our behalf).
-              </li>
-              <li>
-                <strong>Profile info you fill in</strong> — display name, role
-                (tourist or guide), city, bio, hobbies, languages, personality
-                traits, optional photo.
-              </li>
-              <li>
-                <strong>Messages</strong> — contents of conversations you start
-                with other users.
-              </li>
-              <li>
-                <strong>Reviews</strong> — stars and written feedback after
-                exchanging a message.
-              </li>
-              <li>
-                <strong>Bookings</strong> — the day and time you book, any note
-                you add, the amount paid, currency, and the Stripe checkout /
-                payment identifiers and status. Card numbers stay with Stripe.
-              </li>
-              <li>
-                <strong>Consent &amp; audit records</strong> — when you book, we
-                record that you agreed to our{' '}
-                <Link href="/terms" className="underline">Terms</Link> and{' '}
-                <Link href="/cancellation" className="underline">
-                  Cancellation Policy
-                </Link>
-                , the policy version, and your <strong>IP address</strong> and{' '}
-                <strong>browser (user-agent)</strong>, as proof of agreement.
-              </li>
-              <li>
-                <strong>Basic technical data</strong> — browser type,
-                approximate region from IP, standard server logs.
-              </li>
-            </ul>
-          </Section>
-
-          <Section id="use" icon="use" title="How we use it">
-            <ul className="ml-5 list-disc space-y-2">
-              <li>To match you with potential buddies who share your interests.</li>
-              <li>To let you message, review, and be reviewed by other users.</li>
-              <li>
-                To take bookings and process payments and refunds via Stripe.
-              </li>
-              <li>
-                To keep an audit record that you agreed to our Terms and
-                Cancellation Policy (a legal basis for the booking contract).
-              </li>
-              <li>To investigate safety reports and protect users from abuse or fraud.</li>
-            </ul>
-            <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
-              We <strong>do not</strong> sell your personal information, run
-              third-party ads against your profile, or share with data brokers.
-            </p>
-          </Section>
-
-          <Section id="visibility" icon="eye" title="Who can see your profile">
-            <p>
-              By default your role/name/photo/bio/hobbies/languages/traits are
-              visible to signed-in users. Switch your profile to{' '}
-              <strong>Private</strong> from{' '}
-              <Link href="/profile" className="underline">/profile</Link> and
-              only you will see it. Your email address is never shown to other
-              users.
-            </p>
-            <p>
-              Reviews you receive appear on your public profile once you have at
-              least three. Until then, only you can see them.
-            </p>
-          </Section>
-
-          <Section id="third-parties" icon="globe" title="Third parties">
-            <ul className="ml-5 list-disc space-y-2">
-              <li>
-                <strong>Supabase</strong> — Postgres, authentication, file
-                storage. (
-                <a
-                  href="https://supabase.com/privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline"
-                >
-                  policy
-                </a>
-                )
-              </li>
-              <li>
-                <strong>Vercel</strong> — application hosting and edge delivery.
-              </li>
-              <li>
-                <strong>Stripe</strong> — payments for bookings, and refunds.
-                Stripe handles all payment-card data. (
-                <a
-                  href="https://stripe.com/privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline"
-                >
-                  policy
-                </a>
-                )
-              </li>
-            </ul>
-          </Section>
-
-          <Section id="rights" icon="lock" title="Your rights">
-            <ul className="ml-5 list-disc space-y-2">
-              <li>
-                <strong>Access</strong> — visible in-app, or email us for a full
-                export.
-              </li>
-              <li>
-                <strong>Correction</strong> — update anytime from{' '}
-                <Link href="/profile" className="underline">/profile</Link>.
-              </li>
-              <li>
-                <strong>Deletion</strong> — email us to delete your account and
-                your profile, messages, and reviews. We may retain limited
-                booking, payment, and consent/audit records where we&apos;re
-                required to keep them (for example, tax, accounting, and
-                fraud-prevention obligations), then delete them when no longer
-                needed.
-              </li>
-            </ul>
-          </Section>
-
-          <Section id="cookies" icon="cookie" title="Cookies">
-            <p>
-              One cookie group: your auth session, set by Supabase Auth so you
-              stay signed in. No analytics or advertising cookies during the
-              pilot.
-            </p>
-          </Section>
-
-          <Section id="contact" icon="send" title="Contact">
-            <p>
-              For privacy questions or to exercise any rights above, email us at{' '}
-              <strong>{CONTACT_EMAIL}</strong>. We aim to respond
-              within seven days.
-            </p>
-            <div className="flex flex-wrap gap-3 pt-2">
-              <Link
-                href="/contact"
-                className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-              >
-                Reach out
-              </Link>
-              <Link
-                href="/about"
-                className="rounded-full border border-zinc-300 px-5 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
-              >
-                About us
-              </Link>
-            </div>
-          </Section>
+          {SECTIONS.map((s) => (
+            <Section
+              key={s.id}
+              id={s.id}
+              icon={s.icon}
+              title={copy.sections[s.id].title}
+            >
+              {copy.sections[s.id].body}
+              {s.id === 'contact' && (
+                <div className="flex flex-wrap gap-3 pt-2">
+                  <Link
+                    href="/contact"
+                    className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                  >
+                    {copy.reachOut}
+                  </Link>
+                  <Link
+                    href="/about"
+                    className="rounded-full border border-zinc-300 px-5 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                  >
+                    {copy.aboutUs}
+                  </Link>
+                </div>
+              )}
+            </Section>
+          ))}
         </article>
       </div>
     </main>

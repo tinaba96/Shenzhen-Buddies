@@ -6,7 +6,8 @@ import { getI18n } from '@/i18n/server'
 import type { Dictionary } from '@/i18n'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = (await getI18n()).t.seo.explore
+  const { meta, t } = await getI18n()
+  const seo = t.seo.explore
   return {
     title: seo.title,
     description: seo.description,
@@ -17,6 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // `images` is not redundant: the object above replaces the inherited one, and
     // the file-convention card goes with it. See DEFAULT_OG_IMAGE in lib/config.
     openGraph: {
+      locale: meta.ogLocale,
       title: seo.title,
       description: seo.description,
       url: '/explore',

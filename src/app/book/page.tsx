@@ -5,11 +5,10 @@ import { GuestRequestForm } from '@/components/GuestRequestForm'
 import { focusFor } from '@/content/gallery'
 import { packageHoursLabel } from '@/content/packages'
 import {
-  localizedCn,
   localizedPackage,
   localizedPackages,
-  titleNamesPlace,
 } from '@/content/packages-i18n'
+import { fill } from '@/i18n'
 import { getI18n } from '@/i18n/server'
 import { DEFAULT_FREE_TOUR_LENGTH, FREE_TOUR_LENGTHS, FREE_TOURS, GUEST_REQUESTS } from '@/lib/booking'
 import { WECHAT_ID, isWhatsAppConfigured } from '@/lib/config'
@@ -53,9 +52,15 @@ export default async function BookPage({ searchParams }: Props) {
               >
                 {p.title}
                 <span className="mt-1 block text-xs font-normal text-zinc-500">
-                  {titleNamesPlace(p)
-                    ? packageHoursLabel(p, t.common)
-                    : `${localizedCn(p, locale)} · ${packageHoursLabel(p, t.common)}`}
+                  {/* The Chinese name is for English readers; zh and ja titles
+                      already carry it. */}
+                  {locale === 'en' ? (
+                    <>
+                      {p.cn} · {packageHoursLabel(p, t.common)}
+                    </>
+                  ) : (
+                    packageHoursLabel(p, t.common)
+                  )}
                 </span>
               </Link>
             </li>
@@ -102,7 +107,7 @@ export default async function BookPage({ searchParams }: Props) {
                     href="/contact#wechat"
                     className="inline-flex items-center rounded-full border border-zinc-300 px-4 py-2 text-sm font-medium transition hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
                   >
-                    WeChat · {WECHAT_ID}
+                    {fill(t.common.wechatId, { id: WECHAT_ID })}
                   </Link>
                 </div>
               </div>
@@ -163,9 +168,7 @@ export default async function BookPage({ searchParams }: Props) {
               {pkg.kicker}
             </p>
             <h2 className="mt-1 text-lg font-semibold">{pkg.title}</h2>
-            {!titleNamesPlace(pkg) && (
-              <p className="text-sm text-zinc-500">{localizedCn(pkg, locale)}</p>
-            )}
+            {locale === 'en' && <p className="text-sm text-zinc-500">{pkg.cn}</p>}
             <dl className="mt-4 space-y-2 border-t border-zinc-100 pt-4 text-sm dark:border-zinc-800">
               <div className="flex justify-between gap-4">
                 <dt className="text-zinc-500">{t.tours.detail.duration}</dt>

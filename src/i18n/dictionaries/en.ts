@@ -26,10 +26,10 @@ export const en = {
   seo: {
     siteTitle: 'Shenzhen Buddies',
     siteDescription:
-      'Match with a local buddy in Shenzhen who shares your interests. Casual, affordable, personal.',
+      'Match with a Shenzhen local who shares your interests, for a private outing of 2 or 3 hours. Bring a friend if you like. Free during our pilot.',
     toursTitle: 'Free local experiences in Shenzhen — Shenzhen Buddies',
     toursDescription:
-      'Six one-on-one experiences in Shenzhen, free during our pilot — the Huaqiangbei electronics market, Dongmen street food, the skyline after dark, and your first hours from Hong Kong.',
+      'Six private experiences in Shenzhen, free during our pilot: the Huaqiangbei electronics market, Dongmen street food, Futian after dark, Talent Park, the Shekou waterfront and a bike ride along Shenzhen Bay.',
     // Per-page <title>, description and share card. English values are the
     // strings the pages shipped with before they were translated.
     about: {
@@ -76,9 +76,9 @@ export const en = {
 
   common: {
     hours: '{n} hours',
-    hoursRange: '{a}–{b} hours',
+    hoursRange: '{a} or {b} hours',
     free: 'Free',
-    oneOnOne: 'One-on-one',
+    oneOnOne: 'Private · 1–2 people',
     perPerson: 'per person',
     from: 'from',
     readMore: 'Read more',
@@ -97,6 +97,8 @@ export const en = {
     signUp: 'Sign up',
     exploreFirst: 'Explore Shenzhen first',
     freeDuringPilot: 'Free during pilot',
+    // The WeChat chip in the footer and on /book. {id} is the account ID.
+    wechatId: 'WeChat · {id}',
   },
 
   nav: {
@@ -128,7 +130,7 @@ export const en = {
       badge: 'Now matching in Shenzhen',
       titleLead: 'See Shenzhen with someone ',
       titleAccent: 'who gets you.',
-      body: 'Skip the tour bus. A few free hours with a local who shares what you are into — electronics, food, skylines, mornings — and a city that finally makes sense.',
+      body: 'Skip the tour bus. Spend two or three free hours with a local who is into the same things you are: electronics, food, skylines, early mornings.',
       primaryCta: 'See the free experiences',
       secondaryCta: 'Become a guide',
       scroll: 'Scroll',
@@ -141,8 +143,8 @@ export const en = {
     },
     packages: {
       kicker: 'A few hours, one local',
-      title: 'Pick your three hours.',
-      body: 'Every experience below is one-on-one and free while we pilot — two or three hours built around one thing done properly rather than six things glimpsed from a coach window.',
+      title: 'Two or three hours, your pick.',
+      body: 'Every experience below is just you (and a friend, if you like) and a local, free while we pilot. Most run 2 or 3 hours, your pick; Talent Park and Shekou run 2. Each one is built around one thing done properly rather than six things glimpsed from a coach window.',
       featuredLabel: 'Most booked',
       allLink: 'All experiences',
       priceNote: '{price} during the pilot — your buddy’s time costs nothing, and what you eat or ride you pay at local prices.',
@@ -160,14 +162,14 @@ export const en = {
       travelerSubtitle: 'Visiting Shenzhen',
       travelerPoints: [
         'Skip the language barrier — match by shared languages',
-        'Discover spots only locals know',
-        'Personal, casual, and affordable',
+        'Go where the locals actually go',
+        'Just you, or you and a friend. Never a group tour',
       ],
       localTitle: 'For locals',
       localSubtitle: 'Live in Shenzhen',
       localPoints: [
         'Meet people from around the world',
-        'Share your favorite spots and stories',
+        'Show people the places you actually like',
         'Pick the days, topics, and pace that work for you',
       ],
     },
@@ -239,7 +241,7 @@ export const en = {
     moments: {
       kicker: 'Moments',
       title: 'Our own photographs, not stock.',
-      body: 'Every picture on this site was taken by us, in this city.',
+      body: 'Every photo in our gallery was taken by us, in this city.',
       cta: 'Open the gallery',
     },
     finalCta: {
@@ -258,8 +260,8 @@ export const en = {
       heroAlt: 'The Shenzhen Bay skyline at dusk, its lit towers reflected in the water',
       kicker: 'Experiences',
       title: 'A few hours, done properly.',
-      body: 'Six one-on-one experiences, free while we pilot — two or three hours each. You are booking a local’s afternoon, not a seat on a bus, so the route bends to you on the day.',
-      priceLine: '{price} · 2 or 3 hours, one-on-one',
+      body: 'Six private experiences for one or two people, free while we pilot. Some run two hours; on the others you pick two or three. You are booking a local’s afternoon, not a seat on a bus, so the route bends to you on the day.',
+      priceLine: '{price} · 1–2 people · 2 or 3 hours depending on the tour',
       countLine: '{n} experiences',
       notATour: {
         title: 'This is not a tour company.',
@@ -272,7 +274,7 @@ export const en = {
       itinerary: 'How the day runs',
       itineraryNote: 'Times are elapsed from your meeting point, not clock times — you pick the start hour when you book.',
       tourLength: 'Tour length',
-      customizable: 'Tours are customizable to each traveller — feel free to tell us what you have in mind when you book.',
+      customizable: 'Every tour can be changed to suit you. Tell us what you have in mind when you book.',
       includes: 'What is included',
       notIncluded: 'What is not included',
       goodFor: 'Good for',
@@ -285,12 +287,12 @@ export const en = {
       groupSizeValue: '1–2 people',
       price: 'Price',
       priceNote: 'Free during the pilot — you pay nothing to book. What you eat, ride or buy on the day is yours, at local prices.',
-      readMore: 'Read the full guide',
+      readMore: 'See the full tour',
       otherExperiences: 'Other experiences',
       bookCta: 'Reserve your spot',
-      bookNote: 'Next you pick a day, a length — 2 or 3 hours — and a start time. Nothing to pay.',
-      bookNoteFixed: 'Next you pick a day and a start time. This experience is {n} hours. Nothing to pay.',
-      bookNoteGuest: 'No account needed. Tell us how to reach you — WhatsApp, WeChat or email — and your buddy messages you to set the day. Nothing to pay.',
+      bookNote: 'Next you pick a day, a length — 2 or 3 hours — and a start time.',
+      bookNoteFixed: 'Next you pick a day and a start time. This experience is {n} hours.',
+      bookNoteGuest: 'No account needed. Tell us how to reach you — WhatsApp, WeChat or email — and your buddy messages you to set the day.',
       backToAll: 'All experiences',
     },
   },
@@ -326,7 +328,7 @@ export const en = {
   request: {
     title: 'Request this experience',
     kicker: 'No account needed',
-    intro: 'Tell us how to reach you and your buddy will message you to set the day and time. Nothing to pay.',
+    intro: 'Tell us how to reach you and your buddy will message you to set the day and time.',
     name: 'Your name',
     namePlaceholder: 'What should we call you?',
     contactHeading: 'How can we reach you?',
@@ -368,7 +370,7 @@ export const en = {
       pledge: 'Please tick the box about leaving a review.',
     },
     thanksTitle: 'Request sent!',
-    thanksBody: 'Your buddy will get back to you on the contact you gave, usually within a day, to set the day and time.',
+    thanksBody: 'Your buddy will get back to you on the contact you gave to set the day and time. We confirm within 3 business days.',
     thanksFaster: 'Want a faster reply? Message us directly:',
     thanksBack: 'Back to the experience',
     thanksMore: 'All experiences',
@@ -415,7 +417,7 @@ export const en = {
     fullProfile: 'Full profile & reviews',
     highlights: {
       localTitle: 'A real local',
-      localBody: 'Spend the day with {name}, not a tour script.',
+      localBody: 'A few hours with {name}, not a tour script.',
       speaksOne: 'Speaks {n} language',
       speaksMany: 'Speaks {n} languages',
       easyTalk: 'Easy to talk to',
@@ -628,7 +630,7 @@ export const en = {
       badge: 'Pilot · Shenzhen first',
       titleLead: 'Built for explorers, and the locals who ',
       titleAccent: 'love their city.',
-      body: 'Shenzhen Buddies matches travelers with locals who share their interests. Casual, affordable, personal — the opposite of a tour bus.',
+      body: 'Shenzhen Buddies matches travelers with locals who share their interests. You (and a friend, if you like), one local, no tour bus.',
       imageAlt: 'A bowl of crayfish and a lift of noodles on a Shenzhen table',
     },
     why: {
@@ -674,7 +676,7 @@ export const en = {
     quote: "Every good day we've had in a new city started the same way: someone who lived there said, “come on, I'll show you.”",
     cta: {
       title: "Come along while it's small.",
-      body: 'Pilot pricing, founder-level attention to every new sign-up, and a roadmap shaped by what early users ask for.',
+      body: 'Tours are free during the pilot, the two of us look at every new sign-up ourselves, and what early users ask for decides what we build next.',
       join: 'Join the pilot',
       talk: 'Talk to us',
     },
@@ -822,7 +824,7 @@ export const en = {
     opening: 'Opening…',
     signUpToMessage: 'Sign up to message',
     aiKicker: 'AI suggested',
-    aiTitle: 'Your best matches in Shenzhen, hand-picked.',
+    aiTitle: 'Your best matches in Shenzhen.',
     why: 'Why: {reasons}',
     whySpeaks: 'speaks {list}',
     whyInto: 'into {list}',
@@ -834,6 +836,12 @@ export const en = {
     badgeShared: '{n} shared',
     badgeSameCity: 'same city',
     badgeMatch: 'match',
+    // Cities as profiles store them. Unknown cities are shown as written.
+    cityNames: {
+      shenzhen: 'Shenzhen',
+      'hong kong': 'Hong Kong',
+      guangzhou: 'Guangzhou',
+    },
     languageNames: {
       english: 'English',
       mandarin: 'Mandarin',
@@ -1044,6 +1052,8 @@ export const en = {
     readNext: 'Read next',
     ctaLabel: 'Have a local show you around',
     ctaBody: 'Matched on what you are actually into, not on a fixed itinerary.',
+    // Button on the inline call-out cards inside an article.
+    ctaButton: 'Find a buddy',
     lastChecked: 'Last checked: {date}. Border and visa rules change — confirm anything time-sensitive with an official source before you travel.',
     englishOnly: 'This article is in English for now.',
     // Keyed by Pillar in src/content/posts/types.ts.
@@ -1073,7 +1083,7 @@ export const en = {
     badge: 'Pilot season · every tour is free',
     titleLead: 'Your first day in Shenzhen, ',
     titleAccent: 'free.',
-    body: 'Skip the tour bus. Spend 2 or 3 hours with a real local who shows you the food, streets, and corners you’d never find alone — and while we’re piloting, it costs you nothing.',
+    body: 'Skip the tour bus. Spend 2 or 3 hours with someone who lives here and knows where the food is. While we’re piloting, it costs you nothing.',
     ticketLabel: 'Pilot price',
     ticketFree: 'FREE',
     ticketNoCode: 'no code needed',
@@ -1083,7 +1093,7 @@ export const en = {
     trust: ['Free 2 or 3 hour tours', 'No card, no deposit', 'Confirmed by email'],
     deal: {
       kicker: 'The pilot deal',
-      titleLead: 'A day out, for ',
+      titleLead: 'Your buddy’s time, for ',
       titleAccent: 'nothing.',
       body: 'While we get Shenzhen Buddies off the ground, every tour is free — pick a 2 or 3 hour day with a local buddy. There is no payment step at all: request a day, and we confirm by email within three business days.',
       cta: 'Pick a day',
@@ -1124,7 +1134,7 @@ export const en = {
       items: [
         {
           title: 'A local, not a script',
-          body: 'Spend the day with someone who actually lives here and loves showing it off.',
+          body: 'A few hours with someone who actually lives here and likes showing people around.',
         },
         {
           title: 'Completely free',
@@ -1155,7 +1165,7 @@ export const en = {
         },
         {
           q: 'How long is a tour?',
-          a: '2 or 3 hours, your choice, one-on-one with your buddy.',
+          a: 'Most tours run 2 or 3 hours, your choice. Talent Park and Shekou run 2. Always private: you (and a friend, if you like) and your buddy.',
         },
         {
           q: 'Can I book more than one tour?',
@@ -1192,9 +1202,6 @@ export const en = {
       signupLink: 'Sign up',
       bannerAlt: 'SplitWhom — split shared expenses with friends',
       photoAlt: 'Shenzhen at night',
-      quote:
-        "“Daniel took me to a dumpling place no map app would have found. We're still texting about food.”",
-      quoteBy: '— Marco R., visiting from Milan',
     },
     signup: {
       kicker: 'Get started',
@@ -1206,7 +1213,7 @@ export const en = {
       haveAccount: 'Already have an account?',
       loginLink: 'Log in',
       photoAlt: 'Skewers grilling at a Shenzhen night-market stall',
-      panelTitle: 'Casual. Affordable. Personal.',
+      panelTitle: 'Casual. Personal. Free for now.',
       panelBody:
         'Match by what you actually like — language, food, art, hiking, electronics — and meet a local who knows the spot.',
       points: ['Free during the pilot', 'Cancel anytime', 'Reviewed by the community'],

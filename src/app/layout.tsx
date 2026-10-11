@@ -5,6 +5,7 @@ import { Analytics } from "@/components/Analytics";
 import { Avatar } from "@/components/Avatar";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { MobileMenu } from "@/components/MobileMenu";
+import { fill } from "@/i18n";
 import { getI18n } from "@/i18n/server";
 import { avatarPublicUrl } from "@/lib/avatars";
 import {
@@ -60,7 +61,7 @@ const SITE_DESCRIPTION =
 // Localised per the visitor's cookie. The canonical, OG url and JSON-LD below
 // stay English on purpose — see the `seo` note in i18n/dictionaries/en.ts.
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getI18n();
+  const { meta, t } = await getI18n();
 
   return {
     // Resolves every relative metadata URL below to an absolute one, so link
@@ -74,7 +75,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: "website",
       siteName: SITE_NAME,
-      locale: "en_US",
+      locale: meta.ogLocale,
       title: t.seo.siteTitle,
       description: t.seo.siteDescription,
       url: "/",
@@ -384,7 +385,7 @@ async function SiteFooter() {
                 <path d="M9.5 4C5.9 4 3 6.5 3 9.6c0 1.7.9 3.2 2.3 4.2L4.7 16l2.5-1.3c.7.2 1.5.3 2.3.3" />
                 <path d="M9 10.6c0 3 2.9 5.4 6.5 5.4.7 0 1.4-.1 2-.3L20 17l-.5-2c1-.9 1.5-2 1.5-3.4 0-3-2.9-5.4-6.5-5.4S9 7.6 9 10.6z" />
               </svg>
-              WeChat · {WECHAT_ID}
+              {fill(t.common.wechatId, { id: WECHAT_ID })}
             </Link>
           </div>
 

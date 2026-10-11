@@ -7,7 +7,8 @@ import { getI18n } from '@/i18n/server'
 import type { Dictionary } from '@/i18n'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = (await getI18n()).t.seo.contact
+  const { meta, t } = await getI18n()
+  const seo = t.seo.contact
   return {
     title: seo.title,
     description: seo.description,
@@ -16,6 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // metadata merges per key — so a page that omits this inherits the site's
     // generic title, description and an og:url pointing at the homepage.
     openGraph: {
+      locale: meta.ogLocale,
       title: seo.title,
       description: seo.description,
       url: '/contact',
@@ -100,13 +102,13 @@ const CHANNELS: Channel[] = [
 ]
 
 export default async function ContactPage() {
-  const { t } = await getI18n()
+  const { meta, t } = await getI18n()
   const copy = t.contact
   // Company and team names are proper nouns and stay as written.
   const facts = [
     { label: copy.facts.company, value: 'Tensai Tech Inc.' },
     { label: copy.facts.founded, value: copy.facts.foundedValue },
-    { label: copy.facts.team, value: 'Bryan Wang (CEO) · Takahiro Inaba (CTO)' },
+    { label: copy.facts.team, value: `Bryan Wang (CEO)${meta.sep}Takahiro Inaba (CTO)` },
     { label: copy.facts.stage, value: copy.facts.stageValue },
   ]
   // Beta: hidden, not removed — same rule as the marketplace and the homepage

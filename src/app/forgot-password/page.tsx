@@ -9,7 +9,7 @@ type Props = {
 }
 
 export default async function ForgotPasswordPage({ searchParams }: Props) {
-  const [{ error, sent }, { t }] = await Promise.all([searchParams, getI18n()])
+  const [{ error, sent }, { t, locale }] = await Promise.all([searchParams, getI18n()])
   const errorText = authErrorText(error, t.auth.errors)
 
   return (
@@ -54,7 +54,7 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
         </SubmitButton>
 
         <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-          {t.auth.forgot.remembered}{' '}
+          {t.auth.forgot.remembered}{locale === 'en' ? ' ' : ''}
           <Link href="/login" className="font-medium underline">
             {t.auth.forgot.loginLink}
           </Link>

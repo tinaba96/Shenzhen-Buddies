@@ -125,8 +125,8 @@ export const shenzhenFromHongKongDayTrip: Post = {
 
     {
       k: 'cta',
-      label: 'Cross with someone who has done it before',
-      sub: 'A local buddy meets you on the Shenzhen side and takes the guesswork out of the first hour.',
+      label: 'Have a local sort out the Shenzhen side',
+      sub: 'Your buddy knows the exits, the metro and the payment apps, so there is less guessing once you are across.',
     },
 
     { k: 'h2', text: 'The paperwork, which depends on your passport' },
@@ -213,7 +213,7 @@ export const shenzhenFromHongKongDayTrip: Post = {
     {
       k: 'cta',
       label: 'Find a buddy in Shenzhen',
-      sub: 'Locals who share your interests, for a few hours or a whole day.',
+      sub: 'Two or three hours with a local who shares your interests.',
     },
   ],
   faq: [

@@ -17,10 +17,10 @@ export const zhHant: Dictionary = {
   seo: {
     siteTitle: 'Shenzhen Buddies',
     siteDescription:
-      '在深圳配對一位和你興趣相投的本地夥伴。輕鬆、實惠、有人情味。',
+      '配對一位和你興趣相投的深圳本地人，來一趟 2 或 3 小時的私人出遊。想帶朋友同行也可以。試營運期間免費。',
     toursTitle: '深圳免費本地體驗 — Shenzhen Buddies',
     toursDescription:
-      '六個一對一的深圳體驗，試營運期間免費——華強北電子市場、東門街頭小食、入夜後的天際線，以及由香港過關後的頭幾個小時。',
+      '六個私人深圳體驗，試營運期間免費：華強北電子市場、東門街頭小食、入夜後的福田、人才公園、蛇口海濱，以及沿深圳灣踏單車。',
     about: {
       title: '關於我們 — Shenzhen Buddies',
       description: '為愛探索的旅人，也為熱愛自己城市的本地人而設。為甚麼會有 Shenzhen Buddies？它又是怎樣運作的？',
@@ -34,7 +34,7 @@ export const zhHant: Dictionary = {
     },
     donate: {
       title: '支持試營運 — Shenzhen Buddies',
-      description: 'Shenzhen Buddies 起步期間，所有行程免費。如果我們令你這趟旅程更好，一點小額捐款，就能讓服務繼續運作下去。',
+      description: 'Shenzhen Buddies 起步期間，所有行程免費。如果這趟旅程因為我們而更精彩，小額捐款就能讓服務繼續運作下去。',
     },
     explore: {
       title: '按區探索深圳 — Shenzhen Buddies',
@@ -65,9 +65,9 @@ export const zhHant: Dictionary = {
 
   common: {
     hours: '{n} 小時',
-    hoursRange: '{a}–{b} 小時',
+    hoursRange: '{a} 或 {b} 小時',
     free: '免費',
-    oneOnOne: '一對一',
+    oneOnOne: '私人 · 1–2 人',
     perPerson: '每人',
     from: '起',
     readMore: '繼續閱讀',
@@ -86,6 +86,7 @@ export const zhHant: Dictionary = {
     signUp: '註冊',
     exploreFirst: '先逛逛深圳',
     freeDuringPilot: '試營運期間免費',
+    wechatId: '微信 · {id}',
   },
 
   nav: {
@@ -117,7 +118,7 @@ export const zhHant: Dictionary = {
       badge: '現已在深圳開放配對',
       titleLead: '看深圳，就找個',
       titleAccent: '懂你的人。',
-      body: '不用再擠旅遊巴。和一位跟你興趣相投的本地人免費過幾個小時——電子產品、美食、天際線、清晨都可以——你會發現，這座城市終於看得懂了。',
+      body: '不用再擠旅遊巴。免費花兩、三個小時，跟一位和你喜好相同的本地人走走：電子產品、美食、天際線、清晨都可以。',
       primaryCta: '查看免費體驗',
       secondaryCta: '成為嚮導',
       scroll: '向下捲動',
@@ -130,8 +131,8 @@ export const zhHant: Dictionary = {
     },
     packages: {
       kicker: '幾個小時，一位本地人',
-      title: '選好你的三個小時。',
-      body: '下面每個體驗都是一對一，試營運期間免費——兩小時或三小時，專心把一件事做好，而不是隔着旅遊巴車窗匆匆瞥過六個景點。',
+      title: '兩小時或三小時，由你選。',
+      body: '下面每個體驗，都只有你（想帶朋友也可以）和一位本地人，試營運期間免費。大部分行程是 2 或 3 小時，由你選；人才公園和蛇口則是 2 小時。每一個都專心把一件事做好，而不是隔着旅遊巴車窗匆匆瞥過六個景點。',
       featuredLabel: '最多人預約',
       allLink: '全部體驗',
       priceNote: '試營運期間{price}——夥伴的時間不收費，你吃的、搭的就按本地價自己付。',
@@ -139,31 +140,31 @@ export const zhHant: Dictionary = {
     districts: {
       kicker: '地圖',
       title: '六個區，六座不同的城。',
-      body: '深圳太大，一天根本「看」不完。按你這趟想做的事，挑那一區就好。',
+      body: '深圳太大，一天根本「看」不完。按你這趟來的目的，挑合適的一區就好。',
       cta: '打開城區指南',
     },
     audiences: {
-      travelerAlt: '深圳夜市的一個攤檔，擺滿一盤盤昆蟲串',
+      travelerAlt: '深圳夜市的一個攤檔上，擺滿一盤盤串好的昆蟲',
       localAlt: '深圳的一張飯桌上擺着雞飯、麵和炸腐皮，大家一起分來吃',
       travelerTitle: '給旅客',
       travelerSubtitle: '來深圳玩',
       travelerPoints: [
         '跨過語言這一關——按共通語言配對',
-        '找到只有本地人才知道的地方',
-        '有人情味、隨性，又實惠',
+        '去本地人真正會去的地方',
+        '只有你，或你和朋友，絕不是旅行團',
       ],
       localTitle: '給本地人',
       localSubtitle: '住在深圳',
       localPoints: [
         '認識來自世界各地的人',
-        '分享你最喜歡的地方和故事',
+        '帶人去你真心喜歡的地方',
         '哪天帶、聊甚麼、走多快，都由你決定',
       ],
     },
     promise: {
       kicker: '本地夥伴到底做甚麼',
-      title: '所有麻煩，都替你打點好。',
-      body: '不是導遊牌，不是旅遊巴，也不是插在竿上的小旗。只是一個住在這裏的人，把那些費神的事從你手上接過來。',
+      title: '麻煩事，有人替你打點。',
+      body: '不是導遊證，不是旅遊巴，也不是插在竿上的小旗。只是一個住在這裏的人，把那些費神的事從你手上接過來。',
       items: [
         {
           title: '即場翻譯',
@@ -171,7 +172,7 @@ export const zhHant: Dictionary = {
         },
         {
           title: '用得上的支付方式',
-          body: '幫你在手機上設定好支付寶和微信支付，並試過確定能用——因為這裏幾乎沒有地方收外國銀行卡。',
+          body: '幫你在手機上設定好支付寶和微信支付，再實際試一次，確保真的能用——因為這裏幾乎沒有地方收外國銀行卡。',
         },
         {
           title: '交通',
@@ -183,29 +184,29 @@ export const zhHant: Dictionary = {
         },
         {
           title: '隨時可改的行程',
-          body: '到了第二個小時才說想做別的，餘下的行程也會跟着改。換了在旅遊巴上，你試試看？',
+          body: '到了第二個小時才說想做別的，餘下的行程也會跟着改。坐旅遊巴的話，你試試看？',
         },
         {
           title: '真的免費',
-          body: '試營運期間預約不花一分錢——不用信用卡，也不用訂金。如果未能確認你選的日子，我們會馬上通知你——由始至終，都不會收你一分錢。',
+          body: '試營運期間預約不花一分錢——不用信用卡，也不收訂金。如果未能確認你選的日子，我們會馬上通知你，而你由始至終都沒有付過錢。',
         },
       ],
     },
     howItWorks: {
       photoAlts: [
         '深圳一間麵包店的櫃枱上，放着圓形酸種麵包和法包',
-        '扣蓋玻璃樽裏，裝着用糖漿醃漬的金桔和梅子',
+        '扣蓋玻璃瓶裏，裝着用糖漿醃漬的金桔和梅子',
         '從街上仰望，深圳的高樓在夜裏亮着藍光',
       ],
       kicker: '怎樣運作',
       title: '簡單三步。',
       steps: [
         {
-          title: '選你的體驗',
+          title: '選體驗',
           body: '選一個現成體驗，或者說說你喜歡甚麼，讓夥伴按你的喜好安排這一天。',
         },
         {
-          title: '選你的日子',
+          title: '選日子',
           body: '可預約的日子即時更新。挑一天免費申請，2 或 3 小時都可以，我們會在三個工作天內確認。',
         },
         {
@@ -227,14 +228,14 @@ export const zhHant: Dictionary = {
     },
     moments: {
       kicker: '點滴',
-      title: '全是我們自己拍的，沒有一張圖庫照。',
-      body: '這個網站上的每一張相片，都是我們在這座城市拍的。',
+      title: '全是我們自己拍的，沒有一張圖庫相片。',
+      body: '相簿裏的每一張相片，都是我們在這座城市拍的。',
       cta: '打開相簿',
     },
     finalCta: {
       titleAnon: '準備好一起出發了嗎？',
       titleLoggedIn: '找你的下一位夥伴。',
-      bodyAnon: '試營運期間免費加入，不用一分鐘。',
+      bodyAnon: '試營運期間免費加入，不用一分鐘就完成。',
       bodySingleGuide: '選個日子，免費約一位本地人陪你幾個小時。',
       bodyLoggedIn: '瀏覽公開的個人資料，開始聊天。',
     },
@@ -242,15 +243,15 @@ export const zhHant: Dictionary = {
 
   tours: {
     index: {
-      heroAlt: '黃昏時的深圳灣天際線，亮燈的高樓倒映在水中',
+      heroAlt: '黃昏時分的深圳灣天際線，亮燈的高樓倒映在水中',
       kicker: '體驗',
       title: '幾個小時，好好走一趟。',
-      body: '六個一對一體驗，試營運期間免費——每次兩小時或三小時。你約的是一位深圳本地人的一個下午，而不是旅遊巴上的一個座位，所以當天的路線可以隨你調整。',
-      priceLine: '{price} · 兩小時或三小時 · 一對一',
+      body: '六個私人體驗，一至兩人參加，試營運期間免費。有些是兩小時；其餘的可選兩小時或三小時。你約的是一位深圳本地人的一個下午，而不是旅遊巴上的一個座位，所以當天的路線可以隨你調整。',
+      priceLine: '{price} · 1–2 人 · 2 或 3 小時（視乎行程）',
       countLine: '{n} 個體驗',
       notATour: {
         title: '我們不是旅行社。',
-        body: '沒有旅遊巴、沒有團、沒有小旗，也沒有佣金。你約的是一位深圳本地人的幾個小時——試營運期間免費；那天你吃的、搭的、買的，全部按本地價直接付給店家。',
+        body: '沒有旅遊巴、沒有團、沒有小旗，也沒有佣金。你預約的，是一位深圳本地人的幾個小時——試營運期間免費；那天你吃的、搭的、買的，全部按本地價自己直接付。',
       },
     },
     detail: {
@@ -259,7 +260,7 @@ export const zhHant: Dictionary = {
       itinerary: '這一天怎樣過',
       itineraryNote: '時間由見面那一刻起計，並非實際鐘點——出發時間在預約時由你自選。',
       tourLength: '行程時長',
-      customizable: '行程可以按每位旅客的需要調整——預約時歡迎告訴我們你的想法。',
+      customizable: '每個行程都可以按你的需要調整。預約時告訴我們你的想法就可以。',
       includes: '包括甚麼',
       notIncluded: '不包括甚麼',
       goodFor: '適合誰',
@@ -272,12 +273,12 @@ export const zhHant: Dictionary = {
       groupSizeValue: '1–2 人',
       price: '價錢',
       priceNote: '試營運期間免費——預約時不用付一分錢。當天你吃的、搭的、買的，就按本地價自己付。',
-      readMore: '閱讀完整指南',
+      readMore: '查看完整行程',
       otherExperiences: '其他體驗',
       bookCta: '立即預約',
-      bookNote: '下一步選日期、時長（兩小時或三小時）和出發時間。全程不用付款。',
-      bookNoteFixed: '下一步選日期和出發時間。這個體驗時長為 {n} 小時。全程不用付款。',
-      bookNoteGuest: '毋須註冊帳號。留下 WhatsApp、微信或電郵，你的夥伴會聯絡你敲定日期。全程不用付款。',
+      bookNote: '下一步選日期、時長（兩小時或三小時）和出發時間。',
+      bookNoteFixed: '下一步選日期和出發時間。這個體驗時長為 {n} 小時。',
+      bookNoteGuest: '毋須註冊帳號。留下 WhatsApp、微信或電郵，你的夥伴會聯絡你敲定日期。',
       backToAll: '全部體驗',
     },
   },
@@ -311,7 +312,7 @@ export const zhHant: Dictionary = {
   request: {
     title: '申請這個體驗',
     kicker: '毋須註冊帳號',
-    intro: '留下你的聯絡方式，你的夥伴會傳訊息給你，一起敲定日期和時間。全程不用付款。',
+    intro: '留下你的聯絡方式，你的夥伴會傳訊息給你，一起敲定日期和時間。',
     name: '你的名字',
     namePlaceholder: '我們該怎樣稱呼你？',
     contactHeading: '怎樣聯絡你？',
@@ -319,7 +320,7 @@ export const zhHant: Dictionary = {
     whatsapp: 'WhatsApp',
     whatsappPlaceholder: '+852 9123 4567',
     wechat: '微信 ID',
-    wechatPlaceholder: 'your_wechat_id',
+    wechatPlaceholder: '你的微信 ID',
     phone: '電話',
     phonePlaceholder: '+852 ...',
     email: '電郵',
@@ -328,12 +329,12 @@ export const zhHant: Dictionary = {
     hours: '{n} 小時',
     when: '大概甚麼時候來？',
     whenPlaceholder: '例如：10 月 18 至 20 日，哪天晚上都可以',
-    whenHint: '選填。大概說一下就可以，具體時間你和夥伴再一起定。',
+    whenHint: '選填。粗略說一下就可以，具體時間你和夥伴再一起定。',
     message: '還有甚麼想說的？',
     messagePlaceholder: '誰會一起來、喜歡甚麼、有甚麼想避開的……',
     submit: '送出申請',
-    sending: '送出中…',
-    pledgeNote: '我們的行程是免費的，所以行程結束後留一則簡短、真實的評價，對你的夥伴意義很大。任何意見都歡迎，小費完全隨意。',
+    sending: '送出中……',
+    pledgeNote: '我們的行程是免費的，所以事後留一則簡短、真實的評價，對你的夥伴意義很大。任何意見都歡迎，小費完全隨意。',
     pledgeCheck: '我願意在行程結束後留下評價',
     termsPrefix: '送出即表示你同意我們的',
     termsLink: '服務條款',
@@ -351,7 +352,7 @@ export const zhHant: Dictionary = {
       pledge: '請勾選同意在行程結束後留下評價。',
     },
     thanksTitle: '申請已送出！',
-    thanksBody: '你的夥伴通常會在一天內，透過你留下的聯絡方式聯絡你，一起敲定日期和時間。',
+    thanksBody: '你的夥伴會透過你留下的聯絡方式找你，一起敲定日期和時間。我們會在 3 個工作天內確認。',
     thanksFaster: '想更快得到回覆？直接聯絡我們：',
     thanksBack: '返回體驗頁面',
     thanksMore: '全部體驗',
@@ -392,7 +393,7 @@ export const zhHant: Dictionary = {
     fullProfile: '完整資料及評價',
     highlights: {
       localTitle: '地道本地人',
-      localBody: '和{name}一起過一天，而不是聽導遊照稿講解。',
+      localBody: '和{name}一起過幾個小時，而不是聽導遊照稿講解。',
       speaksOne: '會說 {n} 種語言',
       speaksMany: '會說 {n} 種語言',
       easyTalk: '容易溝通',
@@ -400,7 +401,7 @@ export const zhHant: Dictionary = {
       freeTitle: '現在免費',
       freeBody: '試營運期間，行程真的分文不收。',
       riskFreeTitle: '零風險',
-      riskFreeBody: '如未能確認你的日子，全數退款。',
+      riskFreeBody: '如未能確認你選的日子，全數退款。',
     },
     banners: {
       paid: '付款成功！預約申請已收到，我們會在 3 個工作天內以電郵確認。如未能確認，將全數退款。',
@@ -424,8 +425,8 @@ export const zhHant: Dictionary = {
       '麵包店和咖啡店',
     ],
     bookTitle: '約一天，一起遊',
-    introFreeFixed: '試營運期間行程免費——這個體驗為時 {n} 小時，不用付款，也不用信用卡。為了讓大家都有機會，每人同一時間只可預約一個免費行程。選好日子提交申請，我們會以電郵確認。',
-    introFreeChoice: '試營運期間行程免費——可選 2 小時或 3 小時，不用付款，也不用信用卡。為了讓大家都有機會，每人同一時間只可預約一個免費行程。選好日子提交申請，我們會以電郵確認。',
+    introFreeFixed: '試營運期間行程免費——這個體驗為時 {n} 小時，不用付款，也不用信用卡。為了讓大家都有機會，每人同一時間只可預約一個免費行程。選好日子提出申請，我們會以電郵確認。',
+    introFreeChoice: '試營運期間行程免費——可選 2 小時或 3 小時，不用付款，也不用信用卡。為了讓大家都有機會，每人同一時間只可預約一個免費行程。選好日子提出申請，我們會以電郵確認。',
     introPaid: '每次行程 {min} 至 {max} 小時，每小時 {rate}（合共 {low}–{high}）。預約時付款；如我們未能確認，將全數退款。',
     touristsOnly: '預約只限旅客帳號。',
     createProfileLink: '建立個人資料',
@@ -433,11 +434,11 @@ export const zhHant: Dictionary = {
     dateTime: '{date} {time}',
     checkout: {
       prefix: '你有一個未完成付款的預約：',
-      middle: '。每人同一時間只可有一個預約，請先',
+      middle: '。每人同一時間只可有一個預約，你可以',
       finish: '完成付款',
-      or: '，或',
+      or: '；想改選其他時間，就先',
       release: '釋出這個時段',
-      suffix: '，再選其他時間。',
+      suffix: '。',
     },
     live: {
       prefix: '你已預約了 ',
@@ -463,9 +464,9 @@ export const zhHant: Dictionary = {
     submit: {
       free: '申請這一天（免費）',
       paid: '前往付款',
-      pendingFree: '送出中…',
-      pendingPaid: '正在前往付款…',
-      noteFree: '不用付款，我們會在 3 個工作天內以電郵確認。',
+      pendingFree: '送出中……',
+      pendingPaid: '正在前往付款……',
+      noteFree: '預約不用付款，我們會在 3 個工作天內以電郵確認。',
       notePaid: '現在按每小時 {rate} 付款，先保留這一天。我們會在 3 個工作天內確認，如未能確認，將全數退款。',
     },
     agree: {
@@ -477,7 +478,7 @@ export const zhHant: Dictionary = {
     },
     support: {
       lead: '行程是免費的。',
-      body: '如果你喜歡我們在做的事，可以贊助一點，讓試營運繼續下去。',
+      body: '如果你喜歡我們在做的事，可以捐一點，讓試營運繼續下去。',
       cta: '支持試營運 →',
     },
     mine: {
@@ -487,10 +488,10 @@ export const zhHant: Dictionary = {
       fullPolicy: '閱讀完整政策',
       fullPolicySuffix: '。',
       refunded: '已退款 {amount}',
-      opening: '開啟中…',
+      opening: '開啟中……',
       message: '傳訊息給{name}',
       howWasIt: '體驗如何？👍👎',
-      cancelling: '取消中…',
+      cancelling: '取消中……',
       cancel: '取消',
       cancelFullRefund: '取消（全數退款）',
       cancelFee: '取消（收取 {pct}% 手續費）',
@@ -507,7 +508,7 @@ export const zhHant: Dictionary = {
       guest: '毋須註冊，直接申請',
       guestNote: '留下 WhatsApp、微信或電郵，{name}會聯絡你約時間。或者，想現在就選定時段：',
       signup: '註冊並預約這一天',
-      loginPrefix: '一分鐘內完成。已經有帳號？',
+      loginPrefix: '不用一分鐘就完成。已經有帳號？',
       loginSuffixFree: '。你登入或註冊時，這一天仍可預約；而且試營運期間，行程本身是免費的。',
       loginSuffixPaid: '。你登入或註冊時，這一天仍可預約；如{name}當天未能確認，將全數退款。',
     },
@@ -546,7 +547,7 @@ export const zhHant: Dictionary = {
     channels: {
       email: {
         title: '打個招呼',
-        description: '問題、意見、合作構思，或者只是想打聲招呼都可以。每一則訊息我們都會看。',
+        description: '問題、意見、合作構思，或者只是想聊兩句都可以。每一則訊息我們都會看。',
         cta: '電郵給我們',
       },
       whatsapp: {
@@ -562,7 +563,7 @@ export const zhHant: Dictionary = {
       },
       guide: {
         title: '成為嚮導',
-        description: '住在深圳，想帶旅客四處逛逛？提交申請，我們會優先審核你的個人資料。',
+        description: '住在深圳，想帶旅客四處逛逛？申請後，我們會優先審核你的個人資料。',
         cta: '申請',
       },
       press: {
@@ -599,8 +600,8 @@ export const zhHant: Dictionary = {
       badge: '試營運 · 由深圳起步',
       titleLead: '為愛探索的旅人打造，也獻給',
       titleAccent: '熱愛這座城市的本地人。',
-      body: 'Shenzhen Buddies 為旅客配對興趣相投的本地人。輕鬆、實惠、有人情味——和旅遊巴剛好相反。',
-      imageAlt: '深圳餐桌上的一碗小龍蝦，旁邊是剛夾起的麵條',
+      body: 'Shenzhen Buddies 為旅客配對興趣相投的本地人。你（想帶朋友也可以），加一位本地人，沒有旅遊巴。',
+      imageAlt: '深圳餐桌上，一碗小龍蝦和剛夾起的麵條',
     },
     why: {
       kicker: '我們為甚麼要做這件事',
@@ -614,11 +615,11 @@ export const zhHant: Dictionary = {
       },
       casual: {
         title: '隨性，不商業',
-        body: '這裏的本地人不是持牌導遊，而是街坊——帶你逛的方式，就跟朋友來探他們時一樣。',
+        body: '這裏的本地人不是持牌導遊，而是街坊——帶你逛的方式，就跟有朋友來訪時一樣。',
       },
       trust: {
         title: '信任靠累積',
-        body: '個人頁面累積足夠互動後，評價才會顯示，第一印象也因此更真實。',
+        body: '個人頁面要有足夠的互動，評價才會顯示，第一印象也因此更真實。',
       },
     },
     team: {
@@ -644,8 +645,8 @@ export const zhHant: Dictionary = {
     },
     quote: '我們在陌生城市度過的每一個美好日子，開頭都一樣——有個住在當地的人說：「來吧，我帶你去看看。」',
     cta: {
-      title: '趁我們還小，一起來吧。',
-      body: '享有試營運價格，創辦人親自跟進每位新用戶，產品往哪個方向走，也由早期用戶的意見決定。',
+      title: '趁我們規模還小，一起來吧。',
+      body: '試營運期間行程免費，每位新用戶都由我們兩人親自看過，早期用戶想要甚麼，就決定我們下一步做甚麼。',
       join: '加入試營運',
       talk: '和我們聊聊',
     },
@@ -664,7 +665,7 @@ export const zhHant: Dictionary = {
       nanshan: {
         name: '南山區',
         sub: 'Nanshan',
-        blurb: '城市的科技重鎮，也是綠化最多的一區。內陸有企業總部和大學，海邊有深圳灣和濱海公園，再往西走，就是蛇口外籍人士常去的酒吧和渡輪碼頭。',
+        blurb: '城市的科技重鎮，也是綠化最多的一區。企業總部和大學在離海較遠的一邊，深圳灣和濱海公園在臨海一邊，再往西走，就是蛇口外籍人士常去的酒吧和渡輪碼頭。',
         alt: '南山深圳灣體育中心貝殼般的鏤空屋頂，背後是晴朗天空',
       },
       futian: {
@@ -676,7 +677,7 @@ export const zhHant: Dictionary = {
       luohu: {
         name: '羅湖區',
         sub: 'Luohu',
-        blurb: '深圳起步的地方，也是大多數人初到時的落腳點——過了羅湖口岸，走幾步就是舊城區。東門那幾條熱鬧的商業街就在這裏，這裏的食肆比西邊高樓區的更老字號，也更便宜。',
+        blurb: '深圳由這裏起步，大多數初次到訪的人也是從這裏進城——過了羅湖口岸，走幾步就是舊城區。東門那幾條熱鬧的商業街也在區內；比起西邊的高樓區，這裏的食肆開得更久，價錢也更便宜。',
         alt: '羅湖站廣深城際鐵路的入口和藍色指示牌',
       },
       baoan: {
@@ -705,19 +706,19 @@ export const zhHant: Dictionary = {
       galleryLink: '到相簿',
       bodyTail: '逛逛。',
       alts: [
-        '深圳夜市裏賣昆蟲串燒的攤檔',
-        '筷子夾起麵條，旁邊是一盤蒜蓉小龍蝦',
-        '工作枱上的單板電腦和跳線',
+        '深圳夜市裏賣昆蟲串的攤檔',
+        '筷子夾起麵條，旁邊是一碗蒜蓉小龍蝦',
+        '工作枱上的單板電腦和杜邦線',
         '夜裏亮起白光的深圳高樓，下方是行人天橋',
-        '白切雞飯，淋上薑蔥油，配一碟時菜',
-        '扣蓋玻璃樽裏，裝着用糖漿醃漬的金桔和梅子',
-        '深圳一間麵包店櫃枱上的酸種麵包和法包',
+        '白切雞飯，淋上薑蔥油，配時菜',
+        '扣蓋玻璃瓶裏，裝着用糖漿醃漬的金桔和梅子',
+        '深圳一間麵包店的櫃枱上，放着圓形酸種麵包和法包',
         '拆開放在工作枱上的 AR 頭戴裝置，排線外露',
       ],
     },
     closing: {
       title: '找不到想要的？',
-      body: '告訴我們你喜歡甚麼——行山、電子產品、深夜爵士樂、茶道都可以——我們會替你配對一位真正熱衷此道的本地人。',
+      body: '說說你喜歡甚麼——行山、電子產品、深夜爵士樂、茶道都可以——我們會替你配對一位真正熱衷此道的本地人。',
       cta: '開始配對',
     },
     credits: {
@@ -738,7 +739,7 @@ export const zhHant: Dictionary = {
     signUpToConnect: '註冊後即可聯絡',
     searchPlaceholder: '搜尋名字或簡介……',
     search: '搜尋',
-    searching: '搜尋中…',
+    searching: '搜尋中……',
     filters: '篩選',
     closeFilters: '關閉篩選',
     close: '關閉',
@@ -768,7 +769,7 @@ export const zhHant: Dictionary = {
     sortRated: '評分最高',
     sortRecent: '最新加入',
     apply: '套用篩選',
-    applying: '套用中…',
+    applying: '套用中……',
     reset: '重設',
     clearAll: '全部清除',
     countOne: '共 {n} 位',
@@ -782,10 +783,10 @@ export const zhHant: Dictionary = {
     chipLanguages: '語言',
     chipTraits: '性格',
     message: '傳訊息',
-    opening: '開啟中…',
+    opening: '開啟中……',
     signUpToMessage: '註冊後傳訊息',
     aiKicker: 'AI 推介',
-    aiTitle: '替你挑好了：在深圳和你最合得來的人。',
+    aiTitle: '在深圳和你最合得來的人。',
     why: '推介原因：{reasons}',
     whySpeaks: '同樣會說{list}',
     whyInto: '同樣喜歡{list}',
@@ -796,6 +797,11 @@ export const zhHant: Dictionary = {
     badgeShared: '{n} 個共同點',
     badgeSameCity: '同城',
     badgeMatch: '配對',
+    cityNames: {
+      shenzhen: '深圳',
+      'hong kong': '香港',
+      guangzhou: '廣州',
+    },
     languageNames: {
       english: '英文',
       mandarin: '普通話',
@@ -869,7 +875,7 @@ export const zhHant: Dictionary = {
     commentPlaceholder: '說說和{name}見面的感受……',
     submitReview: '送出評價',
     updateReview: '更新評價',
-    submitting: '送出中…',
+    submitting: '送出中……',
     noReviews: '暫時未有評價。',
     hiddenOne: '{n} 則評價，暫未公開',
     hiddenOther: '{n} 則評價，暫未公開',
@@ -888,13 +894,13 @@ export const zhHant: Dictionary = {
     title: '這次行程怎樣？',
     when: '{when} · 與{name}同行',
     yourGuide: '你的嚮導',
-    tipped: '小費已收到——謝謝你！小費會全數交給{name}。',
+    tipped: '小費已收到——謝謝你！每一分都會交給{name}。',
     thanks: '謝謝——你的評價已送出。',
     notFinished: '行程還未結束——完結後再回來這裏留下評價吧。',
     notConfirmed: '這個預約不是已確認的行程，所以沒有可評價的內容。',
     changeRating: '修改評分',
     oneTap: '按一下就可以',
-    saving: '儲存中…',
+    saving: '儲存中……',
     words: '寫幾句',
     wordsHint: '（選填，10–100 字）',
     placeholder: '有甚麼令你印象深刻？好或不好都可以。',
@@ -977,7 +983,7 @@ export const zhHant: Dictionary = {
   },
 
   blog: {
-    kicker: '深圳筆記',
+    kicker: '實地筆記',
     title: '深圳實地筆記',
     description: '過關、付款、各個街區，還有在這裏生活的人——出發前值得先知道的事。',
     filterLabel: '按主題篩選文章',
@@ -991,6 +997,7 @@ export const zhHant: Dictionary = {
     readNext: '延伸閱讀',
     ctaLabel: '找個本地人帶你遊',
     ctaBody: '按你真正感興趣的事配對，而不是走一條固定路線。',
+    ctaButton: '找個夥伴',
     lastChecked: '最後核實：{date}。過關和簽證規定隨時會變——有時效性的資訊，出發前請再向官方渠道確認。',
     englishOnly: '這篇文章暫時只有英文版。',
     pillars: {
@@ -1014,26 +1021,26 @@ export const zhHant: Dictionary = {
   },
 
   welcome: {
-    heroAlt: '黃昏下的深圳天際線',
+    heroAlt: '黃昏時分的深圳天際線',
     badge: '試營運中 · 所有行程免費',
     titleLead: '你在深圳的第一天，',
     titleAccent: '免費。',
-    body: '不必再跟旅遊巴。花 2 或 3 小時，跟着真正的本地人去吃、去逛，走進那些你自己絕對找不到的角落——試營運期間，全程分文不收。',
+    body: '不用再擠旅遊巴。花 2 或 3 小時，跟一個住在這裏、知道哪裏有好東西吃的人走走。試營運期間，行程費全免。',
     ticketLabel: '試營運價',
     ticketFree: '免費',
     ticketNoCode: '毋須優惠碼',
     ticketNote: '不用信用卡、不收訂金、沒有付款步驟——選好日子就可以',
     primaryCta: '免費預約一天 →',
     secondaryCta: '看看有哪些體驗',
-    trust: ['2 或 3 小時行程，全程免費', '不用信用卡，不收訂金', '電郵確認'],
+    trust: ['2 或 3 小時行程免費', '不用信用卡，不收訂金', '電郵確認'],
     deal: {
       kicker: '試營運優惠',
-      titleLead: '出去玩一天，',
-      titleAccent: '一分錢都不用。',
+      titleLead: '夥伴陪你的這幾個小時，',
+      titleAccent: '分文不收。',
       body: 'Shenzhen Buddies 剛剛起步，這段期間所有行程都免費——約一位本地夥伴，2 小時或 3 小時任你選。整個流程根本沒有付款這一步：提出申請後，我們會在三個工作天內以電郵確認。',
       cta: '選個日子',
-      exampleLabel: '例子 · 3 小時行程',
-      rateNote: '原價每小時 CA$10，試營運期間全免',
+      exampleLabel: '以 3 小時行程為例',
+      rateNote: '原價每小時 CA$10，試營運期間一律免費',
       rows: {
         length: '行程時長',
         lengthValue: '2 或 3 小時',
@@ -1046,7 +1053,7 @@ export const zhHant: Dictionary = {
       },
     },
     how: {
-      kicker: '預約流程',
+      kicker: '怎樣運作',
       title: '按三下，就約好了。',
       steps: [
         {
@@ -1055,29 +1062,29 @@ export const zhHant: Dictionary = {
         },
         {
           title: '免費提出申請',
-          body: '不用信用卡，也不用結帳。申請會直接送到你的夥伴手上。',
+          body: '不用信用卡，也不用結賬。申請會直接送到你的夥伴手上。',
         },
         {
           title: '收到確認',
-          body: '我們會在 3 個工作天內以電郵確認，到時準時出現就可以。',
+          body: '我們會在 3 個工作天內以電郵確認，之後當天準時出現就可以。',
         },
       ],
     },
     why: {
       kicker: '為甚麼找個夥伴',
-      title: '和旅遊巴完全相反。',
+      title: '和旅遊巴剛好相反。',
       items: [
         {
           title: '本地人，不是照稿讀的導遊',
-          body: '陪你一整天的，是真正住在這裏、也樂於帶你四處看看的人。',
+          body: '和你同行的，是一個真正住在這裏、也喜歡帶人四處看看的人。',
         },
         {
           title: '完全免費',
-          body: '試營運期間不收分毫。如果覺得這一天值得，事後可以給夥伴一點小費——給不給由你決定。',
+          body: '試營運期間，行程沒有任何收費。如果覺得這一天值得，事後可以給夥伴一點小費——給不給由你決定。',
         },
         {
           title: '零風險',
-          body: '沒有付款，自然沒有退款的問題。萬一我們未能確認你的日子，會第一時間通知你，你甚麼都不會損失。',
+          body: '沒有付款，自然沒有退款的問題。萬一我們未能確認你選的日子，會第一時間通知你，你甚麼都不會損失。',
         },
       ],
     },
@@ -1100,11 +1107,11 @@ export const zhHant: Dictionary = {
         },
         {
           q: '一次行程有多長？',
-          a: '2 小時或 3 小時，由你決定，全程與夥伴一對一。',
+          a: '大部分行程是 2 或 3 小時，由你決定；人才公園和蛇口是 2 小時。一定是私人行程：只有你（想帶朋友也可以）和你的夥伴。',
         },
         {
           q: '可以一次預約多個行程嗎？',
-          a: '每次只限一個。行程免費，所以在這次行程完結之前，每人只保留一個預約，好讓人人都有機會。行程結束後，歡迎再預約。',
+          a: '每次只限一個。行程免費，為了讓人人都有機會，手上的行程完結前不能再約；完結之後，歡迎再預約。',
         },
         {
           q: '甚麼時候會知道預約成功？',
@@ -1128,27 +1135,24 @@ export const zhHant: Dictionary = {
       title: '登入',
       resume: '登入後會帶你回到剛才的頁面。',
       forgot: '忘記密碼？',
-      pending: '登入中…',
+      pending: '登入中……',
       submit: '登入',
       noAccount: '還沒有帳號？',
       signupLink: '註冊',
       bannerAlt: 'SplitWhom——和朋友分攤共同開支',
       photoAlt: '夜色中的深圳',
-      quote:
-        '「Daniel 帶我去了一間餃子店，地圖 App 根本搜不到。到現在我們還不時傳訊息聊吃的。」',
-      quoteBy: '—— Marco R.，從米蘭來玩',
     },
     signup: {
-      kicker: '加入我們',
+      kicker: '立即開始',
       title: '建立帳號',
-      sub: '試營運期間免費，一分鐘內搞定。',
+      sub: '試營運期間免費，不用一分鐘就完成。',
       checkEmail: '請到電郵按一下確認連結，然後回來登入就可以了。',
-      pending: '註冊中…',
+      pending: '註冊中……',
       submit: '註冊',
       haveAccount: '已經有帳號？',
       loginLink: '登入',
       photoAlt: '深圳夜市攤檔上正在燒烤的串燒',
-      panelTitle: '隨性、實惠、有人情味。',
+      panelTitle: '隨性、有人情味，現在免費。',
       panelBody:
         '按你真正喜歡的東西配對——語言、美食、藝術、行山、電子產品——認識一位熟門熟路的本地人。',
       points: ['試營運期間免費', '隨時可以取消', '評價來自社群'],
@@ -1158,7 +1162,7 @@ export const zhHant: Dictionary = {
       title: '重設密碼',
       body: '輸入你的電郵，我們會寄一條連結給你設定新密碼。',
       sent: '如果這個電郵有註冊帳號，重設連結已經寄出，請查看收件匣。',
-      pending: '傳送中…',
+      pending: '送出中……',
       submit: '寄出重設連結',
       remembered: '記起來了？',
       loginLink: '登入',
@@ -1168,7 +1172,7 @@ export const zhHant: Dictionary = {
       title: '設定新密碼',
       newPassword: '新密碼',
       confirm: '再輸入一次新密碼',
-      pending: '更新中…',
+      pending: '更新中……',
       submit: '更新密碼',
     },
     errors: {
@@ -1190,7 +1194,7 @@ export const zhHant: Dictionary = {
     titleLine1: '行程免費，',
     titleLine2: '營運可不是免費的。',
     body: 'Shenzhen Buddies 剛起步，這段時間所有行程都免費——不收預約費，也不按小時收費。如果和夥伴出遊的那一天令你的旅程更好玩，又或者你只是喜歡我們在做的事，捐一點小錢就能幫忙補貼嚮導的時間，讓試營運繼續下去。多少都可以，甚麼時候都可以，有沒有預約也沒關係。',
-    thanks: '謝謝你！捐款已經收到，真的幫了我們很大的忙。',
+    thanks: '謝謝你！捐款已經收到——有你支持，我們才能繼續營運下去。',
     bookPrefix: '還沒有預約？',
     bookLink: '先預約一次免費行程',
     bookSuffix: '，這對我們幫助更大。',
@@ -1207,7 +1211,7 @@ export const zhHant: Dictionary = {
     customPlaceholder: '自訂金額（CA$）',
     customLabel: '自訂金額（加元）',
     customInvalid: '請輸入 CA${min} 至 CA${max} 之間的整數金額。',
-    opening: '開啟中…',
+    opening: '開啟中……',
     or: '或',
     paypalError: 'PayPal 出了點問題，請再試一次。',
     footCardPaypal:
@@ -1221,14 +1225,14 @@ export const zhHant: Dictionary = {
       cardAmount: '用信用卡捐 CA${amount}',
       card: '用信用卡捐款',
       failed: '捐款未能完成，也沒有任何扣款，請再試一次。',
-      confirming: '正在確認你的捐款…',
+      confirming: '正在確認你的捐款……',
     },
     tip: {
       notSetUp: '小費功能還未開通——心意收到了，謝謝！',
       cardAmount: '用信用卡付 CA${amount} 小費',
       card: '用信用卡付小費',
       failed: '小費未能完成付款，也沒有任何扣款，請再試一次。',
-      confirming: '正在確認小費…',
+      confirming: '正在確認小費……',
     },
   },
 }

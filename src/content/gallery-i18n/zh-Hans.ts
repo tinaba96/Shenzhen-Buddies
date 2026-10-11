@@ -6,7 +6,7 @@ import type { GalleryTranslations } from './types'
 export const galleryZhHans: GalleryTranslations = {
   'huaqiangbei-electronic-world-night': {
     title: '入夜后的华强电子世界',
-    alt: '夜色中华强电子世界亮灯的入口，布满 LED 的外墙和大屏幕下方，就是华强北地铁站出入口。',
+    alt: '夜晚，华强电子世界亮着灯的入口，布满 LED 的外墙和大屏幕下方，就是华强北地铁站出入口。',
     caption:
       '方圆四十个街区的电子元器件，从这里开始。地铁口上的夜市招牌已经说明了一切：写字楼下班了，这里的买卖可没停。',
   },
@@ -17,7 +17,7 @@ export const galleryZhHans: GalleryTranslations = {
   },
   'talent-park-skyline-night': {
     title: '入夜后的人才公园',
-    alt: '夜晚从深圳人才公园隔湖望去的南山天际线，水边一座步行桥亮着鲜艳的蓝光，高楼倒映在桥下，画面四周是深色的树枝。',
+    alt: '夜晚从深圳人才公园隔湖望去的南山天际线，水边一座步行桥亮着鲜蓝色的灯光，高楼倒映在桥下，画面四周是深色的树枝。',
     caption:
       '湖对岸是南山的高楼，还有一座天黑后会变蓝的步行桥。专程走到水边看一眼，值。',
   },
@@ -29,13 +29,13 @@ export const galleryZhHans: GalleryTranslations = {
   'shenzhen-bay-railing-day': {
     title: '隔着深圳湾望过去',
     alt: '晴天的深圳湾滨海步道：木扶手栏杆沿着绿色的海水延伸，对岸的山丘衬着蓝天。',
-    caption: '滨海步道沿着海边一走就是好几公里。对岸那片山，就是香港。',
+    caption: '这条步道沿着海边一走就是好几公里。对岸那片山，就是香港。',
   },
   'sea-world-minghua-ship-night': {
     title: '一艘从不出海的船',
     alt: '夜晚，蛇口海上世界广场上方亮着灯的白色明华轮，周围有棕榈树和餐厅招牌，广场上人们在散步。',
     caption:
-      '明华轮从八十年代起就停在海上世界。蛇口的夜晚，就在它周围这片广场上度过。',
+      '明华轮从八十年代起就停在海上世界。蛇口人的晚上，基本都耗在它周围这片广场上。',
   },
   'skyline-blue-towers-night': {
     title: '名副其实的“蓝调时刻”',
@@ -64,8 +64,8 @@ export const galleryZhHans: GalleryTranslations = {
   },
   'preserved-fruit-jars': {
     title: '手写标签的玻璃罐',
-    alt: '一个木箱里摆着卡扣式玻璃罐，装着泡在琥珀色和红色糖浆里的金桔、梅子等水果，标签是手写的。',
-    caption: '金桔、梅子，还有一种红红的，没人说得上来是什么。标签是用马克笔手写的。',
+    alt: '一个木箱里摆着卡扣式玻璃罐，装着泡在琥珀色和红色糖浆里的金桔、李子等水果，标签是手写的。',
+    caption: '金桔、李子，还有一种红红的，没人说得上来是什么。标签是用马克笔手写的。',
   },
   'maker-desk-headset-teardown': {
     title: '拆开了，没拆坏',
