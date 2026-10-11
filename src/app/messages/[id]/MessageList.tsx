@@ -18,6 +18,10 @@ type Props = {
   conversationId: string
   currentUserId: string
   initialMessages: Message[]
+  // From the server parent, so times render the same on both sides of
+  // hydration and in the visitor's language rather than the device default.
+  intlLocale: string
+  labels: { empty: string; placeholder: string; send: string; hint: string }
 }
 
 // Module-level cache so React StrictMode's double-mount doesn't create two
@@ -28,7 +32,13 @@ function browserClient(): SupabaseClient {
   return cachedClient
 }
 
-export function MessageList({ conversationId, currentUserId, initialMessages }: Props) {
+export function MessageList({
+  conversationId,
+  currentUserId,
+  initialMessages,
+  intlLocale,
+  labels,
+}: Props) {
   // Realtime-only arrivals; merged with initialMessages on render.
   const [realtimeMessages, setRealtimeMessages] = useState<Message[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
@@ -92,7 +102,7 @@ export function MessageList({ conversationId, currentUserId, initialMessages }: 
       >
         {messages.length === 0 ? (
           <p className="text-center text-sm text-zinc-500">
-            No messages yet. Say hi!
+            {labels.empty}
           </p>
         ) : (
           <ul className="space-y-2">
@@ -116,7 +126,7 @@ export function MessageList({ conversationId, currentUserId, initialMessages }: 
                         mine ? 'text-zinc-300 dark:text-zinc-500' : 'text-zinc-500'
                       }`}
                     >
-                      {formatTime(m.created_at)}
+                      {formatTime(m.created_at, intlLocale)}
                     </p>
                   </div>
                 </li>
@@ -133,7 +143,7 @@ export function MessageList({ conversationId, currentUserId, initialMessages }: 
           required
           rows={1}
           maxLength={4000}
-          placeholder="Write a message…"
+          placeholder={labels.placeholder}
           onKeyDown={onKeyDown}
           className="flex-1 resize-none rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
         />
@@ -141,19 +151,22 @@ export function MessageList({ conversationId, currentUserId, initialMessages }: 
           pendingLabel="…"
           className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
-          Send
+          {labels.send}
         </SubmitButton>
       </form>
       <p className="mt-1 text-right text-[10px] text-zinc-500">
-        Enter to send · Shift + Enter for a new line
+        {labels.hint}
       </p>
     </div>
   )
 }
 
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString([], {
+function formatTime(iso: string, intlLocale: string): string {
+  // A fixed zone, so the server render and the client hydration print the
+  // same string. Shenzhen time, like every other time on the site.
+  return new Date(iso).toLocaleTimeString(intlLocale, {
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Asia/Shanghai',
   })
 }

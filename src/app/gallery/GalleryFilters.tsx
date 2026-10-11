@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import type { LocationId, LocationMeta } from '@/content/gallery'
+import type { Dictionary } from '@/i18n'
 import { track } from '@/lib/analytics'
 
 // Real links, not buttons over useState: a filtered view stays shareable
@@ -12,16 +13,22 @@ import { track } from '@/lib/analytics'
 export function GalleryFilters({
   locations,
   active,
+  labels,
 }: {
   locations: LocationMeta[]
   active: LocationId | null
+  labels: {
+    nav: string
+    all: string
+    locations: Dictionary['gallery']['locations']
+  }
 }) {
   return (
-    <nav aria-label="Filter photos by location">
+    <nav aria-label={labels.nav}>
       <ul className="flex flex-wrap justify-center gap-2">
         <li>
           <Chip href="/gallery" loc="all" active={active === null}>
-            All
+            {labels.all}
           </Chip>
         </li>
         {locations.map((l) => (
@@ -31,7 +38,7 @@ export function GalleryFilters({
               loc={l.id}
               active={active === l.id}
             >
-              {l.short}
+              {labels.locations[l.id].short}
             </Chip>
           </li>
         ))}

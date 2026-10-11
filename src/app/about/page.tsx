@@ -2,90 +2,83 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { DEFAULT_OG_IMAGE } from '@/lib/config'
 import { HeroImage } from '@/components/HeroImage'
+import { getI18n } from '@/i18n/server'
+import type { Dictionary } from '@/i18n'
 
-export const metadata: Metadata = {
-  title: 'About — Shenzhen Buddies',
-  description:
-    'Built for explorers and the locals who love their city. Why we made Shenzhen Buddies, and how it works.',
-  alternates: { canonical: '/about' },
-  // Declared explicitly: the root layout sets an openGraph block, and
-  // metadata merges per key — so a page that omits this inherits the site's
-  // generic title, description and an og:url pointing at the homepage.
-  openGraph: {
-    title: 'About — Shenzhen Buddies',
-    description: 'Built for explorers and the locals who love their city. Why we made Shenzhen Buddies, and how it works.',
-    url: '/about',
-    // Not redundant with the root layout: the openGraph object above replaces
-    // the inherited one wholesale, and the file-convention card at
-    // src/app/opengraph-image.png goes with it, so without this line the page
-    // shares as a grey box. See DEFAULT_OG_IMAGE in src/lib/config.ts.
-    images: [DEFAULT_OG_IMAGE],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = (await getI18n()).t.seo.about
+  return {
+    title: seo.title,
+    description: seo.description,
+    alternates: { canonical: '/about' },
+    // Declared explicitly: the root layout sets an openGraph block, and
+    // metadata merges per key — so a page that omits this inherits the site's
+    // generic title, description and an og:url pointing at the homepage.
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: '/about',
+      // Not redundant with the root layout: the openGraph object above replaces
+      // the inherited one wholesale, and the file-convention card at
+      // src/app/opengraph-image.png goes with it, so without this line the page
+      // shares as a grey box. See DEFAULT_OG_IMAGE in src/lib/config.ts.
+      images: [DEFAULT_OG_IMAGE],
+    },
+    // Its own block, or twitter keeps the root layout's site-wide title and
+    // description while og: says something else. twitter:image still comes
+    // from the og image.
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.title,
+      description: seo.description,
+    },
+  }
 }
 
 
 
+// Titles and bodies live in t.about.pillars, keyed by id.
 const PILLARS: {
-  title: string
-  body: string
+  id: keyof Dictionary['about']['pillars']
   icon: 'spark' | 'people' | 'shield'
   tone: 'amber' | 'rose' | 'emerald'
 }[] = [
-  {
-    title: 'Matched on interests',
-    body: 'Not a list of dates. A real person who cares about the same food, art, gadgets, or hikes you do.',
-    icon: 'spark',
-    tone: 'amber',
-  },
-  {
-    title: 'Casual, not commercial',
-    body: 'Locals here aren’t licensed tour operators. They’re neighbors who’d show a visiting friend around the same way.',
-    icon: 'people',
-    tone: 'rose',
-  },
-  {
-    title: 'Earned trust',
-    body: 'Reviews only surface once a profile has enough interactions. First impressions stay honest.',
-    icon: 'shield',
-    tone: 'emerald',
-  },
+  { id: 'interests', icon: 'spark', tone: 'amber' },
+  { id: 'casual', icon: 'people', tone: 'rose' },
+  { id: 'trust', icon: 'shield', tone: 'emerald' },
 ]
 
-const FOUNDERS = [
-  {
-    name: 'Bryan Wang',
-    role: 'CEO · Shenzhen',
-    photo: '/team/bryan.jpg',
-    bio: 'Native Chinese but have spent 8+ years in Canada. I love both countries 🇨🇦🇨🇳 Comfortable with adventure and meeting new people 🚵‍♂️ Currently based in Shenzhen — a coffee or a walk around the city on the weekend would be nice ☕🚶‍♂️',
-  },
-  {
-    name: 'Takahiro Inaba',
-    role: 'CTO · Toronto',
-    photo: '/team/taka.jpg',
-    bio: 'Engineer from Japan, based in Toronto after ten-plus years in software. I build and look after everything technical here — the bookings, the payments, the page you are reading 💻',
-  },
+// Roles and bios live in t.about.founders, keyed by id.
+const FOUNDERS: {
+  id: keyof Dictionary['about']['founders']
+  name: string
+  photo: string
+}[] = [
+  { id: 'bryan', name: 'Bryan Wang', photo: '/team/bryan.jpg' },
+  { id: 'taka', name: 'Takahiro Inaba', photo: '/team/taka.jpg' },
 ]
 
-const TOGETHER = [
-  {
-    src: '/team/together-1.jpg',
-    alt: 'Bryan and Takahiro by the water at sunset',
-    caption: 'Sunset by the lake',
-  },
-  {
-    src: '/team/together-2.jpg',
-    alt: 'Bryan and Takahiro over Korean BBQ',
-    caption: 'Plotting over Korean BBQ',
-  },
-]
-
-export default function AboutPage() {
+export default async function AboutPage() {
+  const { t } = await getI18n()
+  const copy = t.about
+  const together = [
+    {
+      src: '/team/together-1.jpg',
+      alt: copy.together.sunsetAlt,
+      caption: copy.together.sunsetCaption,
+    },
+    {
+      src: '/team/together-2.jpg',
+      alt: copy.together.bbqAlt,
+      caption: copy.together.bbqCaption,
+    },
+  ]
   return (
     <main className="flex flex-1 flex-col">
       <section className="relative overflow-hidden">
         <HeroImage
           name="crayfish-noodles-lift"
-          alt="A bowl of crayfish and a lift of noodles on a Shenzhen table"
+          alt={copy.hero.imageAlt}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/45 to-black/80" />
@@ -99,18 +92,16 @@ export default function AboutPage() {
         <div className="relative mx-auto max-w-4xl px-6 py-28 text-center text-white sm:py-40">
           <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-white backdrop-blur">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-            Pilot · Shenzhen first
+            {copy.hero.badge}
           </p>
           <h1 className="mt-6 text-balance text-5xl font-semibold tracking-tight drop-shadow-lg sm:text-7xl">
-            Built for explorers, and the locals who{' '}
+            {copy.hero.titleLead}
             <span className="bg-gradient-to-r from-amber-300 to-rose-300 bg-clip-text text-transparent">
-              love their city.
+              {copy.hero.titleAccent}
             </span>
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-pretty text-lg text-white/90 drop-shadow sm:text-xl">
-            Shenzhen Buddies matches travelers with locals who share their
-            interests. Casual, affordable, personal — the opposite of a tour
-            bus.
+            {copy.hero.body}
           </p>
         </div>
       </section>
@@ -126,22 +117,19 @@ export default function AboutPage() {
         <div className="relative mx-auto max-w-5xl px-6 py-24">
           <div className="text-center">
             <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-              Why we built this
+              {copy.why.kicker}
             </p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Tourists deserve more than tour buses.
+              {copy.why.title}
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-zinc-600 dark:text-zinc-400">
-              Friends kept telling us the food was incredible, the people were
-              warm — but they spent half their trip translating menus and
-              arguing with map apps. The missing piece wasn&apos;t a slicker
-              booking site. It was a person.
+              {copy.why.body}
             </p>
           </div>
 
           <ul className="mt-14 grid gap-6 md:grid-cols-3">
             {PILLARS.map((p) => (
-              <li key={p.title}>
+              <li key={p.id}>
                 <article className="flex h-full flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
                   <span
                     className={`inline-flex h-11 w-11 items-center justify-center rounded-xl ${
@@ -154,9 +142,9 @@ export default function AboutPage() {
                   >
                     <PillarIcon name={p.icon} />
                   </span>
-                  <h3 className="mt-5 text-lg font-semibold">{p.title}</h3>
+                  <h3 className="mt-5 text-lg font-semibold">{copy.pillars[p.id].title}</h3>
                   <p className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400">
-                    {p.body}
+                    {copy.pillars[p.id].body}
                   </p>
                 </article>
               </li>
@@ -169,10 +157,10 @@ export default function AboutPage() {
         <div className="mx-auto max-w-5xl px-6 py-24">
           <div className="text-center">
             <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-              The team
+              {copy.team.kicker}
             </p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Two people. One city. A second one soon.
+              {copy.team.title}
             </h2>
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2">
@@ -192,13 +180,13 @@ export default function AboutPage() {
                   <div className="absolute bottom-3 left-4 text-white">
                     <p className="text-lg font-semibold drop-shadow">{f.name}</p>
                     <p className="text-xs uppercase tracking-wide text-white/80">
-                      {f.role}
+                      {copy.founders[f.id].role}
                     </p>
                   </div>
                 </div>
                 <div className="p-5">
                   <p className="text-sm text-zinc-700 dark:text-zinc-300">
-                    {f.bio}
+                    {copy.founders[f.id].bio}
                   </p>
                 </div>
               </article>
@@ -208,25 +196,25 @@ export default function AboutPage() {
           {/* Off-the-clock photos of the two of us */}
           <div className="mt-14">
             <p className="text-center text-xs font-medium uppercase tracking-wider text-zinc-500">
-              Off the clock
+              {copy.together.kicker}
             </p>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {TOGETHER.map((t) => (
+              {together.map((p) => (
                 <figure
-                  key={t.src}
+                  key={p.src}
                   className="group relative overflow-hidden rounded-2xl border border-zinc-200 shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl dark:border-zinc-800"
                 >
                   <div className="aspect-[4/5] overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={t.src}
-                      alt={t.alt}
+                      src={p.src}
+                      alt={p.alt}
                       className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
                     />
                   </div>
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
                   <figcaption className="absolute bottom-3 left-4 text-sm font-medium text-white drop-shadow">
-                    {t.caption}
+                    {p.caption}
                   </figcaption>
                 </figure>
               ))}
@@ -246,9 +234,7 @@ export default function AboutPage() {
             <path d="M9.5 6a4.5 4.5 0 0 0 0 9V18a8 8 0 0 1-8-8 8 8 0 0 1 8-8v4zm14 0a4.5 4.5 0 0 0 0 9V18a8 8 0 0 1-8-8 8 8 0 0 1 8-8v4z" />
           </svg>
           <blockquote className="mt-6 text-balance text-3xl font-medium leading-snug tracking-tight sm:text-4xl">
-            Every good day we&apos;ve had in a new city started the same way:
-            someone who lived there said, &ldquo;come on, I&apos;ll show
-            you.&rdquo;
+            {copy.quote}
           </blockquote>
         </div>
       </section>
@@ -257,24 +243,23 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-amber-100 via-rose-50 to-rose-100 dark:from-amber-950/40 dark:via-zinc-900 dark:to-rose-950/40" />
         <div className="relative mx-auto max-w-3xl px-6 py-20 text-center">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Come along while it&apos;s small.
+            {copy.cta.title}
           </h2>
           <p className="mt-3 text-zinc-700 dark:text-zinc-300">
-            Pilot pricing, founder-level attention to every new sign-up, and a
-            roadmap shaped by what early users ask for.
+            {copy.cta.body}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               href="/signup"
               className="rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-black/10 transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
-              Join the pilot
+              {copy.cta.join}
             </Link>
             <Link
               href="/contact"
               className="rounded-full border border-zinc-300 bg-white/80 px-6 py-3 text-sm font-medium backdrop-blur transition hover:bg-white dark:border-zinc-700 dark:bg-zinc-900/60 dark:hover:bg-zinc-900"
             >
-              Talk to us
+              {copy.cta.talk}
             </Link>
           </div>
         </div>

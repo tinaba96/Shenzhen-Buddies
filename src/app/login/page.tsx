@@ -3,6 +3,8 @@ import { SubmitButton } from '@/components/SubmitButton'
 import { safeNextPath } from '@/lib/redirects'
 import { login } from './actions'
 import { HeroImage } from '@/components/HeroImage'
+import { getI18n } from '@/i18n/server'
+import { authErrorText } from '@/lib/auth-errors'
 
 type Props = {
   searchParams: Promise<{ error?: string; next?: string }>
@@ -13,7 +15,8 @@ const SPLITWHOM_URL =
   'https://splitwhom.com/?utm_source=shenzhen-buddies&utm_medium=referral&utm_campaign=og_banner&utm_content=login'
 
 export default async function LoginPage({ searchParams }: Props) {
-  const { error, next } = await searchParams
+  const [{ error, next }, { t }] = await Promise.all([searchParams, getI18n()])
+  const errorText = authErrorText(error, t.auth.errors)
   // Set when the visitor was bounced here from a gated action (e.g. booking).
   const nextPath = safeNextPath(next)
   const signupHref = nextPath
@@ -32,18 +35,18 @@ export default async function LoginPage({ searchParams }: Props) {
 
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-              Welcome back
+              {t.auth.login.kicker}
             </p>
-            <h1 className="mt-1 text-2xl font-semibold">Log in</h1>
+            <h1 className="mt-1 text-2xl font-semibold">{t.auth.login.title}</h1>
             {nextPath && (
               <p className="mt-1 text-xs text-zinc-500">
-                We&apos;ll take you right back to where you left off.
+                {t.auth.login.resume}
               </p>
             )}
           </div>
 
           <label className="block">
-            <span className="text-sm font-medium">Email</span>
+            <span className="text-sm font-medium">{t.auth.email}</span>
             <input
               type="email"
               name="email"
@@ -55,12 +58,12 @@ export default async function LoginPage({ searchParams }: Props) {
 
           <label className="block">
             <div className="flex items-baseline justify-between">
-              <span className="text-sm font-medium">Password</span>
+              <span className="text-sm font-medium">{t.auth.password}</span>
               <Link
                 href="/forgot-password"
                 className="text-xs font-medium text-zinc-500 underline hover:text-zinc-700 dark:hover:text-zinc-300"
               >
-                Forgot password?
+                {t.auth.login.forgot}
               </Link>
             </div>
             <input
@@ -72,19 +75,19 @@ export default async function LoginPage({ searchParams }: Props) {
             />
           </label>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {errorText && <p className="text-sm text-red-600">{errorText}</p>}
 
           <SubmitButton
-            pendingLabel="Logging in…"
+            pendingLabel={t.auth.login.pending}
             className="w-full rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
-            Log in
+            {t.auth.login.submit}
           </SubmitButton>
 
           <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-            No account?{' '}
+            {t.auth.login.noAccount}{' '}
             <Link href={signupHref} className="font-medium underline">
-              Sign up
+              {t.auth.login.signupLink}
             </Link>
           </p>
         </form>
@@ -92,7 +95,7 @@ export default async function LoginPage({ searchParams }: Props) {
         {/* Small partner banner */}
         <div className="mt-5 w-full max-w-sm">
           <p className="mb-1.5 text-center text-[11px] uppercase tracking-wider text-zinc-400">
-            From a friend
+            {t.partner.kicker}
           </p>
           <a
             href={SPLITWHOM_URL}
@@ -103,7 +106,7 @@ export default async function LoginPage({ searchParams }: Props) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/splitwhom-banner.png"
-              alt="SplitWhom — split shared expenses with friends"
+              alt={t.auth.login.bannerAlt}
               className="w-full transition duration-500 group-hover:scale-[1.02]"
             />
           </a>
@@ -114,7 +117,7 @@ export default async function LoginPage({ searchParams }: Props) {
       <aside className="relative hidden lg:flex lg:flex-1">
         <HeroImage
           name="skyline-blue-towers-night"
-          alt="Shenzhen at night"
+          alt={t.auth.login.photoAlt}
           className="absolute inset-0 h-full w-full object-cover"
           shape="panel"
         />
@@ -122,11 +125,10 @@ export default async function LoginPage({ searchParams }: Props) {
         <div className="relative flex items-end p-12">
           <blockquote className="max-w-md text-white drop-shadow">
             <p className="text-2xl font-medium leading-snug">
-              &ldquo;Daniel took me to a dumpling place no map app would have
-              found. We&apos;re still texting about food.&rdquo;
+              {t.auth.login.quote}
             </p>
             <p className="mt-4 text-sm text-white/85">
-              — Marco R., visiting from Milan
+              {t.auth.login.quoteBy}
             </p>
           </blockquote>
         </div>

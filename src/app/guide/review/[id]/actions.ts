@@ -2,6 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { fill } from '@/i18n'
+import { getI18n } from '@/i18n/server'
 import { formatDay } from '@/lib/booking'
 import { officialGuideId } from '@/lib/config'
 import {
@@ -19,6 +21,30 @@ import { checkTipEligibility, officialGuideDisplayName } from '@/lib/tips'
 
 const MIN_REVIEW_WORDS = 5
 const MAX_REVIEW_WORDS = 50
+// Chinese and Japanese are written without spaces, so splitting on whitespace
+// counts a whole sentence as one word and rejects every review. Text in those
+// scripts is measured in characters instead, with limits sized to say about
+// as much as 5–50 English words. The page's hint (t.review.wordsHint) quotes
+// these numbers.
+const MIN_REVIEW_CHARS = 10
+const MAX_REVIEW_CHARS = 100
+// ー (the katakana long-vowel mark) is script Common, so it is named outright.
+const CJK = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー]/u
+const CJK_ALL = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー]/gu
+
+// Each CJK character counts once; any run of other text between spaces counts
+// as one word, so a Latin brand name inside a Chinese sentence is one unit.
+function reviewLength(text: string): { unit: 'words' | 'chars'; n: number } {
+  if (!CJK.test(text)) {
+    return { unit: 'words', n: text.split(/\s+/).filter(Boolean).length }
+  }
+  const chars = text.match(CJK_ALL)?.length ?? 0
+  const rest = text
+    .replace(CJK_ALL, ' ')
+    .split(/\s+/)
+    .filter((w) => /[\p{L}\p{N}]/u.test(w)).length
+  return { unit: 'chars', n: chars + rest }
+}
 
 function reviewFail(bookingId: string, message: string): never {
   redirect(`/guide/review/${bookingId}?error=${encodeURIComponent(message)}`)
@@ -31,15 +57,16 @@ function reviewFail(bookingId: string, message: string): never {
 async function requireFinishedBooking(bookingId: string) {
   const eligibility = await checkTipEligibility(bookingId)
   if (!eligibility.ok) {
+    const e = (await getI18n()).t.review.errors
     switch (eligibility.reason) {
       case 'signed_out':
         redirect(`/login?next=${encodeURIComponent(`/guide/review/${bookingId}`)}`)
       case 'not_found':
-        reviewFail(bookingId, 'Booking not found.')
+        reviewFail(bookingId, e.notFound)
       case 'not_approved':
-        reviewFail(bookingId, 'Only confirmed tours can be reviewed.')
+        reviewFail(bookingId, e.notApproved)
       case 'not_finished':
-        reviewFail(bookingId, 'You can review once your tour has finished.')
+        reviewFail(bookingId, e.notFinished)
     }
   }
   return {
@@ -52,23 +79,30 @@ async function requireFinishedBooking(bookingId: string) {
 export async function submitTourReview(formData: FormData) {
   const bookingId = String(formData.get('booking_id') ?? '')
   const thumb = String(formData.get('thumb') ?? '')
+  // Errors travel to the page as display text in ?error=, so they are written
+  // in the visitor's language here.
+  const e = (await getI18n()).t.review.errors
   if (thumb !== 'up' && thumb !== 'down') {
-    reviewFail(bookingId, 'Pick thumbs up or thumbs down.')
+    reviewFail(bookingId, e.thumb)
   }
 
   const { user, supabase } = await requireFinishedBooking(bookingId)
 
   const guideId = officialGuideId()
-  if (!guideId || guideId === user.id) reviewFail(bookingId, 'No guide to review.')
+  if (!guideId || guideId === user.id) reviewFail(bookingId, e.noGuide)
 
   const text = String(formData.get('body') ?? '').trim()
   let body: string | null = null
   if (text) {
-    const words = text.split(/\s+/).filter(Boolean).length
-    if (words < MIN_REVIEW_WORDS || words > MAX_REVIEW_WORDS) {
+    const { unit, n } = reviewLength(text)
+    const [min, max] =
+      unit === 'words'
+        ? [MIN_REVIEW_WORDS, MAX_REVIEW_WORDS]
+        : [MIN_REVIEW_CHARS, MAX_REVIEW_CHARS]
+    if (n < min || n > max) {
       reviewFail(
         bookingId,
-        `A written review is ${MIN_REVIEW_WORDS}–${MAX_REVIEW_WORDS} words (yours is ${words}). Or leave it empty — the thumb is enough.`,
+        fill(unit === 'words' ? e.words : e.chars, { min, max, n }),
       )
     }
     body = text.slice(0, 5000)
@@ -84,12 +118,13 @@ export async function submitTourReview(formData: FormData) {
     { onConflict: 'reviewer_id,reviewee_id' },
   )
   if (error) {
-    const friendly =
+    const rls =
       error.code === '42501' ||
       error.message.toLowerCase().includes('row-level security')
-        ? 'You can leave a review once your tour has finished.'
-        : error.message
-    reviewFail(bookingId, friendly)
+    // Postgres's own message is English and means nothing to a tourist; it
+    // goes to the logs and they get a sentence in their language.
+    if (!rls) console.error('Tour review upsert failed:', error)
+    reviewFail(bookingId, rls ? e.rls : e.generic)
   }
 
   revalidatePath('/guide')
@@ -102,9 +137,10 @@ export async function submitTourReview(formData: FormData) {
 export async function startTipCheckout(formData: FormData) {
   const bookingId = String(formData.get('booking_id') ?? '')
   const { user, booking } = await requireFinishedBooking(bookingId)
+  const { t } = await getI18n()
 
   if (!supportConfigured()) {
-    reviewFail(bookingId, 'Tips are not set up yet — thank you for the thought!')
+    reviewFail(bookingId, t.support.tip.notSetUp)
   }
 
   const raw = String(
@@ -112,7 +148,7 @@ export async function startTipCheckout(formData: FormData) {
   ).trim()
   const amountCents = parseSupportAmountCents(raw)
   if (amountCents == null) {
-    reviewFail(bookingId, 'Pick a tip between CA$1 and CA$500 (whole dollars).')
+    reviewFail(bookingId, t.review.errors.tipAmount)
   }
 
   const guideName = await officialGuideDisplayName()
@@ -130,7 +166,7 @@ export async function startTipCheckout(formData: FormData) {
     })
   } catch (err) {
     console.error('Tip checkout creation failed:', err)
-    reviewFail(bookingId, 'Could not start the tip payment — please try again.')
+    reviewFail(bookingId, t.review.errors.tipCheckout)
   }
   redirect(checkoutUrl)
 }

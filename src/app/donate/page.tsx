@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SupportPanel } from '@/components/SupportPanel'
 import { CURRENCY } from '@/lib/booking'
+import { getI18n } from '@/i18n/server'
 import { DEFAULT_OG_IMAGE } from '@/lib/config'
 import { paypalConfigured } from '@/lib/paypal'
 import { supportConfigured } from '@/lib/support'
@@ -9,25 +10,33 @@ import { startDonationCheckout } from './actions'
 
 // The tours are free during the pilot; this page is how anyone — before,
 // after, or without a booking — can chip in to keep it running. Linked from
-// the footer and the booking page. English-only for now, like /welcome.
+// the footer and the booking page. Page copy and the <title>/description
+// follow the visitor's language (t.donate, t.seo.donate).
 // Card (Stripe) and PayPal are both offered when configured; the amount picker
 // and buttons live in SupportPanel, the card checkout in ./actions.
 
-const TITLE = 'Support the pilot — Shenzhen Buddies'
-const DESCRIPTION =
-  'Tours are free while we get Shenzhen Buddies off the ground. If it made your trip better, a small donation keeps it running.'
-
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: '/donate' },
-  openGraph: {
-    title: TITLE,
-    description: DESCRIPTION,
-    url: '/donate',
-    // Required alongside any openGraph object — see the note in about/page.tsx.
-    images: [DEFAULT_OG_IMAGE],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = (await getI18n()).t.seo.donate
+  return {
+    title: seo.title,
+    description: seo.description,
+    alternates: { canonical: '/donate' },
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: '/donate',
+      // Required alongside any openGraph object — see the note in about/page.tsx.
+      images: [DEFAULT_OG_IMAGE],
+    },
+    // Its own block, or twitter keeps the root layout's site-wide title and
+    // description while og: says something else. twitter:image still comes
+    // from the og image.
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.title,
+      description: seo.description,
+    },
+  }
 }
 
 type Props = {
@@ -35,37 +44,41 @@ type Props = {
 }
 
 export default async function DonatePage({ searchParams }: Props) {
-  const sp = await searchParams
+  const [sp, { t }] = await Promise.all([searchParams, getI18n()])
+  const d = t.donate
+  // ./actions sends a short code; anything else (an old link) is shown as-is.
+  // Own properties only — ?error=constructor must not resolve to Object's.
+  const errorText =
+    typeof sp.error === 'string' && sp.error
+      ? Object.hasOwn(d.errors, sp.error)
+        ? d.errors[sp.error as keyof typeof d.errors]
+        : sp.error
+      : null
   const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
   const showPaypal = paypalConfigured() && Boolean(paypalClientId)
 
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-4 py-14">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-        Support the pilot
+        {d.kicker}
       </p>
       <h1 className="mt-3 text-4xl font-semibold tracking-tight">
-        The tours are free.
+        {d.titleLine1}
         <br />
-        Running them isn&apos;t.
+        {d.titleLine2}
       </h1>
       <p className="mt-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-        While we get Shenzhen Buddies off the ground, every tour is free — no
-        booking fee, no hourly rate. If a day out with a buddy made your trip
-        better, or you just like what we&apos;re building, a small donation
-        helps cover the guides&apos; time and keeps the pilot going. Any
-        amount, any time — booking or no booking.
+        {d.body}
       </p>
 
       {sp.thanks && (
         <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-          Thank you! Your donation came through — it genuinely keeps this
-          running.
+          {d.thanks}
         </p>
       )}
-      {sp.error && (
+      {errorText && (
         <p className="mt-6 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
-          {sp.error}
+          {errorText}
         </p>
       )}
 
@@ -79,19 +92,19 @@ export default async function DonatePage({ searchParams }: Props) {
           currency={CURRENCY}
           cardAction={startDonationCheckout}
           successHref="/donate?thanks=1"
-          verb="Donate"
+          labels={t.support}
         />
       </div>
 
       <p className="mt-8 text-sm text-zinc-500">
-        Haven&apos;t booked yet?{' '}
+        {d.bookPrefix}
         <Link
           href="/guide"
           className="underline underline-offset-2 hover:text-zinc-900 dark:hover:text-white"
         >
-          Book a free tour first
-        </Link>{' '}
-        — that helps us even more.
+          {d.bookLink}
+        </Link>
+        {d.bookSuffix}
       </p>
     </main>
   )

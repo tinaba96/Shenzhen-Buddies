@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { SubmitButton } from '@/components/SubmitButton'
+import { getI18n } from '@/i18n/server'
+import { authErrorText } from '@/lib/auth-errors'
 import { requestPasswordReset } from './actions'
 
 type Props = {
@@ -7,7 +9,8 @@ type Props = {
 }
 
 export default async function ForgotPasswordPage({ searchParams }: Props) {
-  const { error, sent } = await searchParams
+  const [{ error, sent }, { t }] = await Promise.all([searchParams, getI18n()])
+  const errorText = authErrorText(error, t.auth.errors)
 
   return (
     <main className="flex flex-1 items-center justify-center px-6 py-12 sm:px-12">
@@ -17,17 +20,16 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
       >
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-            Forgot your password?
+            {t.auth.forgot.kicker}
           </p>
-          <h1 className="mt-1 text-2xl font-semibold">Reset password</h1>
+          <h1 className="mt-1 text-2xl font-semibold">{t.auth.forgot.title}</h1>
           <p className="mt-1 text-xs text-zinc-500">
-            Enter your email and we&apos;ll send you a link to set a new
-            password.
+            {t.auth.forgot.body}
           </p>
         </div>
 
         <label className="block">
-          <span className="text-sm font-medium">Email</span>
+          <span className="text-sm font-medium">{t.auth.email}</span>
           <input
             type="email"
             name="email"
@@ -37,25 +39,24 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
           />
         </label>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {errorText && <p className="text-sm text-red-600">{errorText}</p>}
         {sent && (
           <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-            If an account exists for that email, a reset link is on its way.
-            Check your inbox.
+            {t.auth.forgot.sent}
           </p>
         )}
 
         <SubmitButton
-          pendingLabel="Sending…"
+          pendingLabel={t.auth.forgot.pending}
           className="w-full rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
-          Send reset link
+          {t.auth.forgot.submit}
         </SubmitButton>
 
         <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-          Remembered it?{' '}
+          {t.auth.forgot.remembered}{' '}
           <Link href="/login" className="font-medium underline">
-            Log in
+            {t.auth.forgot.loginLink}
           </Link>
         </p>
       </form>

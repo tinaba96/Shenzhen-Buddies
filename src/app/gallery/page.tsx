@@ -10,16 +10,23 @@ import {
   thumbnailSrc,
   toPublicItem,
 } from '@/content/gallery'
+import { localizeGalleryItem } from '@/content/gallery-i18n'
+import { fill } from '@/i18n'
+import { getI18n } from '@/i18n/server'
 import { isAdminViewer } from '@/lib/admin'
+import type { Dictionary } from '@/i18n'
 import { DEFAULT_OG_IMAGE, isSingleGuideMode, siteUrl } from '@/lib/config'
 import { GalleryFilters } from './GalleryFilters'
 import { GalleryGrid } from './GalleryGrid'
 
-const TITLE = 'Shenzhen, as we actually found it — Shenzhen Buddies'
-// Names what is actually in the library, not the neighbourhoods we hope to
-// shoot. This string is the search snippet and the share card, so a district
-// listed here that has no photos behind it is a promise the page breaks on
-// arrival. Update it when the mix changes, not when the plan does.
+// The <title> and description are t.seo.gallery. The description names what
+// is actually in the library, not the neighbourhoods we hope to shoot. It is
+// the search snippet and the share card, so a district listed there that has
+// no photos behind it is a promise the page breaks on arrival. Update it when
+// the mix changes, not when the plan does.
+//
+// The JSON-LD below stays English, like every other page's structured data:
+// it describes the photos to a crawler, and the crawler sees the English page.
 const DESCRIPTION =
   'Real photos of Shenzhen from the people who live here — night skylines, street-food stalls, workbenches mid-project. No stock imagery.'
 
@@ -58,7 +65,12 @@ export async function generateMetadata({
 }: {
   searchParams: SearchParams
 }): Promise<Metadata> {
-  const { photoItem } = await readParams(searchParams)
+  const [{ photoItem: basePhoto }, { locale, t }] = await Promise.all([
+    readParams(searchParams),
+    getI18n(),
+  ])
+  const photoItem = basePhoto && localizeGalleryItem(basePhoto, locale)
+  const seo = t.seo.gallery
 
   // CANONICAL — every variant of this page, ?loc= and ?photo= alike,
   // canonicalises to bare /gallery.
@@ -82,18 +94,25 @@ export async function generateMetadata({
   // If per-photo *pages* become the goal, the right answer is a real
   // /gallery/[id] route with its own content — see the report, not this file.
   const base: Metadata = {
-    title: TITLE,
-    description: DESCRIPTION,
+    title: seo.title,
+    description: seo.description,
     alternates: { canonical: '/gallery' },
     // `images` is not redundant: declaring an openGraph object here replaces
     // the one inherited from the root layout, and the opengraph-image file
     // convention goes with it — so omitting this shares the gallery as a grey
     // box. See the note on DEFAULT_OG_IMAGE in src/lib/config.ts.
     openGraph: {
-      title: TITLE,
-      description: DESCRIPTION,
+      title: seo.title,
+      description: seo.description,
       url: '/gallery',
       images: DEFAULT_OG_IMAGE,
+    },
+    // Without its own block, twitter keeps the root layout's site-wide title
+    // and description while og: says something else.
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.title,
+      description: seo.description,
     },
   }
 
@@ -109,7 +128,7 @@ export async function generateMetadata({
 
   return {
     ...base,
-    title: `${photoItem.title} — Shenzhen Buddies`,
+    title: fill(seo.photoTitle, { title: photoItem.title }),
     description,
     openGraph: {
       title: photoItem.title,
@@ -124,6 +143,11 @@ export async function generateMetadata({
       // scraper has already cached the miss.
       images: [`${siteUrl()}${ogImageSrc(photoItem)}`],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: photoItem.title,
+      description,
+    },
   }
 }
 
@@ -137,6 +161,10 @@ export default async function GalleryPage({
   // Only gates the admin-only share button. Anonymous visitors get the whole
   // page as before — nothing here is behind a session.
   const isAdmin = await isAdminViewer()
+  const { locale, t } = await getI18n()
+  // Titles, captions and alt text in the reader's language. Only the grid gets
+  // these; the JSON-LD below is built from the English `items`.
+  const shown = items.map((item) => localizeGalleryItem(item, locale))
 
   // Anonymous visitors get the read-only /guide preview, so this is not
   // wrapped in an auth redirect. /browse takes no `city` param, so none is
@@ -175,19 +203,25 @@ export default async function GalleryPage({
 
       <section className="mx-auto w-full max-w-5xl px-6 pb-10 pt-16 text-center">
         <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-          Gallery
+          {t.gallery.kicker}
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-          Shenzhen, as we actually found it.
+          {t.gallery.title}
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-zinc-600 dark:text-zinc-400">
-          Every frame here was shot by us or by a buddy, in a place we would
-          actually take you. If a photo isn&apos;t of this city, it isn&apos;t
-          on this page.
+          {t.gallery.intro}
         </p>
         {chipLocations.length > 0 && (
           <div className="mt-8">
-            <GalleryFilters locations={chipLocations} active={active} />
+            <GalleryFilters
+              locations={chipLocations}
+              active={active}
+              labels={{
+                nav: t.gallery.filterLabel,
+                all: t.gallery.all,
+                locations: t.gallery.locations,
+              }}
+            />
           </div>
         )}
       </section>
@@ -195,15 +229,17 @@ export default async function GalleryPage({
       <section className="mx-auto w-full max-w-5xl px-6 pb-16">
         {items.length > 0 ? (
           <GalleryGrid
-            items={items}
+            items={shown}
             activeLocation={active ?? 'all'}
             ctaHref={ctaHref}
             initialIndex={photoIndex}
             isAdmin={isAdmin}
             shareBaseUrl={base}
+            labels={t.gallery}
+            shareLabels={t.share}
           />
         ) : (
-          <EmptyState ctaHref={ctaHref} />
+          <EmptyState ctaHref={ctaHref} t={t.gallery} />
         )}
       </section>
     </main>
@@ -213,19 +249,24 @@ export default async function GalleryPage({
 // The gallery ships before the photos do. Saying so plainly is cheaper than
 // the alternative — filling the grid with stock imagery of somewhere else is
 // the exact defect this page exists to remove.
-function EmptyState({ ctaHref }: { ctaHref: string }) {
+function EmptyState({
+  ctaHref,
+  t,
+}: {
+  ctaHref: string
+  t: Dictionary['gallery']
+}) {
   return (
     <div className="mx-auto max-w-xl rounded-2xl border border-dashed border-zinc-300 px-8 py-14 text-center dark:border-zinc-700">
-      <p className="text-base font-medium">The first batch is being shot.</p>
+      <p className="text-base font-medium">{t.emptyTitle}</p>
       <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-        We would rather show you nothing than show you stock photos of a
-        different city — so this page fills up as the real ones come back.
+        {t.emptyBody}
       </p>
       <Link
         href={ctaHref}
         className="mt-6 inline-flex items-center gap-2 rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
       >
-        Meet a local instead
+        {t.emptyCta}
         <span aria-hidden>→</span>
       </Link>
     </div>

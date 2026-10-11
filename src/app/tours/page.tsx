@@ -29,6 +29,13 @@ export async function generateMetadata(): Promise<Metadata> {
       url: '/tours',
       images: [DEFAULT_OG_IMAGE],
     },
+    // Its own block, or twitter keeps the root layout's site-wide title and
+    // description. twitter:image still comes from the og image.
+    twitter: {
+      card: 'summary_large_image',
+      title: t.seo.toursTitle,
+      description: t.seo.toursDescription,
+    },
   }
 }
 
@@ -73,7 +80,7 @@ export default async function ToursPage() {
         <div className="absolute inset-0 overflow-hidden">
           <HeroImage
             name="skyline-bay-dusk-reflections"
-            alt="The Shenzhen Bay skyline at dusk, its lit towers reflected in the water"
+            alt={t.tours.index.heroAlt}
             className="sb-drift h-full w-full object-cover"
           />
         </div>
@@ -117,6 +124,7 @@ export default async function ToursPage() {
         <PackageCard
           pkg={featured}
           t={t}
+          locale={locale}
           price={price}
           variant="featured"
           eager
@@ -124,7 +132,7 @@ export default async function ToursPage() {
         <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {rest.map((pkg) => (
             <li key={pkg.slug} className="sb-rise">
-              <PackageCard pkg={pkg} t={t} price={price} />
+              <PackageCard pkg={pkg} t={t} locale={locale} price={price} />
             </li>
           ))}
         </ul>

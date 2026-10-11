@@ -3,6 +3,8 @@ import { SubmitButton } from '@/components/SubmitButton'
 import { safeNextPath } from '@/lib/redirects'
 import { signup } from './actions'
 import { HeroImage } from '@/components/HeroImage'
+import { getI18n } from '@/i18n/server'
+import { authErrorText } from '@/lib/auth-errors'
 
 type Props = {
   searchParams: Promise<{ error?: string; check_email?: string; next?: string }>
@@ -10,7 +12,11 @@ type Props = {
 
 
 export default async function SignupPage({ searchParams }: Props) {
-  const { error, check_email, next } = await searchParams
+  const [{ error, check_email, next }, { t }] = await Promise.all([
+    searchParams,
+    getI18n(),
+  ])
+  const errorText = authErrorText(error, t.auth.errors)
   // Set when the visitor was bounced here from a gated action (e.g. booking).
   const nextPath = safeNextPath(next)
   const loginHref = nextPath
@@ -29,16 +35,16 @@ export default async function SignupPage({ searchParams }: Props) {
 
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-              Get started
+              {t.auth.signup.kicker}
             </p>
-            <h1 className="mt-1 text-2xl font-semibold">Create your account</h1>
+            <h1 className="mt-1 text-2xl font-semibold">{t.auth.signup.title}</h1>
             <p className="mt-1 text-xs text-zinc-500">
-              Free during pilot. Takes under a minute.
+              {t.auth.signup.sub}
             </p>
           </div>
 
           <label className="block">
-            <span className="text-sm font-medium">Email</span>
+            <span className="text-sm font-medium">{t.auth.email}</span>
             <input
               type="email"
               name="email"
@@ -49,7 +55,7 @@ export default async function SignupPage({ searchParams }: Props) {
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium">Password</span>
+            <span className="text-sm font-medium">{t.auth.password}</span>
             <input
               type="password"
               name="password"
@@ -59,28 +65,28 @@ export default async function SignupPage({ searchParams }: Props) {
               className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
             />
             <span className="mt-1 block text-xs text-zinc-500">
-              At least 8 characters.
+              {t.auth.minLength}
             </span>
           </label>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {errorText && <p className="text-sm text-red-600">{errorText}</p>}
           {check_email && (
             <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-              Check your email to confirm your address, then log in.
+              {t.auth.signup.checkEmail}
             </p>
           )}
 
           <SubmitButton
-            pendingLabel="Signing up…"
+            pendingLabel={t.auth.signup.pending}
             className="w-full rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
-            Sign up
+            {t.auth.signup.submit}
           </SubmitButton>
 
           <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-            Already have an account?{' '}
+            {t.auth.signup.haveAccount}{' '}
             <Link href={loginHref} className="font-medium underline">
-              Log in
+              {t.auth.signup.loginLink}
             </Link>
           </p>
         </form>
@@ -90,7 +96,7 @@ export default async function SignupPage({ searchParams }: Props) {
       <aside className="relative hidden lg:flex lg:flex-1">
         <HeroImage
           name="night-market-skewers-stall"
-          alt="Skewers grilling at a Shenzhen night-market stall"
+          alt={t.auth.signup.photoAlt}
           className="absolute inset-0 h-full w-full object-cover"
           shape="panel"
         />
@@ -98,30 +104,29 @@ export default async function SignupPage({ searchParams }: Props) {
         <div className="relative flex items-end p-12">
           <div className="text-white drop-shadow">
             <p className="text-2xl font-medium leading-snug">
-              Casual. Affordable. Personal.
+              {t.auth.signup.panelTitle}
             </p>
             <p className="mt-4 max-w-sm text-sm text-white/85">
-              Match by what you actually like — language, food, art, hiking,
-              electronics — and meet a local who knows the spot.
+              {t.auth.signup.panelBody}
             </p>
             <ul className="mt-6 space-y-2 text-sm text-white/85">
               <li className="flex items-center gap-2">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-emerald-300">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
-                Free during the pilot
+                {t.auth.signup.points[0]}
               </li>
               <li className="flex items-center gap-2">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-emerald-300">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
-                Cancel anytime
+                {t.auth.signup.points[1]}
               </li>
               <li className="flex items-center gap-2">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-emerald-300">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
-                Reviewed by the community
+                {t.auth.signup.points[2]}
               </li>
             </ul>
           </div>

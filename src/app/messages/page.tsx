@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
+import { fill, type Dictionary } from '@/i18n'
+import { getI18n } from '@/i18n/server'
 import { avatarPublicUrl } from '@/lib/avatars'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
@@ -33,6 +35,9 @@ export default async function MessagesIndexPage() {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+
+  const { t, meta } = await getI18n()
+  const m = t.messages
 
   const { data: convs } = await supabase
     .from('conversations')
@@ -97,10 +102,10 @@ export default async function MessagesIndexPage() {
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-12">
       <div className="mb-6 flex items-center gap-2">
-        <h1 className="text-2xl font-semibold">Messages</h1>
+        <h1 className="text-2xl font-semibold">{t.nav.messages}</h1>
         {totalUnread > 0 && (
           <span className="rounded-full bg-rose-500 px-2 py-0.5 text-xs font-medium text-white">
-            {totalUnread} unread
+            {fill(m.unread, { n: totalUnread })}
           </span>
         )}
       </div>
@@ -120,16 +125,15 @@ export default async function MessagesIndexPage() {
                 <path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z" />
               </svg>
             </div>
-            <h2 className="mt-4 text-lg font-semibold">No conversations yet</h2>
+            <h2 className="mt-4 text-lg font-semibold">{m.emptyTitle}</h2>
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              Find someone on Browse who shares your interests and start the
-              first hello.
+              {m.emptyBody}
             </p>
             <Link
               href="/browse"
               className="mt-5 inline-flex items-center gap-2 rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
-              Browse buddies
+              {t.common.browseBuddies}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
@@ -160,10 +164,10 @@ export default async function MessagesIndexPage() {
                       <p
                         className={`truncate ${unread > 0 ? 'font-semibold' : 'font-medium'}`}
                       >
-                        {other?.display_name ?? 'Unknown user'}
+                        {other?.display_name ?? m.unknownUser}
                       </p>
                       <span className="text-xs text-zinc-500">
-                        {formatRelative(last?.created_at ?? c.updated_at)}
+                        {formatRelative(last?.created_at ?? c.updated_at, m, meta.intlLocale)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2">
@@ -175,8 +179,8 @@ export default async function MessagesIndexPage() {
                         }`}
                       >
                         {last
-                          ? `${last.sender_id === user.id ? 'You: ' : ''}${last.content}`
-                          : 'No messages yet — say hi!'}
+                          ? `${last.sender_id === user.id ? m.youPrefix : ''}${last.content}`
+                          : m.noMessagesYet}
                       </p>
                       {unread > 0 && (
                         <span className="flex-shrink-0 rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-semibold text-white">
@@ -195,12 +199,16 @@ export default async function MessagesIndexPage() {
   )
 }
 
-function formatRelative(iso: string): string {
+function formatRelative(
+  iso: string,
+  m: Dictionary['messages'],
+  intlLocale: string,
+): string {
   const then = new Date(iso).getTime()
   const diff = Date.now() - then
-  if (diff < 60_000) return 'just now'
-  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m`
-  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h`
-  if (diff < 7 * 86_400_000) return `${Math.floor(diff / 86_400_000)}d`
-  return new Date(iso).toLocaleDateString()
+  if (diff < 60_000) return m.justNow
+  if (diff < 3_600_000) return fill(m.minutesAgo, { n: Math.floor(diff / 60_000) })
+  if (diff < 86_400_000) return fill(m.hoursAgo, { n: Math.floor(diff / 3_600_000) })
+  if (diff < 7 * 86_400_000) return fill(m.daysAgo, { n: Math.floor(diff / 86_400_000) })
+  return new Date(iso).toLocaleDateString(intlLocale)
 }

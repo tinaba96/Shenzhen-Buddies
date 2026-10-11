@@ -5,6 +5,16 @@ import { formatHour, formatMoney, HOURLY_RATE_CENTS } from '@/lib/booking'
 
 type StartOption = { hour: number; maxDuration: number }
 
+// Server-translated labels ({n}/{min}/{max} filled here, not via fill(), so
+// the client bundle never imports the dictionaries).
+type Labels = {
+  startTime: string
+  endTime: string
+  hours: string
+  hoursShort: string
+  daysRun: string
+}
+
 // Start-time + end-time pickers with a live "10:00 → 18:00" summary so the
 // tourist can set exactly when their day starts and ends and see the cost.
 // The duration (end − start) is derived and submitted as a hidden field, so
@@ -13,10 +23,12 @@ export function BookingFields({
   startOptions,
   minHours,
   maxHours,
+  labels: l,
 }: {
   startOptions: StartOption[]
   minHours: number
   maxHours: number
+  labels: Labels
 }) {
   const firstStart = startOptions[0]?.hour ?? 0
   const [startHour, setStartHour] = useState(firstStart)
@@ -44,7 +56,7 @@ export function BookingFields({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
-          <span className="text-sm font-medium">Start time</span>
+          <span className="text-sm font-medium">{l.startTime}</span>
           <select
             name="start_hour"
             value={startHour}
@@ -59,7 +71,7 @@ export function BookingFields({
           </select>
         </label>
         <label className="block">
-          <span className="text-sm font-medium">End time</span>
+          <span className="text-sm font-medium">{l.endTime}</span>
           <select
             value={effectiveEnd}
             onChange={(e) => setEndHour(Number(e.target.value))}
@@ -67,7 +79,7 @@ export function BookingFields({
           >
             {endOptions.map((h) => (
               <option key={h} value={h}>
-                {formatHour(h)} ({h - startHour}h)
+                {formatHour(h)} ({l.hoursShort.replace('{n}', String(h - startHour))})
               </option>
             ))}
           </select>
@@ -83,14 +95,16 @@ export function BookingFields({
             <path d="m12 5 7 7-7 7" />
           </svg>
           <span className="font-semibold">{formatHour(effectiveEnd)}</span>
-          <span className="text-zinc-500">· {duration} hours</span>
+          <span className="text-zinc-500">· {l.hours.replace('{n}', String(duration))}</span>
         </div>
         <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
           {formatMoney(priceCents)}
         </span>
       </div>
       <p className="text-xs text-zinc-500">
-        Days run {minHours}–{maxHours} hours.
+        {l.daysRun
+          .replace('{min}', String(minHours))
+          .replace('{max}', String(maxHours))}
       </p>
     </div>
   )

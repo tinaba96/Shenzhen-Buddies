@@ -2,26 +2,35 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { DEFAULT_OG_IMAGE, isSingleGuideMode } from '@/lib/config'
 import { HeroImage } from '@/components/HeroImage'
+import { getI18n } from '@/i18n/server'
+import type { Dictionary } from '@/i18n'
 
-const TITLE = 'Explore Shenzhen by district — Shenzhen Buddies'
-const DESCRIPTION =
-  "Shenzhen's six main districts — Nanshan, Futian, Luohu, Bao'an, Longhua and Longgang — what each one is actually for, and a local who knows it."
-
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: '/explore' },
-  // Declared explicitly: the root layout sets an openGraph block, and metadata
-  // merges per key — so a page that omits this inherits the site's generic
-  // title, description and an og:url pointing at the homepage.
-  // `images` is not redundant: the object above replaces the inherited one, and
-  // the file-convention card goes with it. See DEFAULT_OG_IMAGE in lib/config.
-  openGraph: {
-    title: TITLE,
-    description: DESCRIPTION,
-    url: '/explore',
-    images: [DEFAULT_OG_IMAGE],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = (await getI18n()).t.seo.explore
+  return {
+    title: seo.title,
+    description: seo.description,
+    alternates: { canonical: '/explore' },
+    // Declared explicitly: the root layout sets an openGraph block, and metadata
+    // merges per key — so a page that omits this inherits the site's generic
+    // title, description and an og:url pointing at the homepage.
+    // `images` is not redundant: the object above replaces the inherited one, and
+    // the file-convention card goes with it. See DEFAULT_OG_IMAGE in lib/config.
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: '/explore',
+      images: [DEFAULT_OG_IMAGE],
+    },
+    // Its own block, or twitter keeps the root layout's site-wide title and
+    // description while og: says something else. twitter:image still comes
+    // from the og image.
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.title,
+      description: seo.description,
+    },
+  }
 }
 
 // PHOTO PROVENANCE — read before changing any `photo` below.
@@ -46,13 +55,11 @@ export const metadata: Metadata = {
 //
 // The hero and the "moments" strip are the founder's own photographs.
 
+// Name, second line, blurb and alt text live in t.explore.districts, keyed by
+// slug. The credit stays here: it must match the source exactly.
 type District = {
-  slug: string
-  name: string
-  cn: string
-  blurb: string
+  slug: keyof Dictionary['explore']['districts']
   photo: string
-  alt: string
   credit: {
     what: string
     author: string
@@ -66,12 +73,7 @@ type District = {
 const districts: District[] = [
   {
     slug: 'nanshan',
-    name: 'Nanshan',
-    cn: '南山',
-    blurb:
-      "The tech end of the city, and the green one. Company headquarters and universities inland, Shenzhen Bay and the coastal park on the water side, Shekou's expat bars and ferry pier further west.",
     photo: '/explore/nanshan.webp',
-    alt: 'The shell-like perforated roof of Shenzhen Bay Sports Center in Nanshan, against a clear sky',
     credit: {
       what: 'Shenzhen Bay Sports Center',
       author: 'Dinkun Chen',
@@ -83,12 +85,7 @@ const districts: District[] = [
   },
   {
     slug: 'futian',
-    name: 'Futian',
-    cn: '福田',
-    blurb:
-      'The central business district — the tallest towers, the civic centre, and the checkpoint most people cross from Hong Kong. Lianhuashan park is the climb everyone does for the skyline view back over it.',
     photo: '/explore/futian.webp',
-    alt: 'Ping An Finance Centre, the tapered supertall tower in Futian, rising into a blue sky',
     credit: {
       what: 'Ping An Finance Centre',
       author: 'Chris from Shenzhen, China',
@@ -100,12 +97,7 @@ const districts: District[] = [
   },
   {
     slug: 'luohu',
-    name: 'Luohu',
-    cn: '罗湖',
-    blurb:
-      'Where the city started, and where most first-timers arrive — the Luohu crossing puts you a short walk from the old downtown. Dongmen’s market streets are here, and the food is older and cheaper than the towers to the west.',
     photo: '/explore/luohu.webp',
-    alt: 'The Guangzhou–Shenzhen intercity railway entrance at Luohu station, with its blue signage',
     credit: {
       what: 'Luohu Port railway station facade',
       author: 'Wikimedia Commons contributor',
@@ -117,12 +109,7 @@ const districts: District[] = [
   },
   {
     slug: 'baoan',
-    name: "Bao'an",
-    cn: '宝安',
-    blurb:
-      'The airport district, and the one that actually makes things — workshops and factories that supply the markets downtown. The coastal strip has been rebuilt with parks and a promenade worth the trip out.',
     photo: '/explore/baoan.webp',
-    alt: "Shenzhen Bao'an International Airport Terminal 3 from above, its white perforated roof spread across the apron",
     credit: {
       what: "Shenzhen Bao'an International Airport",
       author: '準建築人手札網站 Forgemind ArchiMedia',
@@ -134,12 +121,7 @@ const districts: District[] = [
   },
   {
     slug: 'longhua',
-    name: 'Longhua',
-    cn: '龙华',
-    blurb:
-      'The high-speed rail gateway — trains to Guangzhou in half an hour and most of the country from the same hall. Around the station it is manufacturing and dense new housing, with prices that pull younger residents north.',
     photo: '/explore/longhua.webp',
-    alt: 'The roofline of Shenzhen North Railway Station in Longhua, with 深圳北站 in red characters',
     credit: {
       what: 'Shenzhen North Railway Station',
       author: 'Dinkun Chen',
@@ -151,12 +133,7 @@ const districts: District[] = [
   },
   {
     slug: 'longgang',
-    name: 'Longgang',
-    cn: '龙岗',
-    blurb:
-      'The outer east — the Universiade complex built for the 2011 games, big tech campuses, and the point where the city thins out into hills and reservoirs. Furthest from the border, and the least touristed of the six.',
     photo: '/explore/longgang.webp',
-    alt: 'The faceted green crystal roofs of the Universiade Sports Centre in Longgang',
     credit: {
       what: 'Shenzhen Universiade Sports Centre',
       author: 'Stephen Woolverton',
@@ -169,18 +146,21 @@ const districts: District[] = [
 ]
 
 // The founder's own photographs — see src/content/gallery.ts for the library.
-const moments: { src: string; alt: string }[] = [
-  { src: '/gallery/night-market-skewers-stall.webp', alt: 'A night market stall of skewered insects in Shenzhen' },
-  { src: '/gallery/crayfish-noodles-lift.webp', alt: 'Chopsticks lifting noodles beside a bowl of garlic crayfish' },
-  { src: '/gallery/maker-desk-dev-boards.webp', alt: 'Single-board computers and jumper wires on a workbench' },
-  { src: '/gallery/skyline-tower-walkway-night.webp', alt: 'A Shenzhen tower lit white at night above a pedestrian walkway' },
-  { src: '/gallery/chicken-rice-closeup.webp', alt: 'Poached chicken over rice with ginger-scallion oil and greens' },
-  { src: '/gallery/preserved-fruit-jars.webp', alt: 'Clip-top jars of kumquats and plums preserved in syrup' },
-  { src: '/gallery/bakery-bread-counter.webp', alt: 'Sourdough rounds and baguettes on a Shenzhen bakery counter' },
-  { src: '/gallery/maker-desk-headset-teardown.webp', alt: 'An AR headset opened on a bench with its ribbon cables exposed' },
+// Alt text lives in t.explore.moments.alts, in this order.
+const moments: string[] = [
+  '/gallery/night-market-skewers-stall.webp',
+  '/gallery/crayfish-noodles-lift.webp',
+  '/gallery/maker-desk-dev-boards.webp',
+  '/gallery/skyline-tower-walkway-night.webp',
+  '/gallery/chicken-rice-closeup.webp',
+  '/gallery/preserved-fruit-jars.webp',
+  '/gallery/bakery-bread-counter.webp',
+  '/gallery/maker-desk-headset-teardown.webp',
 ]
 
-export default function ExplorePage() {
+export default async function ExplorePage() {
+  const { t } = await getI18n()
+  const copy = t.explore
   // /browse forwards to /guide while the beta runs one guide, and takes no
   // `city` param — appending one would be silently dropped.
   const ctaHref = isSingleGuideMode() ? '/guide' : '/browse'
@@ -191,26 +171,25 @@ export default function ExplorePage() {
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
         <HeroImage
           name="skyline-blue-towers-night"
-          alt="Shenzhen towers lit blue at night, seen from street level"
+          alt={copy.hero.imageAlt}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/45 to-black/70" />
         <div className="relative mx-auto max-w-5xl px-6 py-24 text-center text-white sm:py-32">
           <p className="text-xs font-medium uppercase tracking-wide text-white/80">
-            Explore
+            {copy.hero.kicker}
           </p>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight drop-shadow sm:text-5xl">
-            Six districts, six different cities.
+            {copy.hero.title}
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-white/90 drop-shadow">
-            Shenzhen is too big to &ldquo;see&rdquo; in a day. Pick the part
-            that matches what you came for — and meet someone who lives there.
+            {copy.hero.body}
           </p>
           <Link
             href={ctaHref}
             className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-zinc-900 shadow-sm transition hover:bg-zinc-100"
           >
-            Meet a local
+            {copy.hero.cta}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />
@@ -222,44 +201,47 @@ export default function ExplorePage() {
       {/* SIX DISTRICTS */}
       <section className="mx-auto w-full max-w-5xl px-6 py-16">
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {districts.map((d) => (
-            <li key={d.slug}>
-              <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="relative h-44 overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={d.photo}
-                    alt={d.alt}
-                    width={1600}
-                    height={640}
-                    className="h-full w-full object-cover transition duration-300 hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                  <div className="absolute bottom-3 left-4 text-white drop-shadow">
-                    <h2 className="text-lg font-semibold leading-tight">
-                      {d.name}
-                    </h2>
-                    <p className="text-xs text-white/85">{d.cn}</p>
+          {districts.map((d) => {
+            const text = copy.districts[d.slug]
+            return (
+              <li key={d.slug}>
+                <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
+                  <div className="relative h-44 overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={d.photo}
+                      alt={text.alt}
+                      width={1600}
+                      height={640}
+                      className="h-full w-full object-cover transition duration-300 hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                    <div className="absolute bottom-3 left-4 text-white drop-shadow">
+                      <h2 className="text-lg font-semibold leading-tight">
+                        {text.name}
+                      </h2>
+                      <p className="text-xs text-white/85">{text.sub}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-1 flex-col p-5">
-                  <p className="flex-1 text-sm text-zinc-600 dark:text-zinc-400">
-                    {d.blurb}
-                  </p>
-                  <Link
-                    href={ctaHref}
-                    className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-zinc-900 hover:underline dark:text-white"
-                  >
-                    Find a guide
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                      <path d="M5 12h14" />
-                      <path d="m12 5 7 7-7 7" />
-                    </svg>
-                  </Link>
-                </div>
-              </article>
-            </li>
-          ))}
+                  <div className="flex flex-1 flex-col p-5">
+                    <p className="flex-1 text-sm text-zinc-600 dark:text-zinc-400">
+                      {text.blurb}
+                    </p>
+                    <Link
+                      href={ctaHref}
+                      className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-zinc-900 hover:underline dark:text-white"
+                    >
+                      {copy.findGuide}
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                        <path d="M5 12h14" />
+                        <path d="m12 5 7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
+                </article>
+              </li>
+            )
+          })}
         </ul>
       </section>
 
@@ -268,31 +250,31 @@ export default function ExplorePage() {
         <div className="mx-auto max-w-5xl px-6 py-16">
           <div className="text-center">
             <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-              Moments
+              {copy.moments.kicker}
             </p>
             <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
-              A day in Shenzhen, give or take.
+              {copy.moments.title}
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm text-zinc-600 dark:text-zinc-400">
-              Our own photos, not stock.{' '}
+              {copy.moments.bodyLead}
               <Link href="/gallery" className="underline underline-offset-2">
-                See the whole gallery
+                {copy.moments.galleryLink}
               </Link>
-              .
+              {copy.moments.bodyTail}
             </p>
           </div>
           <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {moments.map((m, i) => (
+            {moments.map((src, i) => (
               <li
-                key={m.src}
+                key={src}
                 className={`overflow-hidden rounded-xl ${
                   i % 5 === 0 ? 'sm:row-span-2 sm:h-full' : ''
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={m.src}
-                  alt={m.alt}
+                  src={src}
+                  alt={copy.moments.alts[i]}
                   loading="lazy"
                   className="h-48 w-full object-cover transition duration-300 hover:scale-105 sm:h-full"
                 />
@@ -306,18 +288,16 @@ export default function ExplorePage() {
       <section className="border-t border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto max-w-3xl px-6 py-16 text-center">
           <h2 className="text-2xl font-semibold tracking-tight">
-            Don&apos;t see what you&apos;re after?
+            {copy.closing.title}
           </h2>
           <p className="mt-3 text-zinc-600 dark:text-zinc-400">
-            Tell a local what you like — hiking, electronics, late-night jazz,
-            tea ceremonies — and we&apos;ll match you with someone who actually
-            does it.
+            {copy.closing.body}
           </p>
           <Link
             href="/signup"
             className="mt-6 inline-flex items-center gap-2 rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
-            Get matched
+            {copy.closing.cta}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />
@@ -332,18 +312,16 @@ export default function ExplorePage() {
       <section className="border-t border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto max-w-5xl px-6 py-10">
           <h2 className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-            District photo credits
+            {copy.credits.title}
           </h2>
           <p className="mt-3 max-w-2xl text-xs text-zinc-500 dark:text-zinc-500">
-            District photographs are from Wikimedia Commons, cropped to the
-            building. Adaptations of share-alike originals are offered under the
-            same licence. The hero and the Moments strip above are our own.
+            {copy.credits.body}
           </p>
           <ul className="mt-4 grid gap-2 text-xs text-zinc-500 sm:grid-cols-2 dark:text-zinc-500">
             {districts.map((d) => (
               <li key={d.slug}>
                 <span className="text-zinc-600 dark:text-zinc-400">
-                  {d.name}
+                  {copy.districts[d.slug].name}
                 </span>{' '}
                 — {d.credit.what},{' '}
                 <a

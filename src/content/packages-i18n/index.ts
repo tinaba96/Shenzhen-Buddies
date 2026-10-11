@@ -89,6 +89,65 @@ export function localizedPackage(
   return base ? localizePackage(base, locale) : undefined
 }
 
+// `cn` as the reader's script writes it. The base record holds Simplified,
+// which is right for English and zh-Hans readers (and for the taxi driver),
+// but is the wrong script on a Traditional or Japanese page. Keyed by slug
+// and checked below, so a new package without its forms fails the build.
+// Not for staff-facing text — book/actions.ts emails the raw `cn` on purpose.
+const CN_FORMS: Record<string, { hant: string; ja: string }> = {
+  'huaqiangbei-electronics': { hant: '華強北', ja: '華強北' },
+  'dongmen-street-food': { hant: '東門老街', ja: '東門老街' },
+  'skyline-after-dark': { hant: '福田CBD', ja: '福田CBD' },
+  'talent-park-night': { hant: '人才公園', ja: '人才公園' },
+  'shekou-sea-world': { hant: '海上世界', ja: '海上世界' },
+  'shenzhen-bay-cycling': { hant: '深圳灣公園', ja: '深圳湾公園' },
+}
+
+export function localizedCn(
+  pkg: Pick<TourPackage, 'slug' | 'cn'>,
+  locale: Locale,
+): string {
+  const forms = CN_FORMS[pkg.slug]
+  if (!forms) return pkg.cn
+  if (locale === 'zh-Hant') return forms.hant
+  if (locale === 'ja') return forms.ja
+  return pkg.cn
+}
+
+// Whether a localized title already names the place `cn` names, in which case
+// printing `cn` beside it reads as the same words twice ("东门老街 (东门老街)").
+// English titles never do, so English always shows it. `cn` is Simplified, so
+// Traditional and Japanese titles are folded to Simplified first — only the
+// characters that differ in the six `cn` values need a mapping.
+const TO_SIMPLIFIED: Record<string, string> = {
+  華: '华',
+  強: '强',
+  東: '东',
+  門: '门',
+  園: '园',
+  灣: '湾',
+}
+
+export function titleNamesPlace(pkg: Pick<TourPackage, 'title' | 'cn'>): boolean {
+  const folded = Array.from(pkg.title, (ch) => TO_SIMPLIFIED[ch] ?? ch).join('')
+  return folded.includes(pkg.cn)
+}
+
+export function assertCnFormsValid(): void {
+  const missing = packages.filter((p) => !Object.hasOwn(CN_FORMS, p.slug))
+  const stale = Object.keys(CN_FORMS).filter(
+    (slug) => !packages.some((p) => p.slug === slug),
+  )
+  if (missing.length || stale.length) {
+    throw new Error(
+      `packages-i18n: CN_FORMS ${[
+        ...missing.map((p) => `is missing "${p.slug}"`),
+        ...stale.map((slug) => `has "${slug}", which is not a package`),
+      ].join('; ')}`,
+    )
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Invariants
 // ---------------------------------------------------------------------------
@@ -184,3 +243,4 @@ export function assertPackageTranslationsValid(): void {
 }
 
 assertPackageTranslationsValid()
+assertCnFormsValid()

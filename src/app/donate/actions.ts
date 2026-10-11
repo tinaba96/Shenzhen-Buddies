@@ -14,7 +14,8 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 export async function startDonationCheckout(formData: FormData) {
   if (!supportConfigured()) {
     redirect(
-      `/donate?error=${encodeURIComponent('Donations are not set up yet — thank you for the thought!')}`,
+      // Codes, not sentences: the page words them in the visitor's language.
+      '/donate?error=setup',
     )
   }
 
@@ -24,7 +25,7 @@ export async function startDonationCheckout(formData: FormData) {
   const amountCents = parseSupportAmountCents(raw)
   if (amountCents == null) {
     redirect(
-      `/donate?error=${encodeURIComponent('Pick an amount between CA$1 and CA$500 (whole dollars).')}`,
+      '/donate?error=amount',
     )
   }
 
@@ -49,7 +50,7 @@ export async function startDonationCheckout(formData: FormData) {
   } catch (err) {
     console.error('Donation checkout creation failed:', err)
     redirect(
-      `/donate?error=${encodeURIComponent('Could not start the payment — please try again.')}`,
+      '/donate?error=checkout',
     )
   }
   redirect(checkoutUrl)

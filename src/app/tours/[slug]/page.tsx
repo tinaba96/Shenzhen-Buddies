@@ -14,7 +14,12 @@ import {
   packagePriceCents,
   packages,
 } from '@/content/packages'
-import { localizedPackage, localizedPackages } from '@/content/packages-i18n'
+import {
+  localizedCn,
+  localizedPackage,
+  localizedPackages,
+  titleNamesPlace,
+} from '@/content/packages-i18n'
 import { getPublishedPost } from '@/content/posts'
 import { getI18n } from '@/i18n/server'
 import { FREE_TOURS, GUEST_REQUESTS } from '@/lib/booking'
@@ -36,7 +41,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const pkg = localizedPackage(slug, locale)
   if (!pkg) return {}
 
-  const title = `${pkg.title} (${pkg.cn}) — Shenzhen Buddies`
+  // Japanese titles separate with a full-width bar, like t.seo's ja titles.
+  const separator = locale === 'ja' ? '｜' : ' — '
+  // English titles carry the Chinese name. Other locales' titles already name
+  // the place in their own script, and the subtitle under the H1 shows the
+  // localized `cn` when they do not.
+  const name = locale === 'en' ? `${pkg.title} (${pkg.cn})` : pkg.title
+  const title = `${name}${separator}Shenzhen Buddies`
   return {
     title,
     description: pkg.tagline,
@@ -50,6 +61,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       // package. Until a per-package export exists, the site card is correct
       // and, unlike a WebP, actually renders in every scraper.
       images: [DEFAULT_OG_IMAGE],
+    },
+    // Its own block, or twitter keeps the root layout's site-wide title and
+    // description. twitter:image still comes from the og image.
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: pkg.tagline,
     },
   }
 }
@@ -140,7 +158,11 @@ export default async function TourDetailPage({ params }: Props) {
           <h1 className="sb-display mt-3 text-5xl leading-[1.05] drop-shadow-xl sm:text-7xl">
             {pkg.title}
           </h1>
-          <p className="mt-2 text-2xl text-white/60 sm:text-3xl">{pkg.cn}</p>
+          {!titleNamesPlace(pkg) && (
+            <p className="mt-2 text-2xl text-white/60 sm:text-3xl">
+              {localizedCn(pkg, locale)}
+            </p>
+          )}
           <p className="mt-6 max-w-2xl text-lg text-white/90">{pkg.tagline}</p>
 
           <div className="mt-8 flex flex-wrap gap-2 text-sm">
@@ -265,7 +287,9 @@ export default async function TourDetailPage({ params }: Props) {
             <p className="mt-3 text-base leading-relaxed text-zinc-800 dark:text-zinc-200">
               {pkg.insiderTipLead && (
                 <>
-                  <strong className="font-semibold">{pkg.insiderTipLead}</strong>{' '}
+                  <strong className="font-semibold">{pkg.insiderTipLead}</strong>
+                  {/* Chinese and Japanese do not space between sentences. */}
+                  {locale === 'en' && ' '}
                 </>
               )}
               {pkg.insiderTip}
@@ -278,7 +302,7 @@ export default async function TourDetailPage({ params }: Props) {
                 href={`/blog/${post.slug}`}
                 className="inline-flex items-center gap-2 text-sm font-medium underline underline-offset-4"
               >
-                {t.tours.detail.readMore}: {post.title}
+                {t.tours.detail.readMoreTitle.replace('{title}', post.title)}
                 <span aria-hidden>→</span>
               </Link>
             </p>
@@ -335,7 +359,7 @@ export default async function TourDetailPage({ params }: Props) {
           <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((other) => (
               <li key={other.slug}>
-                <PackageCard pkg={other} t={t} price={price} />
+                <PackageCard pkg={other} t={t} locale={locale} price={price} />
               </li>
             ))}
           </ul>

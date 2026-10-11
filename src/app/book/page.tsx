@@ -4,17 +4,25 @@ import { redirect } from 'next/navigation'
 import { GuestRequestForm } from '@/components/GuestRequestForm'
 import { focusFor } from '@/content/gallery'
 import { packageHoursLabel } from '@/content/packages'
-import { localizedPackage, localizedPackages } from '@/content/packages-i18n'
+import {
+  localizedCn,
+  localizedPackage,
+  localizedPackages,
+  titleNamesPlace,
+} from '@/content/packages-i18n'
 import { getI18n } from '@/i18n/server'
 import { DEFAULT_FREE_TOUR_LENGTH, FREE_TOUR_LENGTHS, FREE_TOURS, GUEST_REQUESTS } from '@/lib/booking'
 import { WECHAT_ID, isWhatsAppConfigured } from '@/lib/config'
 
 type Props = { searchParams: Promise<{ package?: string; sent?: string }> }
 
-export const metadata: Metadata = {
-  title: 'Request a tour — Shenzhen Buddies',
-  // A form with a package in the query string: nothing for search engines.
-  robots: { index: false, follow: true },
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = (await getI18n()).t.seo.book
+  return {
+    title: seo.title,
+    // A form with a package in the query string: nothing for search engines.
+    robots: { index: false, follow: true },
+  }
 }
 
 // Guest request: the no-account way to ask for a tour while GUEST_REQUESTS
@@ -45,7 +53,9 @@ export default async function BookPage({ searchParams }: Props) {
               >
                 {p.title}
                 <span className="mt-1 block text-xs font-normal text-zinc-500">
-                  {p.cn} · {packageHoursLabel(p, t.common)}
+                  {titleNamesPlace(p)
+                    ? packageHoursLabel(p, t.common)
+                    : `${localizedCn(p, locale)} · ${packageHoursLabel(p, t.common)}`}
                 </span>
               </Link>
             </li>
@@ -153,7 +163,9 @@ export default async function BookPage({ searchParams }: Props) {
               {pkg.kicker}
             </p>
             <h2 className="mt-1 text-lg font-semibold">{pkg.title}</h2>
-            <p className="text-sm text-zinc-500">{pkg.cn}</p>
+            {!titleNamesPlace(pkg) && (
+              <p className="text-sm text-zinc-500">{localizedCn(pkg, locale)}</p>
+            )}
             <dl className="mt-4 space-y-2 border-t border-zinc-100 pt-4 text-sm dark:border-zinc-800">
               <div className="flex justify-between gap-4">
                 <dt className="text-zinc-500">{t.tours.detail.duration}</dt>

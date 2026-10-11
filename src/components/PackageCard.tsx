@@ -7,7 +7,9 @@ import {
   type PackageAccent,
   type TourPackage,
 } from '@/content/packages'
+import { localizedCn } from '@/content/packages-i18n'
 import type { Dictionary } from '@/i18n'
+import type { Locale } from '@/i18n/config'
 
 // Per-package accent colours.
 //
@@ -60,6 +62,8 @@ const ACCENT: Record<
 type Props = {
   pkg: TourPackage
   t: Dictionary
+  // For the Chinese place name, which follows the reader's script.
+  locale: Locale
   price: string
   // 'featured' is the wide two-column treatment used once per page. 'standard'
   // is the grid tile.
@@ -73,6 +77,7 @@ type Props = {
 export function PackageCard({
   pkg,
   t,
+  locale,
   price,
   variant = 'standard',
   featuredLabel,
@@ -110,7 +115,7 @@ export function PackageCard({
               </span>
             )}
             <span className="absolute bottom-5 left-5 text-3xl font-semibold text-white drop-shadow-lg md:text-4xl">
-              {pkg.cn}
+              {localizedCn(pkg, locale)}
             </span>
           </div>
 
@@ -150,7 +155,10 @@ export function PackageCard({
               <li className="flex gap-3 text-sm text-zinc-400">
                 <span className="w-10 shrink-0 font-mono text-xs">…</span>
                 <span>
-                  +{defaultItinerary(pkg).beats.length - 3} {t.tours.detail.itinerary.toLowerCase()}
+                  {t.tours.detail.moreBeats.replace(
+                    '{n}',
+                    String(defaultItinerary(pkg).beats.length - 3),
+                  )}
                 </span>
               </li>
             </ul>
@@ -196,7 +204,7 @@ export function PackageCard({
         />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/65 to-transparent" />
         <span className="absolute bottom-3 left-4 text-2xl font-semibold text-white drop-shadow-lg">
-          {pkg.cn}
+          {localizedCn(pkg, locale)}
         </span>
         <span
           className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider shadow-sm ${accent.chip}`}

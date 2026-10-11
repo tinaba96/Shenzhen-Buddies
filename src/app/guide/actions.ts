@@ -37,6 +37,8 @@ import {
   siteUrl,
 } from '@/lib/config'
 import { sendEmail } from '@/lib/email'
+import { fill } from '@/i18n'
+import { getI18n } from '@/i18n/server'
 import { describeGuideNotify, notifyGuide } from '@/lib/notify'
 import { validatePromoCode } from '@/lib/promo'
 import { stripe } from '@/lib/stripe'
@@ -119,7 +121,19 @@ export async function cancelOwnBooking(formData: FormData) {
     String(formData.get('id') ?? ''),
     user.id,
   )
-  if ('error' in result) availFail(result.error)
+  if ('error' in result) {
+    // The tourist reads this, so it is worded in their language.
+    const e = (await getI18n()).t.booking.errors
+    availFail(
+      {
+        missing: e.cancelMissing,
+        not_found: e.cancelNotFound,
+        not_yours: e.cancelNotYours,
+        closed: e.cancelClosed,
+        changed: e.cancelChanged,
+      }[result.error],
+    )
+  }
   revalidatePath('/guide')
   revalidatePath('/admin')
   redirect(`/guide?cancelled=1&refund_cents=${result.refundCents}`)
@@ -149,31 +163,36 @@ export async function requestBooking(formData: FormData) {
     )
   }
 
+  // Errors go back to the page as ?error= text, so they are written in the
+  // visitor's language here. Emails below stay English (they go to staff).
+  const { locale, meta, t } = await getI18n()
+  const e = t.booking.errors
+
   const { data: myProfile } = await supabase
     .from('profiles')
     .select('role, display_name')
     .eq('id', user.id)
     .maybeSingle<{ role: 'guide' | 'tourist'; display_name: string }>()
   if (myProfile?.role !== 'tourist') {
-    fail('Only tourists can request a booking. Set your role on your profile.')
+    fail(e.touristsOnly)
   }
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) {
-    fail('Pick a day first.')
+    fail(e.pickDay)
   }
   if (day < todayInShenzhen()) {
-    fail('That day has already passed — pick another one.')
+    fail(e.pastDay)
   }
   // Free tours ask for a review in return; the checkbox is required in the
   // form, this catches a request sent without it.
   if (FREE_TOURS && formData.get('review_pledge') !== 'yes') {
-    fail('Please tick the box about leaving a review.', day)
+    fail(t.request.errors.pledge, day)
   }
 
   const startHour = Number(formData.get('start_hour'))
   const duration = Number(formData.get('duration'))
   if (!Number.isInteger(startHour) || startHour < 0 || startHour > 23) {
-    fail('Pick a valid start time.', day)
+    fail(e.startTime, day)
   }
   if (
     !Number.isInteger(duration) ||
@@ -181,14 +200,14 @@ export async function requestBooking(formData: FormData) {
     duration > MAX_BOOKING_HOURS
   ) {
     fail(
-      `Tours run from ${MIN_BOOKING_HOURS} to ${MAX_BOOKING_HOURS} hours.`,
+      fill(e.lengthRange, { min: MIN_BOOKING_HOURS, max: MAX_BOOKING_HOURS }),
       day,
     )
   }
   // Free pilot: only the fixed package lengths, not any value in the range.
   if (FREE_TOURS && !FREE_TOUR_LENGTHS.includes(duration)) {
     fail(
-      `Pick one of the free tour lengths: ${FREE_TOUR_LENGTHS.join(' or ')} hours.`,
+      fill(e.freeLengths, { lengths: FREE_TOUR_LENGTHS.join(e.or) }),
       day,
     )
   }
@@ -243,12 +262,27 @@ export async function requestBooking(formData: FormData) {
       }[]
     >()
   if (myUpcomingError) {
-    fail('Could not check your bookings — please try again.', day)
+    fail(e.checkBookings, day)
   }
   const live = (myUpcoming ?? []).find((b) => isLiveBooking(b, Date.now()))
   if (live) {
+    // English keeps formatDay's exact output; others use their own date order.
+    const when =
+      locale === 'en'
+        ? formatDay(live.day)
+        : new Date(`${live.day}T00:00:00`).toLocaleDateString(meta.intlLocale, {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          })
     fail(
-      `You already have a tour booked for ${formatDay(live.day)}, ${formatHourRange(live.start_hour, live.end_hour)}. Tours are free, so it's one booking per person at a time — cancel it first if you'd like a different one.`,
+      fill(e.liveBooked, {
+        when: fill(t.booking.dateTime, {
+          date: when,
+          time: formatHourRange(live.start_hour, live.end_hour),
+        }),
+      }),
       day,
     )
   }
@@ -262,7 +296,7 @@ export async function requestBooking(formData: FormData) {
     .eq('day', day)
     .returns<AvailabilityWindow[]>()
   if (!windows?.length) {
-    fail('The guide is not available on that day.', day)
+    fail(e.notAvailable, day)
   }
 
   const { data: activeBookings, error: activeError } = await admin
@@ -272,14 +306,14 @@ export async function requestBooking(formData: FormData) {
     .in('status', ACTIVE_BOOKING_STATUSES)
     .returns<{ start_hour: number; end_hour: number }[]>()
   if (activeError) {
-    fail('Could not check availability — please try again.', day)
+    fail(e.checkAvailability, day)
   }
   const dayBookings = activeBookings ?? []
 
   const segments = windows.flatMap((w) => bookableSegments(w, dayBookings))
   if (!fitsInSegments(segments, startHour, endHour)) {
     fail(
-      `${formatHourRange(startHour, endHour)} isn't available on that day — it's outside the guide's hours or too close to another booking. Pick a listed slot.`,
+      fill(e.slotTaken, { range: formatHourRange(startHour, endHour) }),
       day,
     )
   }
@@ -305,17 +339,17 @@ export async function requestBooking(formData: FormData) {
     // 23P01 = exclusion constraint violation: someone grabbed those hours
     // (or ones within the gap) between our check and the insert.
     if (error?.code === '23P01') {
-      fail('Sorry — that time was just booked by someone else.', day)
+      fail(e.justBooked, day)
     }
     // SB001 = the bookings_one_at_a_time trigger, 23505 = the per-day
     // unique index: this tourist's other request landed first (two tabs).
     if (error?.code === 'SB001' || error?.code === '23505') {
-      fail(
-        "You already have a tour booked. Tours are free, so it's one booking per person at a time — cancel it first if you'd like a different one.",
-        day,
-      )
+      fail(e.alreadyBooked, day)
     }
-    fail(error?.message ?? 'Could not create the booking.', day)
+    // Anything else is a database error: log it for us, and show the tourist
+    // a sentence in their language rather than Postgres's English.
+    console.error('Booking insert failed:', error)
+    fail(e.createFailed, day)
   }
 
   // Record the tourist's agreement to the Terms + Cancellation Policy (booking

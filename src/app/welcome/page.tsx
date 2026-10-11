@@ -2,56 +2,68 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { DEFAULT_OG_IMAGE } from '@/lib/config'
 import { HeroImage } from '@/components/HeroImage'
+import type { Dictionary } from '@/i18n'
+import { getI18n } from '@/i18n/server'
 
 // This URL is pasted into Instagram/X/Threads bios, so it stays put — but the
 // offer on it moved with the free pilot: no promo code, the whole tour is
 // free. The VIP50 flow it replaced is in git history if paid tours return.
 
-const TITLE = 'Your first day in Shenzhen, free — Shenzhen Buddies'
-const DESCRIPTION =
-  'Book a local buddy in Shenzhen for a free 2 or 3 hour day out while we pilot. No card, no deposit — request a day and we confirm by email.'
-
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: '/welcome' },
-  // Declared explicitly: the root layout sets an openGraph block, and
-  // metadata merges per key — so a page that omits this inherits the site's
-  // generic title, description and an og:url pointing at the homepage.
-  openGraph: {
-    title: TITLE,
-    description: DESCRIPTION,
-    url: '/welcome',
-    // Required alongside any openGraph object — see the note in about/page.tsx.
-    // This page is the landing page pasted into Instagram, so a missing card
-    // here costs more than on any other route.
-    images: [DEFAULT_OG_IMAGE],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = (await getI18n()).t.seo.welcome
+  return {
+    title: seo.title,
+    description: seo.description,
+    alternates: { canonical: '/welcome' },
+    // Declared explicitly: the root layout sets an openGraph block, and
+    // metadata merges per key — so a page that omits this inherits the site's
+    // generic title, description and an og:url pointing at the homepage.
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: '/welcome',
+      // Required alongside any openGraph object — see the note in about/page.tsx.
+      // This page is the landing page pasted into Instagram, so a missing card
+      // here costs more than on any other route.
+      images: [DEFAULT_OG_IMAGE],
+    },
+    // Its own block, or twitter keeps the root layout's site-wide title and
+    // description while og: says something else. twitter:image still comes
+    // from the og image.
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.title,
+      description: seo.description,
+    },
+  }
 }
 
+type Copy = { t: Dictionary['welcome'] }
 
-export default function WelcomePage() {
+export default async function WelcomePage() {
+  const { t } = await getI18n()
+  const copy = t.welcome
   return (
     <main className="flex flex-1 flex-col">
-      <Hero />
-      <DealStrip />
-      <HowItWorks />
-      <Why />
-      <Testimonials />
-      <Faq />
-      <FinalCta />
+      <Hero t={copy} />
+      <DealStrip t={copy} />
+      <HowItWorks t={copy} />
+      <Why t={copy} />
+      <Testimonials t={copy} />
+      <Faq t={copy} />
+      <FinalCta t={copy} />
     </main>
   )
 }
 
 /* ------------------------------- Hero ---------------------------------- */
 
-function Hero() {
+function Hero({ t }: Copy) {
   return (
     <section className="relative overflow-hidden">
       <HeroImage
         name="skyline-bay-dusk-reflections"
-        alt="Shenzhen skyline at dusk"
+        alt={t.heroAlt}
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/55 to-black/85" />
@@ -68,20 +80,18 @@ function Hero() {
       <div className="relative mx-auto flex max-w-5xl flex-col items-center px-6 py-28 text-center text-white sm:py-36">
         <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium uppercase tracking-wider backdrop-blur">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-          Pilot season · every tour is free
+          {t.badge}
         </p>
 
         <h1 className="mt-7 max-w-4xl text-balance text-5xl font-semibold leading-[1.05] tracking-tight drop-shadow-xl sm:text-7xl">
-          Your first day in Shenzhen,{' '}
+          {t.titleLead}
           <span className="bg-gradient-to-r from-amber-300 via-orange-300 to-rose-300 bg-clip-text text-transparent">
-            free.
+            {t.titleAccent}
           </span>
         </h1>
 
         <p className="mt-6 max-w-xl text-pretty text-lg text-white/90 drop-shadow sm:text-xl">
-          Skip the tour bus. Spend 2 or 3 hours with a real local who shows you
-          the food, streets, and corners you’d never find alone — and while
-          we’re piloting, it costs you nothing.
+          {t.body}
         </p>
 
         {/* The free "ticket" — same shape the promo code used to sit in */}
@@ -93,22 +103,22 @@ function Hero() {
               <span className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-black/85" aria-hidden />
               <div className="text-left">
                 <p className="text-[11px] font-medium uppercase tracking-wider text-white/60">
-                  Pilot price
+                  {t.ticketLabel}
                 </p>
                 <p className="mt-1 bg-gradient-to-r from-amber-300 to-rose-300 bg-clip-text text-2xl font-bold tracking-wide text-transparent">
-                  FREE
+                  {t.ticketFree}
                 </p>
               </div>
               <div className="text-right">
                 <p className="text-3xl font-bold leading-none">CA$0</p>
                 <p className="text-[11px] uppercase tracking-wider text-white/60">
-                  no code needed
+                  {t.ticketNoCode}
                 </p>
               </div>
             </div>
           </div>
           <p className="mt-2 text-xs text-white/60">
-            No card, no deposit, no checkout — just pick a day
+            {t.ticketNote}
           </p>
         </div>
 
@@ -117,20 +127,20 @@ function Hero() {
             href="/guide"
             className="rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:bg-zinc-100"
           >
-            Book my free day →
+            {t.primaryCta}
           </Link>
           <Link
             href="/tours"
             className="rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-sm font-semibold backdrop-blur transition hover:bg-white/20"
           >
-            See the experiences
+            {t.secondaryCta}
           </Link>
         </div>
 
         <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs uppercase tracking-wider text-white/60">
-          <TrustItem>Free 2 or 3 hour tours</TrustItem>
-          <TrustItem>No card, no deposit</TrustItem>
-          <TrustItem>Confirmed by email</TrustItem>
+          {t.trust.map((item) => (
+            <TrustItem key={item}>{item}</TrustItem>
+          ))}
         </div>
       </div>
     </section>
@@ -151,32 +161,29 @@ function TrustItem({ children }: { children: React.ReactNode }) {
 
 /* ----------------------------- Deal strip ------------------------------ */
 
-function DealStrip() {
+function DealStrip({ t }: Copy) {
   return (
     <section className="border-y border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
       <div className="mx-auto max-w-5xl px-6 py-16">
         <div className="grid items-center gap-10 md:grid-cols-2">
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-              The pilot deal
+              {t.deal.kicker}
             </p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-              A day out, for{' '}
+              {t.deal.titleLead}
               <span className="bg-gradient-to-r from-amber-500 to-rose-500 bg-clip-text text-transparent">
-                nothing.
+                {t.deal.titleAccent}
               </span>
             </h2>
             <p className="mt-4 max-w-md text-zinc-600 dark:text-zinc-400">
-              While we get Shenzhen Buddies off the ground, every tour is
-              free — pick a 2 or 3 hour day with a local buddy. There is no
-              payment step at all: request a day, and we confirm by email
-              within three business days.
+              {t.deal.body}
             </p>
             <Link
               href="/guide"
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-zinc-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
-              Pick a day
+              {t.deal.cta}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
                 <path d="M5 12h14" />
                 <path d="m12 5 7 7-7 7" />
@@ -187,7 +194,7 @@ function DealStrip() {
           {/* Price example card */}
           <div className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-gradient-to-br from-amber-50 to-rose-50 p-8 shadow-sm dark:border-zinc-800 dark:from-amber-950/30 dark:to-rose-950/30">
             <p className="text-sm font-medium text-zinc-500">
-              Example · a 3-hour tour
+              {t.deal.exampleLabel}
             </p>
             <div className="mt-4 flex items-end gap-3">
               <span className="text-2xl text-zinc-400 line-through">CA$30</span>
@@ -196,13 +203,13 @@ function DealStrip() {
               </span>
             </div>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              The usual CA$10/hour rate is off during the pilot
+              {t.deal.rateNote}
             </p>
             <dl className="mt-6 space-y-2 border-t border-zinc-200/70 pt-4 text-sm dark:border-zinc-700/70">
-              <Row label="Tour length" value="2 or 3 hours" />
-              <Row label="Your buddy’s time" value="Free" highlight />
-              <Row label="What you eat & ride" value="Local prices, paid direct" />
-              <Row label="Payment step" value="None" />
+              <Row label={t.deal.rows.length} value={t.deal.rows.lengthValue} />
+              <Row label={t.deal.rows.time} value={t.deal.rows.timeValue} highlight />
+              <Row label={t.deal.rows.extras} value={t.deal.rows.extrasValue} />
+              <Row label={t.deal.rows.payment} value={t.deal.rows.paymentValue} />
             </dl>
           </div>
         </div>
@@ -238,24 +245,11 @@ function Row({
 
 /* ---------------------------- How it works ----------------------------- */
 
-function HowItWorks() {
-  const steps = [
-    {
-      n: '01',
-      title: 'Pick your day',
-      body: 'Choose an open date, then a 2 or 3 hour tour — your pick.',
-    },
-    {
-      n: '02',
-      title: 'Request it, free',
-      body: 'No card, no checkout. Your request goes straight to your buddy.',
-    },
-    {
-      n: '03',
-      title: 'Get confirmed',
-      body: 'We confirm by email within 3 business days. Then just show up.',
-    },
-  ]
+function HowItWorks({ t }: Copy) {
+  const steps = t.how.steps.map((step, i) => ({
+    n: String(i + 1).padStart(2, '0'),
+    ...step,
+  }))
   return (
     <section className="relative border-b border-zinc-200 dark:border-zinc-800">
       <div
@@ -268,10 +262,10 @@ function HowItWorks() {
       <div className="relative mx-auto max-w-5xl px-6 py-24">
         <div className="text-center">
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-            How it works
+            {t.how.kicker}
           </p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Booked in three taps.
+            {t.how.title}
           </h2>
         </div>
         <ol className="mt-12 grid gap-6 md:grid-cols-3">
@@ -297,36 +291,23 @@ function HowItWorks() {
 
 /* -------------------------------- Why ---------------------------------- */
 
-function Why() {
-  const items = [
-    {
-      title: 'A local, not a script',
-      body: 'Spend the day with someone who actually lives here and loves showing it off.',
-      icon: 'people' as const,
-      tone: 'amber' as const,
-    },
-    {
-      title: 'Completely free',
-      body: 'The pilot costs you nothing. If the day deserved it, you can tip your buddy afterwards — that part is up to you.',
-      icon: 'tag' as const,
-      tone: 'rose' as const,
-    },
-    {
-      title: 'Nothing at stake',
-      body: 'No payment means nothing to refund. If we can’t confirm your day, we tell you straight away and you’ve lost nothing.',
-      icon: 'shield' as const,
-      tone: 'emerald' as const,
-    },
+function Why({ t }: Copy) {
+  // Icons and tones pair with t.why.items by position.
+  const looks = [
+    { icon: 'people' as const, tone: 'amber' as const },
+    { icon: 'tag' as const, tone: 'rose' as const },
+    { icon: 'shield' as const, tone: 'emerald' as const },
   ]
+  const items = t.why.items.map((item, i) => ({ ...item, ...looks[i] }))
   return (
     <section className="border-b border-zinc-200 bg-zinc-50/60 dark:border-zinc-800 dark:bg-zinc-950/40">
       <div className="mx-auto max-w-5xl px-6 py-24">
         <div className="text-center">
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-            Why book a buddy
+            {t.why.kicker}
           </p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-            The opposite of a tour bus.
+            {t.why.title}
           </h2>
         </div>
         <ul className="mt-14 grid gap-6 md:grid-cols-3">
@@ -390,20 +371,18 @@ function WhyIcon({ name }: { name: 'people' | 'tag' | 'shield' }) {
 // into Instagram bios, fake social proof is the fastest way to look like a
 // scam. Saying "no reviews yet" out loud is the more convincing pitch, and
 // real quotes replace this block once real bookings produce them.
-function Testimonials() {
+function Testimonials({ t }: Copy) {
   return (
     <section className="border-b border-zinc-200 dark:border-zinc-800">
       <div className="mx-auto max-w-3xl px-6 py-24 text-center">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-          The honest part
+          {t.honest.kicker}
         </p>
         <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-          No reviews yet.
+          {t.honest.title}
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-zinc-600 dark:text-zinc-400">
-          We only just opened, and reviews here will only ever come from real,
-          completed bookings — we don&apos;t write our own. Book a day and be
-          the first to say how it actually went.
+          {t.honest.body}
         </p>
       </div>
     </section>
@@ -412,38 +391,17 @@ function Testimonials() {
 
 /* -------------------------------- FAQ ---------------------------------- */
 
-function Faq() {
-  const faqs = [
-    {
-      q: 'Is it really free?',
-      a: 'Yes. While we pilot the service, your buddy’s time costs nothing — no card, no deposit, no checkout page. Anything you eat, ride or buy on the day you pay for directly, at local prices.',
-    },
-    {
-      q: 'What’s the catch?',
-      a: 'There isn’t one. We’re new and we’d rather earn reviews than revenue right now. If you loved your day, you can leave a tip or a donation — both optional.',
-    },
-    {
-      q: 'How long is a tour?',
-      a: '2 or 3 hours, your choice, one-on-one with your buddy.',
-    },
-    {
-      q: 'Can I book more than one tour?',
-      a: 'One at a time. Tours are free, so we keep it to one booking per person until that tour is done — that way everyone gets a turn. Once it’s over, you’re welcome to book another.',
-    },
-    {
-      q: 'When will I know it’s confirmed?',
-      a: 'We confirm by email within 3 business days of your request.',
-    },
-  ]
+function Faq({ t }: Copy) {
+  const faqs = t.faq.items
   return (
     <section className="border-b border-zinc-200 bg-zinc-50/60 dark:border-zinc-800 dark:bg-zinc-950/40">
       <div className="mx-auto max-w-3xl px-6 py-24">
         <div className="text-center">
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-            Good to know
+            {t.faq.kicker}
           </p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Before you book
+            {t.faq.title}
           </h2>
         </div>
         <dl className="mt-12 space-y-4">
@@ -466,7 +424,7 @@ function Faq() {
 
 /* ----------------------------- Final CTA ------------------------------- */
 
-function FinalCta() {
+function FinalCta({ t }: Copy) {
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-orange-400 to-rose-500" />
@@ -480,11 +438,10 @@ function FinalCta() {
       />
       <div className="relative mx-auto max-w-3xl px-6 py-24 text-center text-white">
         <h2 className="text-balance text-4xl font-semibold tracking-tight drop-shadow sm:text-5xl">
-          Shenzhen is better with a friend.
+          {t.final.title}
         </h2>
         <p className="mx-auto mt-4 max-w-md text-white/90 drop-shadow">
-          Pick a date and book your first day out — completely free while we
-          pilot.
+          {t.final.body}
         </p>
 
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
@@ -492,13 +449,13 @@ function FinalCta() {
             href="/guide"
             className="rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-zinc-100"
           >
-            Book my free day →
+            {t.final.primaryCta}
           </Link>
           <Link
             href="/login"
             className="rounded-full border border-white/40 bg-white/10 px-8 py-3.5 text-sm font-semibold backdrop-blur transition hover:bg-white/20"
           >
-            I already have an account
+            {t.final.secondaryCta}
           </Link>
         </div>
       </div>

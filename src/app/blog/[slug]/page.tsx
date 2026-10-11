@@ -20,6 +20,8 @@ import {
   readingTimeMinutes,
   relatedPosts,
 } from '@/content/posts'
+import { fill, type Dictionary } from '@/i18n'
+import { getI18n } from '@/i18n/server'
 import { isAdminViewer } from '@/lib/admin'
 import { DEFAULT_OG_IMAGE, isSingleGuideMode, siteUrl } from '@/lib/config'
 
@@ -45,14 +47,15 @@ export async function generateMetadata({
   // image, so omitting this ships posts that share as a grey box — see
   // DEFAULT_OG_IMAGE. Per-post generated OG images are a v1.1 item.
   //
-  // twitter:image needs no separate block: metadata replacement is per-key, so
-  // `twitter` still inherits from the root layout and Next fills its image from
-  // whatever og:image resolves to here.
+  // twitter needs its own title and description — inherited from the root
+  // layout it would carry the site-wide pair while og: names the post — but
+  // not its own image: Next fills twitter:image from og:image.
   const image = post.heroGalleryId
     ? ogImageSrc(requireGalleryItem(post.heroGalleryId, `posts/${post.slug} hero`))
     : DEFAULT_OG_IMAGE
 
   return {
+    // The article is English in every locale, so its <title> is too.
     title: `${title} — Shenzhen Buddies`,
     description,
     alternates: { canonical: url },
@@ -67,6 +70,11 @@ export async function generateMetadata({
       modifiedTime: post.updatedAt ?? post.publishedAt,
       authors: [AUTHORS[post.author].name],
       images: [image],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
   }
 }
@@ -85,6 +93,14 @@ export default async function BlogPostPage({
   // server-rendered on demand — the root layout reads the session to draw the
   // header — so the check costs no static generation that was not already gone.
   const isAdmin = await isAdminViewer()
+  // The page chrome follows the reader's locale; the article itself — title,
+  // body, FAQ, author box — is English-only content, and is marked lang="en"
+  // when the page around it is not, so screen readers and translation tools
+  // switch language with it.
+  const { locale, meta, t } = await getI18n()
+  const articleLang = locale === 'en' ? undefined : 'en'
+  // English keeps its long-standing en-GB day-month-year format, as on /blog.
+  const dateLocale = locale === 'en' ? 'en-GB' : meta.intlLocale
   // /guide during the single-guide beta, otherwise bare /browse. Never a login
   // route: a blog reader is by definition logged out, and both destinations are
   // public previews.
@@ -138,12 +154,18 @@ export default async function BlogPostPage({
           href={`/blog?pillar=${post.pillar}`}
           className="text-xs font-medium uppercase tracking-wider text-zinc-500 transition hover:text-zinc-900 dark:hover:text-white"
         >
-          {PILLARS.find((p) => p.id === post.pillar)?.label ?? post.pillar}
+          {pillarLabel(post.pillar, t.blog)}
         </Link>
 
-        <h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h1
+          lang={articleLang}
+          className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl"
+        >
           {post.title}
         </h1>
+        {articleLang && (
+          <p className="mt-3 text-sm text-zinc-500">{t.blog.englishOnly}</p>
+        )}
 
         <div className="mt-6 flex flex-wrap items-center gap-3 border-b border-zinc-200 pb-6 dark:border-zinc-800">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -158,10 +180,10 @@ export default async function BlogPostPage({
             <p className="font-medium">{author.name}</p>
             <p className="text-zinc-500">
               <time dateTime={post.publishedAt}>
-                {formatDate(post.publishedAt)}
+                {formatDate(post.publishedAt, dateLocale)}
               </time>
               {' · '}
-              {readingTimeMinutes(post)} min read
+              {fill(t.blog.minRead, { n: readingTimeMinutes(post) })}
             </p>
           </div>
 
@@ -175,22 +197,34 @@ export default async function BlogPostPage({
             surface="blog"
             isAdmin={isAdmin}
             className="ml-auto"
+            labels={t.share}
           />
         </div>
 
         {/* Rules at a border change without notice and a reader cannot tell a
             current page from an abandoned one. Stating the check date up top is
             what makes the rest of the page trustworthy. */}
-        {post.lastChecked && <LastChecked value={post.lastChecked} />}
+        {post.lastChecked && (
+          <LastChecked
+            value={post.lastChecked}
+            template={t.blog.lastChecked}
+            dateLocale={dateLocale}
+          />
+        )}
 
-        <Prose blocks={post.body} slug={post.slug} ctaHref={ctaHref} />
+        <div lang={articleLang}>
+          <Prose blocks={post.body} slug={post.slug} ctaHref={ctaHref} />
+        </div>
 
         {post.faq && post.faq.length > 0 && (
           <section className="mt-16">
             <h2 className="text-2xl font-semibold tracking-tight">
-              Common questions
+              {t.blog.commonQuestions}
             </h2>
-            <div className="mt-6 divide-y divide-zinc-200 border-y border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
+            <div
+              lang={articleLang}
+              className="mt-6 divide-y divide-zinc-200 border-y border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800"
+            >
               {post.faq.map((item) => (
                 <details key={item.q} className="group py-4">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
@@ -220,7 +254,7 @@ export default async function BlogPostPage({
             height={56}
             className="h-14 w-14 shrink-0 rounded-full object-cover"
           />
-          <div>
+          <div lang={articleLang}>
             <p className="font-semibold">{author.name}</p>
             <p className="text-xs uppercase tracking-wide text-zinc-500">
               {author.role}
@@ -234,7 +268,7 @@ export default async function BlogPostPage({
         {related.length > 0 && (
           <section className="mt-14">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
-              Read next
+              {t.blog.readNext}
             </h2>
             <ul className="mt-4 grid gap-4 sm:grid-cols-2">
               {related.map((next) => (
@@ -244,7 +278,7 @@ export default async function BlogPostPage({
                     toSlug={next.slug}
                     className="block h-full rounded-2xl border border-zinc-200 p-5 transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800"
                   >
-                    <RelatedCard post={next} />
+                    <RelatedCard post={next} t={t.blog} lang={articleLang} />
                   </RelatedPostLink>
                 </li>
               ))}
@@ -256,8 +290,8 @@ export default async function BlogPostPage({
           slug={post.slug}
           placement="end"
           href={ctaHref}
-          label="Have a local show you around"
-          sub="Matched on what you are actually into, not on a fixed itinerary."
+          label={t.blog.ctaLabel}
+          sub={t.blog.ctaBody}
         />
       </article>
     </main>
@@ -275,23 +309,48 @@ function JsonLd({ data }: { data: object }) {
   )
 }
 
-function RelatedCard({ post }: { post: Post }) {
+// Pillar labels come from the /blog dictionary, the same ones as its chips.
+function pillarLabel(pillar: Post['pillar'], t: Dictionary['blog']): string {
+  return Object.hasOwn(t.pillars, pillar)
+    ? t.pillars[pillar].label
+    : (PILLARS.find((p) => p.id === pillar)?.label ?? pillar)
+}
+
+function RelatedCard({
+  post,
+  t,
+  lang,
+}: {
+  post: Post
+  t: Dictionary['blog']
+  lang: string | undefined
+}) {
   return (
     <>
       <p className="text-xs uppercase tracking-wide text-zinc-500">
-        {PILLARS.find((p) => p.id === post.pillar)?.label ?? post.pillar}
+        {pillarLabel(post.pillar, t)}
       </p>
-      <p className="mt-1.5 font-medium">{post.title}</p>
-      <p className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">
+      <p lang={lang} className="mt-1.5 font-medium">
+        {post.title}
+      </p>
+      <p lang={lang} className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">
         {post.excerpt}
       </p>
     </>
   )
 }
 
-// 'YYYY-MM' → 'August 2026'
-function LastChecked({ value }: { value: string }) {
-  const label = new Date(`${value}-01T00:00:00Z`).toLocaleDateString('en-GB', {
+// 'YYYY-MM' → 'August 2026' in English.
+function LastChecked({
+  value,
+  template,
+  dateLocale,
+}: {
+  value: string
+  template: string
+  dateLocale: string
+}) {
+  const label = new Date(`${value}-01T00:00:00Z`).toLocaleDateString(dateLocale, {
     month: 'long',
     year: 'numeric',
     timeZone: 'UTC',
@@ -311,15 +370,15 @@ function LastChecked({ value }: { value: string }) {
         <circle cx="12" cy="12" r="9" />
         <path d="M12 7v5l3 2" />
       </svg>
-      Last checked: {label}. Border and visa rules change — confirm anything
-      time-sensitive with an official source before you travel.
+      {fill(template, { date: label })}
     </p>
   )
 }
 
-// Fixed locale and UTC so server and client render the same string.
-function formatDate(iso: string): string {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {
+// Locale passed in from the server render, and UTC, so server and client
+// render the same string.
+function formatDate(iso: string, dateLocale: string): string {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString(dateLocale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { getI18n } from '@/i18n/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export async function submitReview(formData: FormData) {
@@ -13,9 +14,13 @@ export async function submitReview(formData: FormData) {
     redirect('/browse?error=missing_user')
   }
 
+  // Errors travel to the page as display text in ?error=, so they are
+  // written in the visitor's language here.
+  const { t } = await getI18n()
+
   const stars = Number.parseInt(starsRaw, 10)
   if (!Number.isInteger(stars) || stars < 1 || stars > 5) {
-    redirect(`/u/${revieweeId}?error=${encodeURIComponent('Pick between 1 and 5 stars.')}`)
+    redirect(`/u/${revieweeId}?error=${encodeURIComponent(t.buddy.errors.stars)}`)
   }
 
   const trimmed = bodyRaw.trim()
@@ -29,7 +34,7 @@ export async function submitReview(formData: FormData) {
   if (!user) redirect(`/login?next=${encodeURIComponent(`/u/${revieweeId}`)}`)
 
   if (user.id === revieweeId) {
-    redirect(`/u/${revieweeId}?error=${encodeURIComponent("You can't review yourself.")}`)
+    redirect(`/u/${revieweeId}?error=${encodeURIComponent(t.buddy.errors.self)}`)
   }
 
   const { error } = await supabase
@@ -47,12 +52,13 @@ export async function submitReview(formData: FormData) {
   if (error) {
     // 42501 = RLS check failed: the reviewer isn't eligible yet (no confirmed
     // booking and no message history). Show a clear message instead of the
-    // raw database error.
-    const friendly =
+    // raw database error. Anything else is logged and shown generically —
+    // Postgres's English is not something to put in front of a visitor.
+    const rls =
       error.code === '42501' ||
       error.message.toLowerCase().includes('row-level security')
-        ? 'You can leave a review after your tour with this guide has finished.'
-        : error.message
+    if (!rls) console.error('Review upsert failed:', error)
+    const friendly = rls ? t.buddy.errors.notYet : t.buddy.errors.generic
     redirect(`/u/${revieweeId}?error=${encodeURIComponent(friendly)}`)
   }
 

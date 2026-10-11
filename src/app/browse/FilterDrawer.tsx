@@ -2,11 +2,22 @@
 
 import { useEffect, useState } from 'react'
 
+export type FilterDrawerLabels = {
+  filters: string
+  closeFilters: string
+  close: string
+  // Carries an {n} placeholder for the active-filter count.
+  active: string
+  refine: string
+}
+
 export function FilterDrawer({
   activeCount,
+  labels,
   children,
 }: {
   activeCount: number
+  labels: FilterDrawerLabels
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
@@ -45,7 +56,7 @@ export function FilterDrawer({
         >
           <path d="M22 3H2l8 9.46V19l4 2v-8.54z" />
         </svg>
-        Filters
+        {labels.filters}
         {activeCount > 0 && (
           <span className="rounded-full bg-zinc-900 px-1.5 py-0.5 text-[10px] font-semibold text-white dark:bg-white dark:text-zinc-900">
             {activeCount}
@@ -58,28 +69,28 @@ export function FilterDrawer({
           className="fixed inset-0 z-50"
           role="dialog"
           aria-modal="true"
-          aria-label="Filters"
+          aria-label={labels.filters}
         >
           <button
             type="button"
             onClick={() => setOpen(false)}
-            aria-label="Close filters"
+            aria-label={labels.closeFilters}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
           <div className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-2xl dark:bg-zinc-900">
             <div className="flex flex-shrink-0 items-center justify-between border-b border-zinc-200 px-6 py-4 dark:border-zinc-800">
               <div>
-                <h2 className="text-lg font-semibold">Filters</h2>
+                <h2 className="text-lg font-semibold">{labels.filters}</h2>
                 <p className="text-xs text-zinc-500">
                   {activeCount > 0
-                    ? `${activeCount} active`
-                    : 'Refine your matches'}
+                    ? labels.active.replace('{n}', String(activeCount))
+                    : labels.refine}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                aria-label="Close"
+                aria-label={labels.close}
                 className="rounded-md p-1.5 text-zinc-500 transition hover:bg-zinc-100 dark:hover:bg-zinc-800"
               >
                 <svg

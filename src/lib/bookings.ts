@@ -170,13 +170,25 @@ export async function resolveBookingById(
   return null
 }
 
+// Why a tourist's cancellation was refused. Codes rather than sentences: the
+// tourist reads the result, so the action words it in their language
+// (t.booking.errors.cancel*).
+export type CancelBookingError =
+  | 'missing'
+  | 'not_found'
+  | 'not_yours'
+  | 'closed'
+  | 'changed'
+
 // Tourist-initiated cancellation of their own booking. Returns the refund
-// applied (per the cancellation policy) or an error message.
+// applied (per the cancellation policy) or an error code.
 export async function cancelBookingByTourist(
   bookingId: string,
   touristId: string,
-): Promise<{ error: string } | { refundCents: number; refundPercent: number }> {
-  if (!bookingId) return { error: 'Missing booking id.' }
+): Promise<
+  { error: CancelBookingError } | { refundCents: number; refundPercent: number }
+> {
+  if (!bookingId) return { error: 'missing' }
 
   const admin = createSupabaseAdminClient()
   const { data: booking } = await admin
@@ -186,10 +198,10 @@ export async function cancelBookingByTourist(
     )
     .eq('id', bookingId)
     .maybeSingle<BookingRow>()
-  if (!booking) return { error: 'Booking not found.' }
-  if (booking.tourist_id !== touristId) return { error: 'That is not your booking.' }
+  if (!booking) return { error: 'not_found' }
+  if (booking.tourist_id !== touristId) return { error: 'not_yours' }
   if (booking.status !== 'pending' && booking.status !== 'approved') {
-    return { error: 'This booking can no longer be cancelled.' }
+    return { error: 'closed' }
   }
 
   const hoursUntil = hoursUntilTourStart(booking.day, booking.start_hour, Date.now())
@@ -208,7 +220,7 @@ export async function cancelBookingByTourist(
     .eq('status', booking.status)
     .select('id')
     .maybeSingle<{ id: string }>()
-  if (!updated) return { error: 'This booking was just updated — please refresh.' }
+  if (!updated) return { error: 'changed' }
 
   const payment = paidPaymentRef(booking)
   if (refundCents > 0 && payment) {

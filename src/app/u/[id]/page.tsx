@@ -3,6 +3,8 @@ import { notFound, redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
 import { StarRating, StarRatingInput } from '@/components/StarRating'
 import { SubmitButton } from '@/components/SubmitButton'
+import { fill, type Dictionary } from '@/i18n'
+import { getI18n } from '@/i18n/server'
 import { avatarPublicUrl } from '@/lib/avatars'
 import {
   scoreMatch,
@@ -56,9 +58,23 @@ type ReviewerLite = {
 
 const REVIEW_VISIBILITY_THRESHOLD = 1
 
+// Same rule as /browse: translate the known language/hobby/trait tags, show
+// anything else (or an English entry) exactly as the profile has it.
+function tagLabel(names: Record<string, string>, value: string): string {
+  const key = value.trim().toLowerCase()
+  // Own properties only: a profile tag of "constructor" must not resolve to
+  // Object's constructor.
+  const label = Object.hasOwn(names, key) ? names[key] : undefined
+  return label && label.toLowerCase() !== key ? label : value
+}
+
 export default async function ProfileDetailPage({ params, searchParams }: Props) {
   const { id } = await params
   const { reviewed, error: queryError } = await searchParams
+  const { t, meta } = await getI18n()
+  const c = t.buddy
+  const reviewCountLabel = (n: number) =>
+    fill(n === 1 ? c.reviewCountOne : c.reviewCountOther, { n })
 
   const supabase = await createSupabaseServerClient()
   const {
@@ -149,7 +165,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
             avatarPublicUrl(profile.cover_path, profile.updated_at) ??
             DEFAULT_COVER
           }
-          alt={`${profile.display_name}'s cover`}
+          alt={fill(c.coverAlt, { name: profile.display_name })}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-amber-500/20 via-rose-500/15 to-black/50" />
@@ -158,7 +174,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
             href="/browse"
             className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
           >
-            ← Browse
+            {c.backToBrowse}
           </Link>
           <div className="flex items-center gap-2">
             {user ? (
@@ -167,13 +183,13 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
                   href="/messages"
                   className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
                 >
-                  Messages
+                  {t.nav.messages}
                 </Link>
                 <Link
                   href="/profile"
                   className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
                 >
-                  Your profile
+                  {t.common.yourProfile}
                 </Link>
               </>
             ) : (
@@ -181,7 +197,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
                 href={`/signup?next=${encodeURIComponent(`/u/${id}`)}`}
                 className="rounded-md bg-white px-4 py-1.5 text-sm font-medium text-zinc-900 shadow-sm transition hover:bg-white/90"
               >
-                Sign up
+                {t.common.signUp}
               </Link>
             )}
           </div>
@@ -207,17 +223,20 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
                     : 'rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-800 dark:bg-sky-950 dark:text-sky-300'
                 }
               >
-                {profile.role === 'guide' ? 'Guide' : 'Tourist'}
+                {profile.role === 'guide' ? c.roleGuide : c.roleTourist}
               </span>
-              {myProfile && !isSelf && <MatchBadge score={score} />}
+              {myProfile && !isSelf && <MatchBadge score={score} b={t.browse} />}
             </div>
             <p className="mt-1 text-sm text-zinc-500">{profile.city}</p>
             {reviewCount > 0 && (
               <div className="mt-2 flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-                <StarRating value={avgStars} size={16} />
+                <StarRating
+                  value={avgStars}
+                  size={16}
+                  label={fill(t.stars.outOf, { value: avgStars.toFixed(1) })}
+                />
                 <span>
-                  {avgStars.toFixed(1)} · {reviewCount}{' '}
-                  {reviewCount === 1 ? 'review' : 'reviews'}
+                  {avgStars.toFixed(1)} · {reviewCountLabel(reviewCount)}
                 </span>
               </div>
             )}
@@ -226,7 +245,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
 
         {reviewed && (
           <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-            Review submitted.
+            {c.reviewed}
           </p>
         )}
         {queryError && (
@@ -243,19 +262,22 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
           )}
 
           <Chips
-            label="Hobbies"
+            label={t.browse.hobbies}
             items={profile.hobbies}
             highlight={score.sharedHobbies}
+            names={t.browse.hobbyNames}
           />
           <Chips
-            label="Languages"
+            label={t.browse.languages}
             items={profile.languages}
             highlight={score.sharedLanguages}
+            names={t.browse.languageNames}
           />
           <Chips
-            label="Personality traits"
+            label={t.browse.traits}
             items={profile.personality_traits}
             highlight={score.sharedTraits}
+            names={t.browse.traitNames}
           />
 
           <div className="mt-6">
@@ -265,28 +287,27 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
               href={`/signup?next=${encodeURIComponent(`/u/${id}`)}`}
               className="inline-block rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
-              Sign up to message {profile.display_name}
+              {fill(c.signUpToMessage, { name: profile.display_name })}
             </Link>
           ) : isSelf ? (
             <Link
               href="/profile"
               className="inline-block rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
-              Edit profile
+              {c.editProfile}
             </Link>
           ) : myProfile?.role && myProfile.role === profile.role ? (
             <div className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-              Messaging is between tourists and guides. You&apos;re both{' '}
-              {profile.role === 'guide' ? 'guides' : 'tourists'}.
+              {profile.role === 'guide' ? c.sameRoleGuides : c.sameRoleTourists}
             </div>
           ) : (
             <form action={startConversationWith}>
               <input type="hidden" name="other_id" value={profile.id} />
               <SubmitButton
-                pendingLabel="Opening…"
+                pendingLabel={t.browse.opening}
                 className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
-                Message {profile.display_name}
+                {fill(c.messageName, { name: profile.display_name })}
               </SubmitButton>
             </form>
           )}
@@ -295,13 +316,16 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
 
       <section className="mt-8">
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-xl font-semibold">Reviews</h2>
+          <h2 className="text-xl font-semibold">{c.reviews}</h2>
           {reviewCount > 0 && (
             <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-              <StarRating value={avgStars} size={14} />
+              <StarRating
+                value={avgStars}
+                size={14}
+                label={fill(t.stars.outOf, { value: avgStars.toFixed(1) })}
+              />
               <span>
-                {avgStars.toFixed(1)} · {reviewCount}{' '}
-                {reviewCount === 1 ? 'review' : 'reviews'}
+                {avgStars.toFixed(1)} · {reviewCountLabel(reviewCount)}
               </span>
             </div>
           )}
@@ -315,56 +339,57 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
             <input type="hidden" name="reviewee_id" value={profile.id} />
             <div>
               <p className="text-sm font-medium">
-                {myReview ? 'Update your review' : 'Leave a review'}
+                {myReview ? c.updateYourReview : c.leaveReview}
               </p>
               <p className="text-xs text-zinc-500">
-                You can review your guide after your tour has finished.
+                {c.reviewHint}
               </p>
             </div>
             <div>
               <StarRatingInput
                 name="stars"
                 defaultValue={myReview?.stars ?? 0}
+                labels={{ one: t.stars.starOne, other: t.stars.starOther }}
               />
             </div>
             <label className="block">
-              <span className="text-sm font-medium">Comment</span>
+              <span className="text-sm font-medium">{c.comment}</span>
               <span className="ml-1 text-xs text-zinc-500">
-                (optional, up to 5000 chars)
+                {c.commentHint}
               </span>
               <textarea
                 name="body"
                 rows={4}
                 maxLength={5000}
                 defaultValue={myReview?.body ?? ''}
-                placeholder={`Share what it was like meeting ${profile.display_name}…`}
+                placeholder={fill(c.commentPlaceholder, { name: profile.display_name })}
                 className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
               />
             </label>
             <SubmitButton
-              pendingLabel="Submitting…"
+              pendingLabel={c.submitting}
               className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
-              {myReview ? 'Update review' : 'Submit review'}
+              {myReview ? c.updateReview : c.submitReview}
             </SubmitButton>
           </form>
         )}
 
         {reviewCount === 0 && (
           <p className="rounded-lg border border-dashed border-zinc-300 px-6 py-12 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-            No reviews yet.
+            {c.noReviews}
           </p>
         )}
 
         {reviewCount > 0 && !canSeeReviews && (
           <div className="rounded-lg border border-dashed border-zinc-300 px-6 py-8 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
             <p>
-              {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'} — not
-              visible yet
+              {fill(reviewCount === 1 ? c.hiddenOne : c.hiddenOther, {
+                n: reviewCount,
+              })}
             </p>
             <p className="mt-1 text-xs text-zinc-500">
-              Reviews become public once a profile has at least{' '}
-              {REVIEW_VISIBILITY_THRESHOLD} reviews.
+              {fill(c.hiddenNote, { n: REVIEW_VISIBILITY_THRESHOLD })}
             </p>
           </div>
         )}
@@ -375,7 +400,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
               const reviewer = reviewerById.get(r.reviewer_id)
               // Reviewers whose profile isn't ours to show (private, or hidden
               // from anonymous visitors) keep the review and lose the name.
-              const reviewerName = reviewer?.display_name ?? 'Traveler'
+              const reviewerName = reviewer?.display_name ?? c.traveler
               return (
                 <li
                   key={r.id}
@@ -394,10 +419,15 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <p className="truncate font-medium">{reviewerName}</p>
                         <span className="text-xs text-zinc-500">
-                          {new Date(r.created_at).toLocaleDateString()}
+                          {new Date(r.created_at).toLocaleDateString(meta.intlLocale)}
                         </span>
                       </div>
-                      <StarRating value={r.stars} size={14} className="mt-1" />
+                      <StarRating
+                        value={r.stars}
+                        size={14}
+                        className="mt-1"
+                        label={fill(t.stars.outOf, { value: r.stars.toFixed(1) })}
+                      />
                       {r.body && (
                         <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
                           {r.body}
@@ -416,19 +446,25 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
   )
 }
 
-function MatchBadge({ score }: { score: MatchScore }) {
+function MatchBadge({
+  score,
+  b,
+}: {
+  score: MatchScore
+  b: Dictionary['browse']
+}) {
   if (score.total <= 0) return null
   const shared =
     score.sharedHobbies.length +
     score.sharedLanguages.length +
     score.sharedTraits.length
   const bits: string[] = []
-  if (shared > 0) bits.push(`${shared} shared`)
-  if (score.sameCity) bits.push('same city')
+  if (shared > 0) bits.push(fill(b.badgeShared, { n: shared }))
+  if (score.sameCity) bits.push(b.badgeSameCity)
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
       <span aria-hidden>✦</span>
-      {bits.join(' · ') || 'match'}
+      {bits.join(' · ') || b.badgeMatch}
     </span>
   )
 }
@@ -437,10 +473,12 @@ function Chips({
   label,
   items,
   highlight,
+  names,
 }: {
   label: string
   items: string[]
   highlight?: string[]
+  names: Record<string, string>
 }) {
   if (!items || items.length === 0) return null
   const highlightSet = new Set((highlight ?? []).map((s) => s.trim().toLowerCase()))
@@ -459,7 +497,7 @@ function Chips({
                   : 'rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'
               }
             >
-              {it}
+              {tagLabel(names, it)}
             </span>
           )
         })}

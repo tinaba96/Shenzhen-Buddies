@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
 import { StarRating } from '@/components/StarRating'
 import { SubmitButton } from '@/components/SubmitButton'
+import { fill, type Dictionary } from '@/i18n'
+import { getI18n } from '@/i18n/server'
 import { avatarPublicUrl } from '@/lib/avatars'
 import { isSingleGuideMode } from '@/lib/config'
 import { scoreMatch, type MatchScore, type ProfileForMatching } from '@/lib/matching'
@@ -101,6 +103,20 @@ const HOBBY_OPTIONS = [
   'running',
 ] as const
 
+// Display label for a language/hobby/trait value. The stored value stays the
+// English tag (it is what profiles hold and what the filter matches on); only
+// the chip text is translated, and anything outside the known list — free text
+// someone typed on their profile — is shown as written. An entry that only
+// restates the key (every English one) also keeps the value as written, so
+// English chips keep whatever casing the profile used.
+function tagLabel(names: Record<string, string>, value: string): string {
+  const key = value.trim().toLowerCase()
+  // Own properties only: a profile tag of "constructor" must not resolve to
+  // Object's constructor.
+  const label = Object.hasOwn(names, key) ? names[key] : undefined
+  return label && label.toLowerCase() !== key ? label : value
+}
+
 function asArray(input: string | string[] | undefined): string[] {
   if (!input) return []
   return Array.isArray(input) ? input : [input]
@@ -112,6 +128,8 @@ export default async function BrowsePage({ searchParams }: Props) {
   if (isSingleGuideMode()) redirect('/guide')
 
   const sp = await searchParams
+  const { t } = await getI18n()
+  const b = t.browse
   const rawQ = typeof sp.q === 'string' ? sp.q : ''
   // Sanitize free-text search: strip PostgREST .or() metacharacters and cap length.
   const q = rawQ
@@ -295,26 +313,30 @@ export default async function BrowsePage({ searchParams }: Props) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src='/hero/preserved-fruit-jars.webp'
-          alt="Shenzhen at dusk"
+          alt={b.heroAlt}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
         <div className="relative mx-auto flex max-w-5xl flex-col gap-4 px-4 py-12 text-white sm:flex-row sm:items-end sm:justify-between sm:py-16">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-white/70">
-              Discover
+              {b.kicker}
             </p>
             <h1 className="mt-1 text-3xl font-semibold tracking-tight drop-shadow sm:text-4xl">
-              Browse buddies
+              {b.title}
             </h1>
             <p className="mt-2 max-w-xl text-sm text-white/85">
               {!user
-                ? 'Local guides in Shenzhen — browse who you could spend a day with, no account needed.'
+                ? b.introAnon
                 : myProfile?.role === 'tourist'
-                ? `Local guides in Shenzhen — ${sortByMatch ? 'sorted by match with your profile' : 'most recent first'}.`
+                ? sortByMatch
+                  ? b.introTouristMatch
+                  : b.introTouristRecent
                 : myProfile?.role === 'guide'
-                ? `Tourists looking for a buddy — ${sortByMatch ? 'sorted by match with your profile' : 'most recent first'}.`
-                : 'Pick a role on your profile to see matches.'}
+                ? sortByMatch
+                  ? b.introGuideMatch
+                  : b.introGuideRecent
+                : b.introNoRole}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -324,13 +346,13 @@ export default async function BrowsePage({ searchParams }: Props) {
                   href="/messages"
                   className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
                 >
-                  Messages
+                  {t.nav.messages}
                 </Link>
                 <Link
                   href="/profile"
                   className="rounded-md border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur hover:bg-white/20"
                 >
-                  Your profile
+                  {t.common.yourProfile}
                 </Link>
               </>
             ) : (
@@ -338,7 +360,7 @@ export default async function BrowsePage({ searchParams }: Props) {
                 href="/signup?next=%2Fbrowse"
                 className="rounded-md bg-white px-4 py-1.5 text-sm font-medium text-zinc-900 shadow-sm transition hover:bg-white/90"
               >
-                Sign up to connect
+                {b.signUpToConnect}
               </Link>
             )}
           </div>
@@ -349,19 +371,19 @@ export default async function BrowsePage({ searchParams }: Props) {
 
       {/* Top picks for the AI-suggested panel, then exclude those from the
           main list below so the same profiles don't appear twice. */}
-      <AiSuggestedPicks scored={topPicks} />
+      <AiSuggestedPicks scored={topPicks} t={t} />
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <form
           action={applyFilters}
           className="flex flex-1 min-w-[200px] items-center gap-1 rounded-full border border-zinc-300 bg-white pl-1 pr-3 text-sm shadow-sm focus-within:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900"
         >
-          <SearchSubmit />
+          <SearchSubmit labels={{ search: b.search, searching: b.searching }} />
           <input
             type="search"
             name="q"
             defaultValue={q}
-            placeholder="Search names or bios…"
+            placeholder={b.searchPlaceholder}
             className="flex-1 bg-transparent py-1.5 outline-none placeholder:text-zinc-400 disabled:opacity-70"
           />
           {/* Preserve other filter state across search submits. */}
@@ -387,75 +409,91 @@ export default async function BrowsePage({ searchParams }: Props) {
             <input type="hidden" name="sort" value={sort} />
           )}
         </form>
-        <FilterDrawer activeCount={activeCount}>
+        <FilterDrawer
+          activeCount={activeCount}
+          labels={{
+            filters: b.filters,
+            closeFilters: b.closeFilters,
+            close: b.close,
+            active: b.activeCount,
+            refine: b.refine,
+          }}
+        >
           <form action={applyFilters} className="space-y-5">
             {/* Preserve the current search query across filter applies. */}
             <input type="hidden" name="q" defaultValue={q} />
             <div>
               <div className="mb-2 flex items-baseline justify-between gap-2">
                 <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-                  Languages
+                  {b.languages}
                 </p>
             <span className="text-xs text-zinc-500">
               {langs.length
-                ? `${langs.length} selected — must speak at least one`
-                : 'any language'}
+                ? fill(b.languagesSelected, { n: langs.length })
+                : b.anyLanguage}
             </span>
           </div>
           <ChipGroup
             name="lang"
             options={LANGUAGE_OPTIONS}
             selected={langs}
+            names={b.languageNames}
           />
         </div>
 
         <div>
           <div className="mb-2 flex items-baseline justify-between gap-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-              Hobbies
+              {b.hobbies}
             </p>
             <span className="text-xs text-zinc-500">
               {hobbies.length
-                ? `${hobbies.length} selected — must enjoy at least one`
-                : 'any hobby'}
+                ? fill(b.hobbiesSelected, { n: hobbies.length })
+                : b.anyHobby}
             </span>
           </div>
           <ChipGroup
             name="hobby"
             options={HOBBY_OPTIONS}
             selected={hobbies}
+            names={b.hobbyNames}
           />
         </div>
 
         <div>
           <div className="mb-2 flex items-baseline justify-between gap-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-              Personality traits
+              {b.traits}
             </p>
             <span className="text-xs text-zinc-500">
               {traits.length
-                ? `${traits.length} selected — must share at least one vibe`
-                : 'any vibe'}
+                ? fill(b.traitsSelected, { n: traits.length })
+                : b.anyVibe}
             </span>
           </div>
-          <ChipGroup name="trait" options={TRAIT_OPTIONS} selected={traits} />
+          <ChipGroup
+            name="trait"
+            options={TRAIT_OPTIONS}
+            selected={traits}
+            names={b.traitNames}
+          />
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
           <div className="mb-2 flex items-baseline justify-between gap-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-              Minimum rating
+              {b.minRating}
             </p>
             <span className="text-xs text-zinc-500">
               {minStars > 0
-                ? `${minStars}+ stars only`
-                : 'any rating'}
+                ? fill(b.minRatingSelected, { n: minStars })
+                : b.anyRating}
             </span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {[
-              { v: 0, label: 'Any' },
+              { v: 0, label: b.any },
               { v: 3, label: '★ 3+' },
               { v: 4, label: '★ 4+' },
               { v: 5, label: '★ 5' },
@@ -479,17 +517,19 @@ export default async function BrowsePage({ searchParams }: Props) {
           <div>
             <div className="mb-2 flex items-baseline justify-between gap-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-                Minimum reviews
+                {b.minReviews}
               </p>
               <span className="text-xs text-zinc-500">
-                {minReviews > 0 ? `${minReviews}+ reviews` : 'any count'}
+                {minReviews > 0
+                  ? fill(b.reviewsAtLeast, { n: minReviews })
+                  : b.anyCount}
               </span>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {[
-                { v: 0, label: 'Any' },
-                { v: 3, label: '3+ reviews' },
-                { v: 10, label: '10+ reviews' },
+                { v: 0, label: b.any },
+                { v: 3, label: fill(b.reviewsAtLeast, { n: 3 }) },
+                { v: 10, label: fill(b.reviewsAtLeast, { n: 10 }) },
               ].map((opt) => (
                 <label key={opt.v} className="cursor-pointer select-none">
                   <input
@@ -517,7 +557,7 @@ export default async function BrowsePage({ searchParams }: Props) {
               defaultChecked={greatOnly}
               className="h-4 w-4 rounded border-zinc-300 text-zinc-900 dark:border-zinc-700"
             />
-            <span>Great matches only</span>
+            <span>{b.greatOnly}</span>
           </label>
 
           <label className="flex cursor-pointer items-center gap-2 text-sm">
@@ -528,7 +568,7 @@ export default async function BrowsePage({ searchParams }: Props) {
               defaultChecked={withPhoto}
               className="h-4 w-4 rounded border-zinc-300 text-zinc-900 dark:border-zinc-700"
             />
-            <span>With photo</span>
+            <span>{b.withPhoto}</span>
           </label>
 
           <label className="flex cursor-pointer items-center gap-2 text-sm">
@@ -539,36 +579,36 @@ export default async function BrowsePage({ searchParams }: Props) {
               defaultChecked={activeOnly}
               className="h-4 w-4 rounded border-zinc-300 text-zinc-900 dark:border-zinc-700"
             />
-            <span>Active in last 30 days</span>
+            <span>{b.activeRecently}</span>
           </label>
 
           <label className="ml-auto flex items-center gap-2 text-sm">
-            <span className="text-zinc-500">Sort</span>
+            <span className="text-zinc-500">{b.sort}</span>
             <select
               name="sort"
               defaultValue={sort ?? 'match'}
               className="rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
             >
-              <option value="match">Best match</option>
-              <option value="rated">Highest rated</option>
-              <option value="recent">Most recent</option>
+              <option value="match">{b.sortMatch}</option>
+              <option value="rated">{b.sortRated}</option>
+              <option value="recent">{b.sortRecent}</option>
             </select>
           </label>
         </div>
 
             <div className="sticky bottom-0 -mx-6 -mb-5 flex items-center gap-3 border-t border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900">
               <SubmitButton
-                pendingLabel="Applying…"
+                pendingLabel={b.applying}
                 className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
-                Apply filters
+                {b.apply}
               </SubmitButton>
               {hasFilters && (
                 <Link
                   href="/browse"
                   className="text-sm text-zinc-600 underline dark:text-zinc-400"
                 >
-                  Reset
+                  {b.reset}
                 </Link>
               )}
             </div>
@@ -579,21 +619,22 @@ export default async function BrowsePage({ searchParams }: Props) {
             href="/browse"
             className="text-sm text-zinc-600 underline dark:text-zinc-400"
           >
-            Clear all
+            {b.clearAll}
           </Link>
         )}
         <p className="ml-auto text-xs text-zinc-500">
-          {scored.length} {scored.length === 1 ? 'match' : 'matches'}
+          {fill(scored.length === 1 ? b.countOne : b.countOther, {
+            n: scored.length,
+          })}
         </p>
       </div>
 
       {user && !myProfile?.role && (
         <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
           <p>
-            <strong>Set your role first.</strong> Tourists match with guides
-            and vice versa.{' '}
+            <strong>{b.roleFirstTitle}</strong> {b.roleFirstBody}{' '}
             <Link href="/profile" className="font-medium underline">
-              Go to your profile →
+              {b.roleFirstLink}
             </Link>
           </p>
         </div>
@@ -601,14 +642,13 @@ export default async function BrowsePage({ searchParams }: Props) {
 
       {error && (
         <p className="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
-          Couldn&apos;t load profiles: {error.message}
+          {fill(b.loadError, { error: error.message })}
         </p>
       )}
 
       {scored.length === 0 && (
         <p className="rounded-lg border border-dashed border-zinc-300 px-6 py-12 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-          No matching profiles yet. Try a different filter or invite friends to
-          sign up.
+          {b.empty}
         </p>
       )}
 
@@ -641,19 +681,23 @@ export default async function BrowsePage({ searchParams }: Props) {
                         : 'rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-800 dark:bg-sky-950 dark:text-sky-300'
                     }
                   >
-                    {p.role === 'guide' ? 'Guide' : 'Tourist'}
+                    {p.role === 'guide' ? t.buddy.roleGuide : t.buddy.roleTourist}
                   </span>
                 </div>
                 <p className="text-xs text-zinc-500">{p.city}</p>
                 {rating && rating.count > 0 && (
                   <div className="mt-1 flex items-center gap-1 text-xs text-zinc-600 dark:text-zinc-400">
-                    <StarRating value={rating.avg} size={12} />
+                    <StarRating
+                      value={rating.avg}
+                      size={12}
+                      label={fill(t.stars.outOf, { value: rating.avg.toFixed(1) })}
+                    />
                     <span>
                       {rating.avg.toFixed(1)} · {rating.count}
                     </span>
                   </div>
                 )}
-                {myProfile && <MatchBadge score={score} />}
+                {myProfile && <MatchBadge score={score} b={b} />}
               </div>
             </div>
 
@@ -663,18 +707,33 @@ export default async function BrowsePage({ searchParams }: Props) {
               </p>
             )}
 
-            <Chips label="Hobbies" items={p.hobbies} highlight={score.sharedHobbies} />
-            <Chips label="Languages" items={p.languages} highlight={score.sharedLanguages} />
-            <Chips label="Traits" items={p.personality_traits} highlight={score.sharedTraits} />
+            <Chips
+              label={b.chipHobbies}
+              items={p.hobbies}
+              highlight={score.sharedHobbies}
+              names={b.hobbyNames}
+            />
+            <Chips
+              label={b.chipLanguages}
+              items={p.languages}
+              highlight={score.sharedLanguages}
+              names={b.languageNames}
+            />
+            <Chips
+              label={b.chipTraits}
+              items={p.personality_traits}
+              highlight={score.sharedTraits}
+              names={b.traitNames}
+            />
 
             {user ? (
               <form action={startConversationWith} className="relative z-10 mt-4">
                 <input type="hidden" name="other_id" value={p.id} />
                 <SubmitButton
-                  pendingLabel="Opening…"
+                  pendingLabel={b.opening}
                   className="w-full rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
                 >
-                  Message
+                  {b.message}
                 </SubmitButton>
               </form>
             ) : (
@@ -682,7 +741,7 @@ export default async function BrowsePage({ searchParams }: Props) {
                 href={`/signup?next=${encodeURIComponent(`/u/${p.id}`)}`}
                 className="relative z-10 mt-4 block w-full rounded-md bg-zinc-900 px-3 py-2 text-center text-sm font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
-                Sign up to message
+                {b.signUpToMessage}
               </Link>
             )}
           </li>
@@ -697,10 +756,12 @@ function ChipGroup({
   name,
   options,
   selected,
+  names,
 }: {
   name: string
   options: readonly string[]
   selected: string[]
+  names: Record<string, string>
 }) {
   const set = new Set(selected.map((s) => s.toLowerCase()))
   return (
@@ -715,7 +776,7 @@ function ChipGroup({
             className="peer sr-only"
           />
           <span className="inline-block rounded-full border border-zinc-300 px-3 py-1 text-xs transition hover:bg-zinc-50 peer-checked:border-zinc-900 peer-checked:bg-zinc-900 peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-amber-400 dark:border-zinc-700 dark:hover:bg-zinc-800 dark:peer-checked:border-white dark:peer-checked:bg-white dark:peer-checked:text-zinc-900">
-            {opt}
+            {tagLabel(names, opt)}
           </span>
         </label>
       ))}
@@ -725,10 +786,13 @@ function ChipGroup({
 
 function AiSuggestedPicks({
   scored,
+  t,
 }: {
   scored: { profile: ProfileRow; score: MatchScore; rating: RatingStats | null }[]
+  t: Dictionary
 }) {
   if (scored.length === 0) return null
+  const b = t.browse
   return (
     <section className="mb-8 overflow-hidden rounded-2xl border border-amber-200/70 bg-gradient-to-br from-amber-50 via-white to-rose-50 p-6 shadow-sm dark:border-amber-900/30 dark:from-amber-950/30 dark:via-zinc-900 dark:to-rose-950/30">
       <div className="mb-4 flex items-center gap-3">
@@ -739,10 +803,10 @@ function AiSuggestedPicks({
         </span>
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-800 dark:text-amber-300">
-            AI suggested
+            {b.aiKicker}
           </p>
           <p className="text-sm font-semibold">
-            Your best matches in Shenzhen, hand-picked.
+            {b.aiTitle}
           </p>
         </div>
       </div>
@@ -774,13 +838,17 @@ function AiSuggestedPicks({
                         : 'rounded-full bg-sky-100 px-1.5 py-0.5 text-[10px] font-medium text-sky-800 dark:bg-sky-950 dark:text-sky-300'
                     }
                   >
-                    {p.role === 'guide' ? 'Guide' : 'Tourist'}
+                    {p.role === 'guide' ? t.buddy.roleGuide : t.buddy.roleTourist}
                   </span>
                 </div>
                 <p className="truncate text-xs text-zinc-500">{p.city}</p>
                 {rating && rating.count > 0 && (
                   <div className="mt-1 flex items-center gap-1 text-[11px] text-zinc-600 dark:text-zinc-400">
-                    <StarRating value={rating.avg} size={11} />
+                    <StarRating
+                      value={rating.avg}
+                      size={11}
+                      label={fill(t.stars.outOf, { value: rating.avg.toFixed(1) })}
+                    />
                     <span>
                       {rating.avg.toFixed(1)} · {rating.count}
                     </span>
@@ -795,19 +863,19 @@ function AiSuggestedPicks({
               </p>
             )}
 
-            <SharedChips score={score} />
+            <SharedChips score={score} b={b} />
 
             <p className="mt-3 flex-1 text-xs italic text-zinc-600 dark:text-zinc-400">
-              {describeMatch(score)}
+              {describeMatch(score, b)}
             </p>
 
             <form action={startConversationWith} className="relative z-10 mt-4">
               <input type="hidden" name="other_id" value={p.id} />
               <SubmitButton
-                pendingLabel="Opening…"
+                pendingLabel={b.opening}
                 className="w-full rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
-                Message
+                {b.message}
               </SubmitButton>
             </form>
           </li>
@@ -817,13 +885,21 @@ function AiSuggestedPicks({
   )
 }
 
-function SharedChips({ score }: { score: MatchScore }) {
+type BrowseCopy = Dictionary['browse']
+
+function SharedChips({ score, b }: { score: MatchScore; b: BrowseCopy }) {
   // Surface up to 4 of the most distinctive shared items: hobbies first
   // (concrete activities), then languages, then a trait if there's room.
   const items: { kind: 'hobby' | 'lang' | 'trait'; label: string }[] = [
-    ...score.sharedHobbies.slice(0, 3).map((h) => ({ kind: 'hobby' as const, label: h })),
-    ...score.sharedLanguages.slice(0, 2).map((l) => ({ kind: 'lang' as const, label: l })),
-    ...score.sharedTraits.slice(0, 1).map((t) => ({ kind: 'trait' as const, label: t })),
+    ...score.sharedHobbies
+      .slice(0, 3)
+      .map((h) => ({ kind: 'hobby' as const, label: tagLabel(b.hobbyNames, h) })),
+    ...score.sharedLanguages
+      .slice(0, 2)
+      .map((l) => ({ kind: 'lang' as const, label: tagLabel(b.languageNames, l) })),
+    ...score.sharedTraits
+      .slice(0, 1)
+      .map((t) => ({ kind: 'trait' as const, label: tagLabel(b.traitNames, t) })),
   ].slice(0, 4)
   if (items.length === 0) return null
   return (
@@ -840,43 +916,48 @@ function SharedChips({ score }: { score: MatchScore }) {
   )
 }
 
-function describeMatch(score: MatchScore): string {
+function describeMatch(score: MatchScore, b: BrowseCopy): string {
+  const list = (items: string[], names: Record<string, string>) =>
+    formatList(
+      items.slice(0, 2).map((it) => tagLabel(names, it)),
+      b.listJoin,
+    )
   const parts: string[] = []
   if (score.sharedLanguages.length > 0) {
-    parts.push(`speaks ${formatList(score.sharedLanguages.slice(0, 2))}`)
+    parts.push(fill(b.whySpeaks, { list: list(score.sharedLanguages, b.languageNames) }))
   }
   if (score.sharedHobbies.length > 0) {
-    parts.push(`into ${formatList(score.sharedHobbies.slice(0, 2))}`)
+    parts.push(fill(b.whyInto, { list: list(score.sharedHobbies, b.hobbyNames) }))
   }
   if (score.sharedTraits.length > 0 && parts.length < 2) {
-    parts.push(`feels ${formatList(score.sharedTraits.slice(0, 2))}`)
+    parts.push(fill(b.whyFeels, { list: list(score.sharedTraits, b.traitNames) }))
   }
   if (score.sameCity) {
-    parts.push('in your city')
+    parts.push(b.whySameCity)
   }
-  if (parts.length === 0) return 'A solid all-round match.'
-  return 'Why: ' + parts.join(' · ')
+  if (parts.length === 0) return b.whyAllRound
+  return fill(b.why, { reasons: parts.join(' · ') })
 }
 
-function formatList(items: string[]): string {
+function formatList(items: string[], join: string): string {
   if (items.length === 0) return ''
   if (items.length === 1) return items[0]
-  return items.join(' & ')
+  return items.join(join)
 }
 
-function MatchBadge({ score }: { score: MatchScore }) {
+function MatchBadge({ score, b }: { score: MatchScore; b: BrowseCopy }) {
   if (score.total <= 0) return null
   const shared =
     score.sharedHobbies.length +
     score.sharedLanguages.length +
     score.sharedTraits.length
   const bits: string[] = []
-  if (shared > 0) bits.push(`${shared} shared`)
-  if (score.sameCity) bits.push('same city')
+  if (shared > 0) bits.push(fill(b.badgeShared, { n: shared }))
+  if (score.sameCity) bits.push(b.badgeSameCity)
   return (
     <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
       <span aria-hidden>✦</span>
-      {bits.join(' · ') || 'match'}
+      {bits.join(' · ') || b.badgeMatch}
     </p>
   )
 }
@@ -885,10 +966,12 @@ function Chips({
   label,
   items,
   highlight,
+  names,
 }: {
   label: string
   items: string[]
   highlight?: string[]
+  names: Record<string, string>
 }) {
   if (!items || items.length === 0) return null
   const highlightSet = new Set((highlight ?? []).map((s) => s.trim().toLowerCase()))
@@ -907,7 +990,7 @@ function Chips({
                   : 'rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'
               }
             >
-              {it}
+              {tagLabel(names, it)}
             </span>
           )
         })}

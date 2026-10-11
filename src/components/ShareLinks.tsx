@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import type { Dictionary } from '@/i18n'
 import { track } from '@/lib/analytics'
 
 // The two share buttons that sit on blog posts and on gallery photos.
@@ -53,6 +54,7 @@ export function ShareLinks({
   isAdmin,
   tone = 'default',
   className = '',
+  labels,
 }: {
   // Absolute and clean — no UTM, no tracking params. Built from siteUrl() on
   // the server so what lands on the clipboard is the production domain rather
@@ -78,6 +80,7 @@ export function ShareLinks({
   isAdmin: boolean
   tone?: Tone
   className?: string
+  labels: Dictionary['share']
 }) {
   const [status, setStatus] = useState<Status>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -161,7 +164,7 @@ export function ShareLinks({
         onClick={() => share('public')}
         done={current?.variant === 'public' && current.kind === 'copied'}
       >
-        Copy link
+        {labels.copyLink}
       </ShareButton>
 
       {/* The admin button needs the clipboard specifically: its whole job is to
@@ -173,7 +176,7 @@ export function ShareLinks({
           onClick={() => share('instagram')}
           done={current?.variant === 'instagram' && current.kind === 'copied'}
         >
-          Copy Instagram link
+          {labels.copyInstagram}
         </ShareButton>
       )}
 
@@ -187,20 +190,23 @@ export function ShareLinks({
           tone === 'onDark' ? 'text-white/70' : 'text-zinc-500'
         }`}
       >
-        {statusMessage(current)}
+        {statusMessage(current, labels)}
       </span>
     </div>
   )
 }
 
-function statusMessage(status: Status): string {
+function statusMessage(status: Status, labels: Dictionary['share']): string {
   if (!status) return ''
-  const what = status.variant === 'instagram' ? 'Instagram link' : 'Link'
-  if (status.kind === 'copied') return `${what} copied`
+  const instagram = status.variant === 'instagram'
+  if (status.kind === 'copied') {
+    return instagram ? labels.instagramCopied : labels.linkCopied
+  }
   // Naming the failed action rather than a generic "something went wrong", and
-  // pointing at the address bar, because that is the recovery.
-  const verb = status.kind === 'share-failed' ? 'share' : 'copy'
-  return `Could not ${verb} the ${what.toLowerCase()} — it is in the address bar`
+  // pointing at the address bar, because that is the recovery. Only the public
+  // link ever goes through the share sheet, so share-failed has one wording.
+  if (status.kind === 'share-failed') return labels.shareFailed
+  return instagram ? labels.instagramCopyFailed : labels.copyFailed
 }
 
 function ShareButton({

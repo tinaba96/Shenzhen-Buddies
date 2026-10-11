@@ -4,6 +4,7 @@ import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitButton } from '@/components/SubmitButton'
+import type { Dictionary } from '@/i18n'
 
 // Amount picker + the two ways to give, shared by the donation page and the
 // post-tour tip step. One chosen amount feeds both: the card button posts it
@@ -18,6 +19,15 @@ import { SubmitButton } from '@/components/SubmitButton'
 
 const MIN_DOLLARS = 1
 const MAX_DOLLARS = 500
+
+// {placeholder} filling for this client component. The shared fill() lives in
+// @/i18n, whose module imports every dictionary — pulling that into the client
+// bundle to substitute two numbers is not worth it.
+function fillIn(template: string, values: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (whole, key: string) =>
+    key in values ? String(values[key]) : whole,
+  )
+}
 
 function parseDollars(raw: string): number | null {
   const trimmed = raw.trim()
@@ -37,7 +47,7 @@ export function SupportPanel({
   currency,
   cardAction,
   successHref,
-  verb,
+  labels,
   frame = true,
 }: {
   // 'donation': anyone, any time; the routes take just the amount.
@@ -56,8 +66,9 @@ export function SupportPanel({
   cardAction: (formData: FormData) => Promise<void>
   // Where to go after a PayPal capture succeeds.
   successHref: string
-  // Button wording: "Donate CA$10 by card" / "Tip CA$10 by card".
-  verb: string
+  // The `support` dictionary namespace, in the visitor's language. Passed in
+  // from the server page so the client bundle carries one locale, not four.
+  labels: Dictionary['support']
   // Draw the white card around the panel (off when the page already frames it).
   frame?: boolean
 }) {
@@ -75,16 +86,15 @@ export function SupportPanel({
     amountRef.current = dollars
   }, [dollars])
 
-  const noun = kind === 'tip' ? 'tip' : 'donation'
+  const copy = labels[kind]
   const createUrl = kind === 'tip' ? '/api/paypal/create-tip' : '/api/paypal/create-donation'
   const captureUrl = kind === 'tip' ? '/api/paypal/capture-tip' : '/api/paypal/capture-donation'
-  const failed = `Your ${noun} could not be completed. Nothing was charged — please try again.`
+  const failed = copy.failed
 
   if (!cardEnabled && !paypalClientId) {
     return (
       <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-        {kind === 'tip' ? 'Tips' : 'Donations'} are not set up yet — thank you
-        for the thought!
+        {copy.notSetUp}
       </p>
     )
   }
@@ -100,8 +110,8 @@ export function SupportPanel({
           : ''
       }
     >
-      <p className="text-sm font-semibold">Choose an amount</p>
-      <div className={`mt-3 grid ${cols} gap-2`} role="group" aria-label="Preset amounts">
+      <p className="text-sm font-semibold">{labels.chooseAmount}</p>
+      <div className={`mt-3 grid ${cols} gap-2`} role="group" aria-label={labels.presets}>
         {presets.map((d) => {
           const selected = preset === d && !custom.trim()
           return (
@@ -132,13 +142,13 @@ export function SupportPanel({
         step={1}
         value={custom}
         onChange={(e) => setCustom(e.target.value)}
-        placeholder="Custom amount (CA$)"
-        aria-label="Custom amount in Canadian dollars"
+        placeholder={labels.customPlaceholder}
+        aria-label={labels.customLabel}
         className="mt-3 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
       />
       {custom.trim() && !valid && (
         <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-          Pick a whole amount between CA${MIN_DOLLARS} and CA${MAX_DOLLARS}.
+          {fillIn(labels.customInvalid, { min: MIN_DOLLARS, max: MAX_DOLLARS })}
         </p>
       )}
 
@@ -147,11 +157,11 @@ export function SupportPanel({
           {bookingId && <input type="hidden" name="booking_id" value={bookingId} />}
           <input type="hidden" name="amount" value={dollars ?? ''} />
           <SubmitButton
-            pendingLabel="Opening…"
+            pendingLabel={labels.opening}
             className="w-full rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
             disabled={!valid}
           >
-            {valid ? `${verb} CA$${dollars} by card` : `${verb} by card`}
+            {valid ? fillIn(copy.cardAmount, { amount: dollars ?? '' }) : copy.card}
           </SubmitButton>
         </form>
       )}
@@ -161,7 +171,7 @@ export function SupportPanel({
           {cardEnabled && (
             <div className="my-5 flex items-center gap-3 text-xs text-zinc-400">
               <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
-              or
+              {labels.or}
               <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
             </div>
           )}
@@ -169,7 +179,7 @@ export function SupportPanel({
             <p className="mb-2 text-sm text-red-600 dark:text-red-400">{paypalError}</p>
           )}
           {capturing && (
-            <p className="mb-2 text-sm text-zinc-500">Confirming your {noun}…</p>
+            <p className="mb-2 text-sm text-zinc-500">{copy.confirming}</p>
           )}
           <div className={cardEnabled ? '' : 'mt-5'}>
             <PayPalScriptProvider
@@ -228,7 +238,7 @@ export function SupportPanel({
                   }
                 }}
                 onError={() => {
-                  setPaypalError('Something went wrong with PayPal. Please try again.')
+                  setPaypalError(labels.paypalError)
                 }}
               />
             </PayPalScriptProvider>
@@ -238,12 +248,10 @@ export function SupportPanel({
 
       <p className="mt-4 text-xs text-zinc-500">
         {cardEnabled && paypalClientId
-          ? 'Paid securely by card via Stripe, or with PayPal. '
+          ? labels.footCardPaypal
           : cardEnabled
-            ? 'Paid securely by card via Stripe. '
-            : 'Paid securely with PayPal. '}
-        One-off, no account needed, and no perks attached — this is a
-        thank-you, not a purchase.
+            ? labels.footCard
+            : labels.footPaypal}
       </p>
     </div>
   )

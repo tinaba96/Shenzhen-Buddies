@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import { TrackOnMount } from '@/components/blog/BlogTracking'
 import { requireGalleryItem } from '@/content/gallery'
+import { localizeGalleryItem } from '@/content/gallery-i18n'
 import {
   AUTHORS,
   PILLARS,
@@ -13,30 +14,45 @@ import {
   readingTimeMinutes,
   resolvePillarFilter,
 } from '@/content/posts'
+import { fill, type Dictionary } from '@/i18n'
+import type { Locale } from '@/i18n/config'
+import { getI18n } from '@/i18n/server'
 import { DEFAULT_OG_IMAGE, siteUrl } from '@/lib/config'
 
+// JSON-LD stays English. Metadata follows the reader's locale like every
+// other page; a crawler sends no locale cookie, so it still indexes the
+// English pair (t.seo.blog in en.ts).
 const TITLE = 'Field notes on Shenzhen'
 const DESCRIPTION =
   'Border crossings, payments, neighbourhoods and the people who live here. The things worth knowing before you arrive.'
 
-export const metadata: Metadata = {
-  title: `${TITLE} — Shenzhen Buddies`,
-  description: DESCRIPTION,
-  // Every ?pillar= view canonicalises here. They exist to be shared and to
-  // survive a reload, not to be indexed as separate thin pages.
-  alternates: { canonical: '/blog' },
-  openGraph: {
-    type: 'website',
-    title: TITLE,
-    description: DESCRIPTION,
-    url: '/blog',
-    // Restates the site default: declaring openGraph here drops the image the
-    // root layout's file convention would otherwise supply. See DEFAULT_OG_IMAGE.
-    // No `twitter` block is needed alongside it — replacement is per-key, so
-    // twitter still inherits from the root layout and Next fills twitter:image
-    // from the resolved OG image. Verified in view-source.
-    images: [DEFAULT_OG_IMAGE],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n()
+  const seo = t.seo.blog
+  return {
+    title: seo.title,
+    description: seo.description,
+    // Every ?pillar= view canonicalises here. They exist to be shared and to
+    // survive a reload, not to be indexed as separate thin pages.
+    alternates: { canonical: '/blog' },
+    openGraph: {
+      type: 'website',
+      title: seo.ogTitle,
+      description: seo.description,
+      url: '/blog',
+      // Restates the site default: declaring openGraph here drops the image the
+      // root layout's file convention would otherwise supply. See
+      // DEFAULT_OG_IMAGE.
+      images: [DEFAULT_OG_IMAGE],
+    },
+    // Its own block, or twitter keeps the root layout's site-wide title and
+    // description. twitter:image still comes from the og image above.
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.ogTitle,
+      description: seo.description,
+    },
+  }
 }
 
 // Reading searchParams opts this route out of static rendering — it renders per
@@ -51,6 +67,11 @@ export default async function BlogIndexPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const activePillar = resolvePillarFilter((await searchParams).pillar)
+  const { locale, meta, t } = await getI18n()
+  // English keeps its long-standing 'en-GB' day-month-year format; other
+  // locales use their own Intl locale. Server-only, so no hydration mismatch.
+  const dateLocale = locale === 'en' ? 'en-GB' : meta.intlLocale
+  const card = { t: t.blog, dateLocale, locale }
   const all = publishedPosts()
   const shown = postsForPillar(activePillar)
   const [featured, ...rest] = shown
@@ -93,24 +114,24 @@ export default async function BlogIndexPage({
 
       <header className="max-w-2xl">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-          Field notes
+          {t.blog.kicker}
         </p>
         <h1 className="mt-2 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-          {TITLE}
+          {t.blog.title}
         </h1>
         <p className="mt-4 text-pretty text-lg text-zinc-600 dark:text-zinc-400">
-          {DESCRIPTION}
+          {t.blog.description}
         </p>
       </header>
 
       {showFilters && (
-        <nav aria-label="Filter posts by topic" className="mt-10 flex flex-wrap gap-2">
-          <FilterChip href="/blog" label="Everything" active={!activePillar} />
+        <nav aria-label={t.blog.filterLabel} className="mt-10 flex flex-wrap gap-2">
+          <FilterChip href="/blog" label={t.blog.everything} active={!activePillar} />
           {pillarsWithPosts.map((p) => (
             <FilterChip
               key={p.id}
               href={`/blog?pillar=${p.id}`}
-              label={p.label}
+              label={t.blog.pillars[p.id].label}
               active={activePillar === p.id}
             />
           ))}
@@ -119,26 +140,26 @@ export default async function BlogIndexPage({
 
       {activePillar && (
         <p className="mt-6 text-sm text-zinc-500">
-          {PILLARS.find((p) => p.id === activePillar)?.blurb}
+          {t.blog.pillars[activePillar].blurb}
         </p>
       )}
 
       {shown.length === 0 ? (
         <p className="mt-16 text-zinc-600 dark:text-zinc-400">
-          Nothing here yet.{' '}
+          {t.blog.emptyLead}
           <Link href="/blog" className="underline underline-offset-2">
-            See everything instead
+            {t.blog.emptyLink}
           </Link>
-          .
+          {t.blog.emptySuffix}
         </p>
       ) : (
         <>
-          <FeaturedCard post={featured} />
+          <FeaturedCard post={featured} {...card} />
           {rest.length > 0 && (
             <ul className="mt-8 grid gap-6 sm:grid-cols-2">
               {rest.map((post) => (
                 <li key={post.slug}>
-                  <PostCard post={post} />
+                  <PostCard post={post} {...card} />
                 </li>
               ))}
             </ul>
@@ -173,14 +194,22 @@ function FilterChip({
   )
 }
 
-function pillarLabel(pillar: Pillar): string {
-  return PILLARS.find((p) => p.id === pillar)?.label ?? pillar
+type CardCopy = { t: Dictionary['blog']; dateLocale: string; locale: Locale }
+
+// Post titles and excerpts are English-only; say so to screen readers and
+// translation tools when the page around them is not.
+function postLang(locale: Locale): string | undefined {
+  return locale === 'en' ? undefined : 'en'
 }
 
-// 'YYYY-MM-DD' → '9 August 2026'. Fixed locale so the server and the client
-// never disagree about the string and trigger a hydration warning.
-function formatDate(iso: string): string {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {
+function pillarLabel(pillar: Pillar, t: Dictionary['blog']): string {
+  return t.pillars[pillar]?.label ?? pillar
+}
+
+// 'YYYY-MM-DD' → '9 August 2026' in English. The locale is passed in from the
+// server render, so the server and the client never disagree about the string.
+function formatDate(iso: string, dateLocale: string): string {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString(dateLocale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -188,16 +217,18 @@ function formatDate(iso: string): string {
   })
 }
 
-function CardMeta({ post }: { post: Post }) {
+function CardMeta({ post, t, dateLocale }: { post: Post } & CardCopy) {
   return (
     <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500">
       <span className="font-medium text-zinc-700 dark:text-zinc-300">
-        {pillarLabel(post.pillar)}
+        {pillarLabel(post.pillar, t)}
       </span>
       <span aria-hidden>·</span>
-      <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+      <time dateTime={post.publishedAt}>
+        {formatDate(post.publishedAt, dateLocale)}
+      </time>
       <span aria-hidden>·</span>
-      <span>{readingTimeMinutes(post)} min read</span>
+      <span>{fill(t.minRead, { n: readingTimeMinutes(post) })}</span>
     </p>
   )
 }
@@ -207,7 +238,17 @@ function CardMeta({ post }: { post: Post }) {
 // carry an image would mean illustrating a border-crossing guide with a picture
 // of somewhere else — which is the exact credibility problem the gallery exists
 // to fix.
-function CardImage({ post, tall }: { post: Post; tall?: boolean }) {
+function CardImage({
+  post,
+  tall,
+  t,
+  locale,
+}: {
+  post: Post
+  tall?: boolean
+  t: Dictionary['blog']
+  locale: Locale
+}) {
   const ratio = tall ? 'aspect-[16/9]' : 'aspect-[3/2]'
 
   if (!post.heroGalleryId) {
@@ -216,13 +257,16 @@ function CardImage({ post, tall }: { post: Post; tall?: boolean }) {
         className={`${ratio} flex items-end bg-gradient-to-br from-amber-100 via-rose-50 to-rose-100 p-5 dark:from-amber-950/40 dark:via-zinc-900 dark:to-rose-950/40`}
       >
         <span className="text-xs font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-          {pillarLabel(post.pillar)}
+          {pillarLabel(post.pillar, t)}
         </span>
       </div>
     )
   }
 
-  const hero = requireGalleryItem(post.heroGalleryId, `posts/${post.slug} hero`)
+  const hero = localizeGalleryItem(
+    requireGalleryItem(post.heroGalleryId, `posts/${post.slug} hero`),
+    locale,
+  )
   return (
     <div className={`${ratio} overflow-hidden`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -237,21 +281,27 @@ function CardImage({ post, tall }: { post: Post; tall?: boolean }) {
   )
 }
 
-function FeaturedCard({ post }: { post: Post }) {
+function FeaturedCard({ post, t, dateLocale, locale }: { post: Post } & CardCopy) {
   return (
     <article className="group mt-10 overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
       <Link href={`/blog/${post.slug}`} className="block">
-        <CardImage post={post} tall />
+        <CardImage post={post} tall t={t} locale={locale} />
         <div className="p-6 sm:p-8">
-          <CardMeta post={post} />
-          <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+          <CardMeta post={post} t={t} dateLocale={dateLocale} locale={locale} />
+          <h2
+            lang={postLang(locale)}
+            className="mt-3 text-balance text-2xl font-semibold tracking-tight sm:text-3xl"
+          >
             {post.title}
           </h2>
-          <p className="mt-3 max-w-2xl text-pretty text-zinc-600 dark:text-zinc-400">
+          <p
+            lang={postLang(locale)}
+            className="mt-3 max-w-2xl text-pretty text-zinc-600 dark:text-zinc-400"
+          >
             {post.excerpt}
           </p>
           <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium">
-            Read it
+            {t.readIt}
             <span aria-hidden className="transition group-hover:translate-x-0.5">
               →
             </span>
@@ -262,17 +312,20 @@ function FeaturedCard({ post }: { post: Post }) {
   )
 }
 
-function PostCard({ post }: { post: Post }) {
+function PostCard({ post, t, dateLocale, locale }: { post: Post } & CardCopy) {
   return (
     <article className="group h-full overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
       <Link href={`/blog/${post.slug}`} className="flex h-full flex-col">
-        <CardImage post={post} />
+        <CardImage post={post} t={t} locale={locale} />
         <div className="flex flex-1 flex-col p-5">
-          <CardMeta post={post} />
-          <h3 className="mt-2 text-lg font-semibold tracking-tight">
+          <CardMeta post={post} t={t} dateLocale={dateLocale} locale={locale} />
+          <h3 lang={postLang(locale)} className="mt-2 text-lg font-semibold tracking-tight">
             {post.title}
           </h3>
-          <p className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400">
+          <p
+            lang={postLang(locale)}
+            className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400"
+          >
             {post.excerpt}
           </p>
         </div>

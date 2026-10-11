@@ -10,6 +10,8 @@ import {
   hoursUntilTourStart,
   type BookingRow,
 } from '@/lib/booking'
+import { fill } from '@/i18n'
+import { getI18n } from '@/i18n/server'
 import { isSingleGuideMode, officialGuideId } from '@/lib/config'
 import { paypalConfigured } from '@/lib/paypal'
 import { supportConfigured } from '@/lib/support'
@@ -23,9 +25,12 @@ import { startTipCheckout, submitTourReview } from './actions'
 // the tourist's booking list on /guide and from the confirmation email, so it
 // works as a durable URL they can come back to after the tour.
 
-export const metadata: Metadata = {
-  title: 'How was your tour? — Shenzhen Buddies',
-  robots: { index: false },
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n()
+  return {
+    title: t.seo.review.title,
+    robots: { index: false },
+  }
 }
 
 const TIP_PRESETS = [1, 5, 10, 20]
@@ -37,7 +42,12 @@ type Props = {
 
 export default async function ReviewPage({ params, searchParams }: Props) {
   if (!isSingleGuideMode()) redirect('/browse')
-  const [{ id }, sp] = await Promise.all([params, searchParams])
+  const [{ id }, sp, { locale, meta, t }] = await Promise.all([
+    params,
+    searchParams,
+    getI18n(),
+  ])
+  const r = t.review
   const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
   const showPaypal = paypalConfigured() && Boolean(paypalClientId)
 
@@ -75,13 +85,26 @@ export default async function ReviewPage({ params, searchParams }: Props) {
       .eq('reviewee_id', guideId)
       .maybeSingle<{ stars: number; body: string | null }>(),
   ])
-  const guideName = guide?.display_name ?? 'your guide'
-  const firstName = guideName.split(' ')[0]
+  const guideName = guide?.display_name ?? r.yourGuide
+  // The fallback is a phrase, not a name — splitting it would leave "your".
+  const firstName = guide?.display_name
+    ? guide.display_name.split(' ')[0]
+    : r.yourGuide
 
   // eslint-disable-next-line react-hooks/purity -- request-time clock to gate the post-tour form
   const ended = hoursUntilTourStart(booking.day, booking.end_hour, Date.now()) <= 0
   const reviewable = booking.status === 'approved' && ended
-  const when = `${formatDay(booking.day)} · ${formatHourRange(booking.start_hour, booking.end_hour)}`
+  // English keeps formatDay's exact output, as on /guide.
+  const day =
+    locale === 'en'
+      ? formatDay(booking.day)
+      : new Date(`${booking.day}T00:00:00`).toLocaleDateString(meta.intlLocale, {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })
+  const when = `${day} · ${formatHourRange(booking.start_hour, booking.end_hour)}`
 
   // The tip step opens once a thumb has landed — either just now (?thanks=)
   // or on an earlier visit (a stored review).
@@ -101,14 +124,14 @@ export default async function ReviewPage({ params, searchParams }: Props) {
         href="/guide"
         className="text-xs font-medium uppercase tracking-wider text-zinc-500 transition hover:text-zinc-900 dark:hover:text-white"
       >
-        ← Your bookings
+        {r.back}
       </Link>
 
       <h1 className="mt-6 text-3xl font-semibold tracking-tight">
-        How was your tour?
+        {r.title}
       </h1>
       <p className="mt-2 text-sm text-zinc-500">
-        {when} · with {guideName}
+        {fill(r.when, { when, name: guideName })}
       </p>
 
       {sp.error && (
@@ -118,20 +141,18 @@ export default async function ReviewPage({ params, searchParams }: Props) {
       )}
       {sp.tipped && (
         <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-          Tip received — thank you! 100% of it goes to {firstName}.
+          {fill(r.tipped, { name: firstName })}
         </p>
       )}
       {sp.thanks && !sp.tipped && (
         <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-          Thanks — your review is in.
+          {r.thanks}
         </p>
       )}
 
       {!reviewable ? (
         <div className="mt-8 rounded-2xl border border-dashed border-zinc-300 px-6 py-10 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-          {booking.status === 'approved'
-            ? 'Your tour has not finished yet — come back here afterwards to leave a review.'
-            : 'This booking is not a confirmed tour, so there is nothing to review.'}
+          {booking.status === 'approved' ? r.notFinished : r.notConfirmed}
         </div>
       ) : (
         <>
@@ -142,13 +163,13 @@ export default async function ReviewPage({ params, searchParams }: Props) {
           >
             <input type="hidden" name="booking_id" value={booking.id} />
             <p className="text-sm font-semibold">
-              {reviewed ? 'Change your rating' : 'One tap is enough'}
+              {reviewed ? r.changeRating : r.oneTap}
             </p>
             <div className="mt-3 grid grid-cols-2 gap-3">
               <SubmitButton
                 name="thumb"
                 value="up"
-                pendingLabel="Saving…"
+                pendingLabel={r.saving}
                 className={`rounded-xl border px-4 py-4 text-center text-2xl transition ${
                   currentThumb === 'up'
                     ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-500 dark:bg-emerald-950'
@@ -160,7 +181,7 @@ export default async function ReviewPage({ params, searchParams }: Props) {
               <SubmitButton
                 name="thumb"
                 value="down"
-                pendingLabel="Saving…"
+                pendingLabel={r.saving}
                 className={`rounded-xl border px-4 py-4 text-center text-2xl transition ${
                   currentThumb === 'down'
                     ? 'border-red-400 bg-red-50 dark:border-red-500 dark:bg-red-950'
@@ -171,22 +192,19 @@ export default async function ReviewPage({ params, searchParams }: Props) {
               </SubmitButton>
             </div>
             <label className="mt-4 block">
-              <span className="text-sm font-medium">A few words</span>
-              <span className="ml-1 text-xs text-zinc-500">
-                (optional, 5–50 words)
-              </span>
+              <span className="text-sm font-medium">{r.words}</span>
+              <span className="ml-1 text-xs text-zinc-500">{r.wordsHint}</span>
               <textarea
                 name="body"
                 rows={3}
                 maxLength={600}
                 defaultValue={existingReview?.body ?? undefined}
-                placeholder="What stood out — good or bad?"
+                placeholder={r.placeholder}
                 className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
               />
             </label>
             <p className="mt-3 text-xs text-zinc-500">
-              Tapping a thumb saves your review. Honest reviews — good or bad —
-              are published on {firstName}&apos;s profile.
+              {fill(r.note, { name: firstName })}
             </p>
           </form>
 
@@ -194,11 +212,10 @@ export default async function ReviewPage({ params, searchParams }: Props) {
           {reviewed && (supportConfigured() || showPaypal) && (
             <section className="mt-6 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-rose-50 p-6 dark:border-amber-900/40 dark:from-amber-950/20 dark:to-rose-950/20">
               <p className="text-sm font-semibold">
-                Want to leave {firstName} a tip?
+                {fill(r.tipTitle, { name: firstName })}
               </p>
               <p className="mt-1 mb-4 text-xs text-zinc-600 dark:text-zinc-400">
-                Totally optional — the tour stays free either way. 100% goes to{' '}
-                {firstName}.
+                {fill(r.tipBody, { name: firstName })}
               </p>
               <SupportPanel
                 kind="tip"
@@ -210,7 +227,7 @@ export default async function ReviewPage({ params, searchParams }: Props) {
                 currency={CURRENCY}
                 cardAction={startTipCheckout}
                 successHref={`/guide/review/${booking.id}?tipped=1`}
-                verb="Tip"
+                labels={t.support}
                 frame={false}
               />
             </section>

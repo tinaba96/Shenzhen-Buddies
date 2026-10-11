@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { PackageCard } from '@/components/PackageCard'
 import { galleryItems, requireGalleryItem } from '@/content/gallery'
+import { localizeGalleryItem } from '@/content/gallery-i18n'
 import { packagePrice } from '@/content/packages'
 import {
   localizedFeaturedPackage,
@@ -27,15 +28,15 @@ export default async function Home() {
   return (
     <main className="flex flex-1 flex-col">
       <Hero loggedIn={!!user} t={t} />
-      <Ticker />
+      <Ticker locale={locale} />
       <Packages locale={locale} t={t} />
       <Promise_ t={t} />
-      <Districts t={t} />
+      <Districts locale={locale} t={t} />
       <HowItWorks t={t} />
       <Audiences t={t} />
       <Testimonials t={t} />
-      <Journal t={t} />
-      <Moments t={t} />
+      <Journal locale={locale} t={t} />
+      <Moments locale={locale} t={t} />
       <PartnerBanner t={t} />
       <FinalCTA loggedIn={!!user} t={t} />
     </main>
@@ -50,7 +51,7 @@ function Hero({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
       <div className="absolute inset-0 overflow-hidden">
         <HeroImage
           name="skyline-bay-tower-night"
-          alt="Nanshan's skyline lit up at night across Shenzhen Bay, the towers mirrored in still water"
+          alt={t.home.hero.imageAlt}
           className="sb-drift h-full w-full object-cover"
         />
       </div>
@@ -70,7 +71,7 @@ function Hero({ loggedIn, t }: { loggedIn: boolean; t: Dictionary }) {
         </p>
 
         <h1 className="sb-display mt-7 max-w-4xl text-balance text-5xl leading-[1.05] drop-shadow-xl sm:text-7xl lg:text-8xl">
-          {t.home.hero.titleLead}{' '}
+          {t.home.hero.titleLead}
           <span className="sb-shine italic">{t.home.hero.titleAccent}</span>
         </h1>
 
@@ -192,23 +193,33 @@ function TrustItem({
 
 // The place-name ticker. Names are shown in Chinese and romanised together and
 // are not translated — they are the actual names of the actual places, and a
-// traveller pointing at 华强北 on a phone screen is the point.
-const TICKER = [
-  '华强北 Huaqiangbei',
-  '东门 Dongmen',
-  '蛇口 Shekou',
-  '福田 Futian',
-  '南山 Nanshan',
-  '罗湖 Luohu',
-  '莲花山 Lianhuashan',
-  '大排档 Dàpáidàng',
-  '深圳湾 Shenzhen Bay',
-  '龙岗 Longgang',
-  '宝安 Baoan',
-  '龙华 Longhua',
+// traveller pointing at 华强北 on a phone screen is the point. The characters
+// follow the reader's script, though: Simplified for English and zh-Hans,
+// Traditional for zh-Hant, and the Japanese forms (宝安, 深圳湾) for ja.
+type PlaceName = { hans: string; hant: string; ja: string }
+
+function placeName(name: PlaceName, locale: Locale): string {
+  if (locale === 'zh-Hant') return name.hant
+  if (locale === 'ja') return name.ja
+  return name.hans
+}
+
+const TICKER: { roman: string; cn: PlaceName }[] = [
+  { roman: 'Huaqiangbei', cn: { hans: '华强北', hant: '華強北', ja: '華強北' } },
+  { roman: 'Dongmen', cn: { hans: '东门', hant: '東門', ja: '東門' } },
+  { roman: 'Shekou', cn: { hans: '蛇口', hant: '蛇口', ja: '蛇口' } },
+  { roman: 'Futian', cn: { hans: '福田', hant: '福田', ja: '福田' } },
+  { roman: 'Nanshan', cn: { hans: '南山', hant: '南山', ja: '南山' } },
+  { roman: 'Luohu', cn: { hans: '罗湖', hant: '羅湖', ja: '羅湖' } },
+  { roman: 'Lianhuashan', cn: { hans: '莲花山', hant: '蓮花山', ja: '蓮花山' } },
+  { roman: 'Dàpáidàng', cn: { hans: '大排档', hant: '大排檔', ja: '大排檔' } },
+  { roman: 'Shenzhen Bay', cn: { hans: '深圳湾', hant: '深圳灣', ja: '深圳湾' } },
+  { roman: 'Longgang', cn: { hans: '龙岗', hant: '龍崗', ja: '龍崗' } },
+  { roman: 'Baoan', cn: { hans: '宝安', hant: '寶安', ja: '宝安' } },
+  { roman: 'Longhua', cn: { hans: '龙华', hant: '龍華', ja: '龍華' } },
 ]
 
-function Ticker() {
+function Ticker({ locale }: { locale: Locale }) {
   return (
     <div className="sb-marquee-host relative overflow-hidden border-y border-zinc-200 bg-zinc-950 py-3 dark:border-zinc-800">
       <div className="sb-marquee">
@@ -220,9 +231,9 @@ function Ticker() {
             aria-hidden={copy === 1}
             className="flex shrink-0 items-center gap-8 pr-8 text-xs uppercase tracking-[0.25em] text-zinc-500"
           >
-            {TICKER.map((name) => (
-              <li key={name} className="flex items-center gap-8 whitespace-nowrap">
-                {name}
+            {TICKER.map(({ roman, cn }) => (
+              <li key={roman} className="flex items-center gap-8 whitespace-nowrap">
+                {`${placeName(cn, locale)} ${roman}`}
                 <span aria-hidden className="text-amber-500/60">
                   ✦
                 </span>
@@ -272,6 +283,7 @@ async function Packages({ locale, t }: { locale: Locale; t: Dictionary }) {
           <PackageCard
             pkg={featured}
             t={t}
+            locale={locale}
             price={price}
             variant="featured"
             featuredLabel={t.home.packages.featuredLabel}
@@ -282,7 +294,7 @@ async function Packages({ locale, t }: { locale: Locale; t: Dictionary }) {
         <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {rest.map((pkg) => (
             <li key={pkg.slug} className="sb-rise">
-              <PackageCard pkg={pkg} t={t} price={price} />
+              <PackageCard pkg={pkg} t={t} locale={locale} price={price} />
             </li>
           ))}
         </ul>
@@ -385,16 +397,16 @@ function Promise_({ t }: { t: Dictionary }) {
 // live on /explore and are Wikimedia CC BY-SA files whose licence requires the
 // attribution block that sits under them there; reproducing the images here
 // would mean reproducing that block here too. Type carries the section fine.
-const DISTRICTS = [
-  { name: 'Nanshan', cn: '南山' },
-  { name: 'Futian', cn: '福田' },
-  { name: 'Luohu', cn: '罗湖' },
-  { name: "Bao'an", cn: '宝安' },
-  { name: 'Longhua', cn: '龙华' },
-  { name: 'Longgang', cn: '龙岗' },
+const DISTRICTS: { name: string; cn: PlaceName }[] = [
+  { name: 'Nanshan', cn: { hans: '南山', hant: '南山', ja: '南山' } },
+  { name: 'Futian', cn: { hans: '福田', hant: '福田', ja: '福田' } },
+  { name: 'Luohu', cn: { hans: '罗湖', hant: '羅湖', ja: '羅湖' } },
+  { name: "Bao'an", cn: { hans: '宝安', hant: '寶安', ja: '宝安' } },
+  { name: 'Longhua', cn: { hans: '龙华', hant: '龍華', ja: '龍華' } },
+  { name: 'Longgang', cn: { hans: '龙岗', hant: '龍崗', ja: '龍崗' } },
 ]
 
-function Districts({ t }: { t: Dictionary }) {
+function Districts({ locale, t }: { locale: Locale; t: Dictionary }) {
   return (
     <section className="border-b border-zinc-200 bg-zinc-950 text-white dark:border-zinc-800">
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
@@ -431,7 +443,7 @@ function Districts({ t }: { t: Dictionary }) {
                   {d.name}
                 </span>
                 <span className="text-lg text-zinc-500 transition group-hover:text-amber-400 sm:text-2xl">
-                  {d.cn}
+                  {placeName(d.cn, locale)}
                 </span>
               </Link>
             </li>
@@ -443,20 +455,12 @@ function Districts({ t }: { t: Dictionary }) {
 }
 
 function HowItWorks({ t }: { t: Dictionary }) {
+  // Alt text comes from the dictionary, one entry per photo in this order.
   const photos = [
-    {
-      src: '/gallery/bakery-bread-counter.webp',
-      alt: 'Sourdough rounds and baguettes on a Shenzhen bakery counter',
-    },
-    {
-      src: '/gallery/preserved-fruit-jars.webp',
-      alt: 'Clip-top jars of kumquats and plums preserved in syrup',
-    },
-    {
-      src: '/gallery/skyline-blue-towers-night.webp',
-      alt: 'Shenzhen towers lit blue at night, seen from street level',
-    },
-  ]
+    '/gallery/bakery-bread-counter.webp',
+    '/gallery/preserved-fruit-jars.webp',
+    '/gallery/skyline-blue-towers-night.webp',
+  ].map((src, i) => ({ src, alt: t.home.howItWorks.photoAlts[i] }))
 
   return (
     <section className="relative border-b border-zinc-200 dark:border-zinc-800">
@@ -520,7 +524,7 @@ function Audiences({ t }: { t: Dictionary }) {
         <AudienceCard
           tone="amber"
           photo="/gallery/night-market-skewers-stall.webp"
-          alt="A Shenzhen night market stall laid with trays of skewered insects"
+          alt={t.home.audiences.travelerAlt}
           icon={
             <>
               <path d="M3 7l9-4 9 4" />
@@ -535,7 +539,7 @@ function Audiences({ t }: { t: Dictionary }) {
         <AudienceCard
           tone="rose"
           photo="/gallery/chicken-rice-table.webp"
-          alt="A shared table of chicken rice, noodles and fried tofu skin in Shenzhen"
+          alt={t.home.audiences.localAlt}
           icon={
             <>
               <path d="M12 21s-7-7-7-12a7 7 0 1 1 14 0c0 5-7 12-7 12z" />
@@ -660,9 +664,12 @@ function Testimonials({ t }: { t: Dictionary }) {
   )
 }
 
-function Journal({ t }: { t: Dictionary }) {
+function Journal({ locale, t }: { locale: Locale; t: Dictionary }) {
   const posts = publishedPosts().slice(0, 3)
   if (posts.length === 0) return null
+  // Post titles and excerpts are English-only. Marking them lets a screen
+  // reader switch voice instead of reading English with Japanese phonetics.
+  const postLang = locale === 'en' ? undefined : 'en'
 
   return (
     <section className="border-b border-zinc-200 dark:border-zinc-800">
@@ -691,7 +698,10 @@ function Journal({ t }: { t: Dictionary }) {
         <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => {
             const hero = post.heroGalleryId
-              ? requireGalleryItem(post.heroGalleryId, 'home/journal')
+              ? localizeGalleryItem(
+                  requireGalleryItem(post.heroGalleryId, 'home/journal'),
+                  locale,
+                )
               : null
             return (
               <li key={post.slug}>
@@ -714,10 +724,13 @@ function Journal({ t }: { t: Dictionary }) {
                     <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
                       {post.publishedAt}
                     </p>
-                    <h3 className="sb-display mt-2 text-2xl leading-snug">
+                    <h3 lang={postLang} className="sb-display mt-2 text-2xl leading-snug">
                       {post.title}
                     </h3>
-                    <p className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400">
+                    <p
+                      lang={postLang}
+                      className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400"
+                    >
                       {post.excerpt}
                     </p>
                     <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium transition group-hover:gap-2.5">
@@ -735,8 +748,11 @@ function Journal({ t }: { t: Dictionary }) {
   )
 }
 
-function Moments({ t }: { t: Dictionary }) {
-  const shots = galleryItems.filter((i) => i.kind === 'image').slice(0, 8)
+function Moments({ locale, t }: { locale: Locale; t: Dictionary }) {
+  const shots = galleryItems
+    .filter((i) => i.kind === 'image')
+    .slice(0, 8)
+    .map((i) => localizeGalleryItem(i, locale))
 
   return (
     <section className="border-b border-zinc-200 bg-zinc-50/60 dark:border-zinc-800 dark:bg-zinc-950/40">
@@ -808,7 +824,7 @@ function PartnerBanner({ t }: { t: Dictionary }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/splitwhom-banner.png"
-            alt="SplitWhom — split shared expenses with friends"
+            alt={t.partner.bannerAlt}
             loading="lazy"
             className="w-full transition duration-500 group-hover:scale-[1.02]"
           />

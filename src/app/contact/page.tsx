@@ -3,51 +3,61 @@ import type { Metadata } from 'next'
 import { CONTACT_EMAIL, DEFAULT_OG_IMAGE, WECHAT_ID, isSingleGuideMode, isWhatsAppConfigured } from '@/lib/config'
 import { HeroImage } from '@/components/HeroImage'
 import { WeChatId } from '@/components/WeChatId'
+import { getI18n } from '@/i18n/server'
+import type { Dictionary } from '@/i18n'
 
-export const metadata: Metadata = {
-  title: 'Contact — Shenzhen Buddies',
-  description:
-    'Get in touch with the Shenzhen Buddies team on WhatsApp, WeChat or email — questions, feedback, partnerships, press, or trust and safety.',
-  alternates: { canonical: '/contact' },
-  // Declared explicitly: the root layout sets an openGraph block, and
-  // metadata merges per key — so a page that omits this inherits the site's
-  // generic title, description and an og:url pointing at the homepage.
-  openGraph: {
-    title: 'Contact — Shenzhen Buddies',
-    description: 'Get in touch with the Shenzhen Buddies team on WhatsApp, WeChat or email — questions, feedback, partnerships, press, or trust and safety.',
-    url: '/contact',
-    // Required alongside any openGraph object — see the note in about/page.tsx.
-    images: [DEFAULT_OG_IMAGE],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = (await getI18n()).t.seo.contact
+  return {
+    title: seo.title,
+    description: seo.description,
+    alternates: { canonical: '/contact' },
+    // Declared explicitly: the root layout sets an openGraph block, and
+    // metadata merges per key — so a page that omits this inherits the site's
+    // generic title, description and an og:url pointing at the homepage.
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: '/contact',
+      // Required alongside any openGraph object — see the note in about/page.tsx.
+      images: [DEFAULT_OG_IMAGE],
+    },
+    // Its own block, or twitter keeps the root layout's site-wide title and
+    // description while og: says something else. twitter:image still comes
+    // from the og image.
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.title,
+      description: seo.description,
+    },
+  }
 }
 
 
 type ChannelIconName = 'envelope' | 'guide' | 'megaphone' | 'shield' | 'whatsapp' | 'wechat'
 
+type ChannelId = keyof Dictionary['contact']['channels']
+
 type Channel = {
-  id: string
-  title: string
-  description: string
+  id: ChannelId
   icon: ChannelIconName
   tone: 'amber' | 'rose' | 'emerald' | 'sky' | 'lime'
 } & (
-  | { kind: 'link'; ctaLabel: string; href: string }
+  | { kind: 'link'; href: string }
   // Opens in a new tab and must not be prefetched: the href is a redirect
   // to WhatsApp, and the number behind it stays out of the page on purpose.
-  | { kind: 'external'; ctaLabel: string; href: string }
+  | { kind: 'external'; href: string }
   // WeChat has no web link to add a contact, so the card shows the ID with
   // a copy button instead of a button that goes somewhere.
   | { kind: 'wechat'; wechatId: string }
 )
 
+// Titles, descriptions and button labels live in t.contact.channels, keyed by
+// id.
 const CHANNELS: Channel[] = [
   {
     id: 'email',
     kind: 'link',
-    title: 'Say hello',
-    description:
-      'Questions, feedback, partnership ideas, or just a friendly hi. We read every message.',
-    ctaLabel: 'Email us',
     href: `mailto:${CONTACT_EMAIL}`,
     icon: 'envelope',
     tone: 'amber',
@@ -55,10 +65,6 @@ const CHANNELS: Channel[] = [
   {
     id: 'whatsapp',
     kind: 'external',
-    title: 'WhatsApp',
-    description:
-      'The quickest way to reach us before or during your trip. Message us and we reply from Shenzhen, usually the same day.',
-    ctaLabel: 'Chat on WhatsApp',
     href: '/whatsapp',
     icon: 'whatsapp',
     tone: 'emerald',
@@ -66,9 +72,6 @@ const CHANNELS: Channel[] = [
   {
     id: 'wechat',
     kind: 'wechat',
-    title: 'WeChat',
-    description:
-      'Already on WeChat? Add our founder Bryan by ID and send a quick hello so we know who you are.',
     wechatId: WECHAT_ID,
     icon: 'wechat',
     tone: 'lime',
@@ -76,10 +79,6 @@ const CHANNELS: Channel[] = [
   {
     id: 'guide',
     kind: 'link',
-    title: 'Become a guide',
-    description:
-      'Living in Shenzhen and want to host visitors? Apply and we’ll fast-track your profile review.',
-    ctaLabel: 'Apply',
     href: '/signup?as=guide',
     icon: 'guide',
     tone: 'rose',
@@ -87,10 +86,6 @@ const CHANNELS: Channel[] = [
   {
     id: 'press',
     kind: 'link',
-    title: 'Press',
-    description:
-      'Working on a story? We have founder bios, screenshots, and stats ready to share.',
-    ctaLabel: 'Press kit',
     href: `mailto:${CONTACT_EMAIL}`,
     icon: 'megaphone',
     tone: 'sky',
@@ -98,24 +93,22 @@ const CHANNELS: Channel[] = [
   {
     id: 'safety',
     kind: 'link',
-    title: 'Safety',
-    description:
-      'Concerned about another user? Report it from their profile, or email our trust & safety team.',
-    ctaLabel: 'Safety contact',
     href: `mailto:${CONTACT_EMAIL}`,
     icon: 'shield',
     tone: 'emerald',
   },
 ]
 
-const FACTS = [
-  { label: 'Company', value: 'Tensai Tech Inc.' },
-  { label: 'Founded', value: '2026 · Toronto + Shenzhen' },
-  { label: 'Team', value: 'Bryan Wang (CEO) · Takahiro Inaba (CTO)' },
-  { label: 'Stage', value: 'Pilot — Shenzhen first' },
-]
-
-export default function ContactPage() {
+export default async function ContactPage() {
+  const { t } = await getI18n()
+  const copy = t.contact
+  // Company and team names are proper nouns and stay as written.
+  const facts = [
+    { label: copy.facts.company, value: 'Tensai Tech Inc.' },
+    { label: copy.facts.founded, value: copy.facts.foundedValue },
+    { label: copy.facts.team, value: 'Bryan Wang (CEO) · Takahiro Inaba (CTO)' },
+    { label: copy.facts.stage, value: copy.facts.stageValue },
+  ]
   // Beta: hidden, not removed — same rule as the marketplace and the homepage
   // hero's guide CTA. The card says "Apply", but there is no application:
   // signup ignores ?as=guide and profile/actions.ts hands every new account
@@ -132,7 +125,7 @@ export default function ContactPage() {
       <section className="relative overflow-hidden">
         <HeroImage
           name="skyline-blue-towers-night"
-          alt="Shenzhen at night"
+          alt={copy.hero.imageAlt}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/45 to-black/75" />
@@ -145,74 +138,80 @@ export default function ContactPage() {
         />
         <div className="relative mx-auto max-w-4xl px-6 py-28 text-center text-white sm:py-36">
           <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-white backdrop-blur">
-            Get in touch
+            {copy.hero.kicker}
           </p>
           <h1 className="mt-6 text-balance text-5xl font-semibold tracking-tight drop-shadow-lg sm:text-7xl">
-            We&apos;d{' '}
+            {copy.hero.titleLead}
             <span className="bg-gradient-to-r from-amber-300 to-rose-300 bg-clip-text text-transparent">
-              love
-            </span>{' '}
-            to hear from you.
+              {copy.hero.titleAccent}
+            </span>
+            {copy.hero.titleTail}
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-pretty text-lg text-white/90 drop-shadow sm:text-xl">
-            Two humans on the other end. We try to reply within two business
-            days.
+            {copy.hero.body}
           </p>
         </div>
       </section>
 
       <section className="border-b border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto grid max-w-5xl gap-5 px-6 py-20 sm:grid-cols-2">
-          {channels.map((c) => (
-            <article
-              key={c.id}
-              id={c.id}
-              className="group scroll-mt-24 flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <span
-                className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl ${
-                  c.tone === 'amber'
-                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
-                    : c.tone === 'rose'
-                    ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
-                    : c.tone === 'sky'
-                    ? 'bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300'
-                    : c.tone === 'lime'
-                    ? 'bg-lime-100 text-lime-700 dark:bg-lime-950 dark:text-lime-300'
-                    : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                }`}
+          {channels.map((c) => {
+            const text = copy.channels[c.id]
+            return (
+              <article
+                key={c.id}
+                id={c.id}
+                className="group scroll-mt-24 flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
               >
-                <ChannelIcon name={c.icon} />
-              </span>
-              <h2 className="mt-5 text-xl font-semibold">{c.title}</h2>
-              <p className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400">
-                {c.description}
-              </p>
-              {c.kind === 'wechat' ? (
-                <div className="mt-5">
-                  <WeChatId id={c.wechatId} />
-                </div>
-              ) : c.kind === 'external' ? (
-                <a
-                  href={c.href}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="mt-5 inline-flex w-fit items-center gap-1 rounded-full bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                <span
+                  className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl ${
+                    c.tone === 'amber'
+                      ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                      : c.tone === 'rose'
+                      ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                      : c.tone === 'sky'
+                      ? 'bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300'
+                      : c.tone === 'lime'
+                      ? 'bg-lime-100 text-lime-700 dark:bg-lime-950 dark:text-lime-300'
+                      : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                  }`}
                 >
-                  {c.ctaLabel}
-                  <CtaArrow />
-                </a>
-              ) : (
-                <Link
-                  href={c.href}
-                  className="mt-5 inline-flex w-fit items-center gap-1 rounded-full bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-                >
-                  {c.ctaLabel}
-                  <CtaArrow />
-                </Link>
-              )}
-            </article>
-          ))}
+                  <ChannelIcon name={c.icon} />
+                </span>
+                <h2 className="mt-5 text-xl font-semibold">{text.title}</h2>
+                <p className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400">
+                  {text.description}
+                </p>
+                {c.kind === 'wechat' ? (
+                  <div className="mt-5">
+                    <WeChatId
+                      id={c.wechatId}
+                      copyLabel={copy.channels.wechat.copy}
+                      copiedLabel={copy.channels.wechat.copied}
+                    />
+                  </div>
+                ) : c.kind === 'external' ? (
+                  <a
+                    href={c.href}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="mt-5 inline-flex w-fit items-center gap-1 rounded-full bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                  >
+                    {'cta' in text ? text.cta : null}
+                    <CtaArrow />
+                  </a>
+                ) : (
+                  <Link
+                    href={c.href}
+                    className="mt-5 inline-flex w-fit items-center gap-1 rounded-full bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+                  >
+                    {'cta' in text ? text.cta : null}
+                    <CtaArrow />
+                  </Link>
+                )}
+              </article>
+            )
+          })}
         </div>
       </section>
 
@@ -220,14 +219,14 @@ export default function ContactPage() {
         <div className="mx-auto max-w-5xl px-6 py-20">
           <div className="text-center">
             <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-              The facts
+              {copy.facts.kicker}
             </p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-              In case you wondered.
+              {copy.facts.title}
             </h2>
           </div>
           <dl className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {FACTS.map((f) => (
+            {facts.map((f) => (
               <div
                 key={f.label}
                 className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
@@ -248,23 +247,23 @@ export default function ContactPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-amber-100 via-rose-50 to-rose-100 dark:from-amber-950/40 dark:via-zinc-900 dark:to-rose-950/40" />
         <div className="relative mx-auto max-w-3xl px-6 py-20 text-center">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Or just sign up and explore.
+            {copy.cta.title}
           </h2>
           <p className="mt-3 text-zinc-700 dark:text-zinc-300">
-            The fastest way to understand the product is to use it.
+            {copy.cta.body}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               href="/signup"
               className="rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-black/10 transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
-              Join the pilot
+              {copy.cta.join}
             </Link>
             <Link
               href="/explore"
               className="rounded-full border border-zinc-300 bg-white/80 px-6 py-3 text-sm font-medium backdrop-blur transition hover:bg-white dark:border-zinc-700 dark:bg-zinc-900/60 dark:hover:bg-zinc-900"
             >
-              Explore Shenzhen
+              {copy.cta.explore}
             </Link>
           </div>
         </div>

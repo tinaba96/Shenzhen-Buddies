@@ -10,12 +10,14 @@ export async function updatePassword(formData: FormData) {
 
   if (password.length < 8) {
     redirect(
-      `/reset-password?error=${encodeURIComponent('Password must be at least 8 characters.')}`,
+      // Codes, not sentences: the page words them in the visitor's language
+      // (src/lib/auth-errors.ts).
+      '/reset-password?error=short',
     )
   }
   if (password !== confirm) {
     redirect(
-      `/reset-password?error=${encodeURIComponent('Passwords do not match.')}`,
+      '/reset-password?error=mismatch',
     )
   }
 
@@ -27,7 +29,7 @@ export async function updatePassword(formData: FormData) {
   } = await supabase.auth.getUser()
   if (!user) {
     redirect(
-      `/forgot-password?error=${encodeURIComponent('Your reset link expired. Request a new one.')}`,
+      '/forgot-password?error=expired',
     )
   }
 

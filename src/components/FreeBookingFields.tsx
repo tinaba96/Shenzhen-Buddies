@@ -9,6 +9,16 @@ import {
 
 type StartOption = { hour: number; maxDuration: number }
 
+// Server-translated labels; {n} is filled here so the client bundle never
+// imports the dictionaries.
+type Labels = {
+  tourLength: string
+  hourTour: string
+  free: string
+  startTime: string
+  hours: string
+}
+
 // The free-pilot replacement for BookingFields: instead of start + end time
 // dropdowns, the tourist picks one of the fixed free lengths and a start time.
 // Same wire contract as BookingFields — start_hour + a hidden duration — so
@@ -18,8 +28,10 @@ type StartOption = { hour: number; maxDuration: number }
 export function FreeBookingFields({
   startOptions,
   lengths = FREE_TOUR_LENGTHS,
+  labels: t,
 }: {
   startOptions: StartOption[]
+  labels: Labels
   // The lengths to show. A package sold at one length only (its `hours`)
   // narrows this to that one; otherwise every free length is on offer.
   lengths?: number[]
@@ -50,7 +62,7 @@ export function FreeBookingFields({
       <input type="hidden" name="start_hour" value={effectiveStart} />
 
       <div>
-        <span className="text-sm font-medium">Tour length</span>
+        <span className="text-sm font-medium">{t.tourLength}</span>
         <div className="mt-1.5 grid grid-cols-2 gap-3">
           {lengths.map((l) => {
             const selected = l === length
@@ -69,12 +81,12 @@ export function FreeBookingFields({
                 }`}
               >
                 <span className="block text-base font-semibold">
-                  {l} hour tour
+                  {t.hourTour.replace('{n}', String(l))}
                 </span>
                 <span
                   className={`block text-xs ${selected ? 'opacity-80' : 'text-emerald-600 dark:text-emerald-400'}`}
                 >
-                  Free
+                  {t.free}
                 </span>
               </button>
             )
@@ -83,7 +95,7 @@ export function FreeBookingFields({
       </div>
 
       <label className="block">
-        <span className="text-sm font-medium">Start time</span>
+        <span className="text-sm font-medium">{t.startTime}</span>
         <select
           value={effectiveStart}
           onChange={(e) => setStartHour(Number(e.target.value))}
@@ -106,10 +118,10 @@ export function FreeBookingFields({
             <path d="m12 5 7 7-7 7" />
           </svg>
           <span className="font-semibold">{formatHour(endHour)}</span>
-          <span className="text-zinc-500">· {length} hours</span>
+          <span className="text-zinc-500">· {t.hours.replace('{n}', String(length))}</span>
         </div>
         <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
-          Free
+          {t.free}
         </span>
       </div>
     </div>

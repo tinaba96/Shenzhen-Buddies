@@ -32,7 +32,8 @@ import {
   type TimeRange,
 } from '@/lib/booking'
 import { bookingNoteFor } from '@/content/packages'
-import { localizedPackage } from '@/content/packages-i18n'
+import { localizedCn, localizedPackage } from '@/content/packages-i18n'
+import { fill, type Dictionary } from '@/i18n'
 import { getI18n } from '@/i18n/server'
 import { DEFAULT_OG_IMAGE, isSingleGuideMode, officialGuideId } from '@/lib/config'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
@@ -54,21 +55,29 @@ import { AvailabilityEditor } from './AvailabilityEditor'
 // its real address, and a <title> identical to the homepage's. A self-referential
 // canonical is the whole point of the tag; pointing it elsewhere is an explicit
 // instruction to index that page instead of this one.
-const TITLE = 'Book a free tour with a local in Shenzhen — Shenzhen Buddies'
-const DESCRIPTION =
-  'Pick a day and spend two or three hours with someone who actually lives here — no coach, no script, no fixed route. Free during our pilot, booked direct.'
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: '/guide' },
-  openGraph: {
-    title: TITLE,
-    description: DESCRIPTION,
-    url: '/guide',
-    // Required alongside any openGraph object — see the note in about/page.tsx.
-    images: [DEFAULT_OG_IMAGE],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = (await getI18n()).t.seo.guide
+  return {
+    title: seo.title,
+    description: seo.description,
+    alternates: { canonical: '/guide' },
+    openGraph: {
+      title: seo.title,
+      description: seo.description,
+      url: '/guide',
+      // Required alongside any openGraph object — see the note in about/page.tsx.
+      images: [DEFAULT_OG_IMAGE],
+    },
+    // Its own block, or twitter keeps the root layout's site-wide title and
+    // description while og: says something else. twitter:image still comes
+    // from the og image.
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.title,
+      description: seo.description,
+    },
+  }
 }
 
 type Props = {
@@ -108,42 +117,40 @@ type GuideProfile = {
 const DEFAULT_COVER =
   '/hero/skyline-tower-walkway-night.webp'
 
-const STATUS_STYLES: Record<BookingStatus, { label: string; className: string }> = {
+// Labels live in the dictionary (booking.status); only the colours are here.
+const STATUS_STYLES: Record<BookingStatus, { className: string }> = {
   pending_payment: {
-    label: 'Payment incomplete',
     className: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
   },
   pending: {
-    label: 'Awaiting confirmation (within 3 business days)',
     className:
       'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
   },
   approved: {
-    label: 'Confirmed',
     className:
       'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
   },
   rejected: {
-    label: 'Declined',
     className: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400',
   },
   cancelled: {
-    label: 'Cancelled',
     className: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
   },
 }
 
+// Labels are translated by position (booking.ideas); `key` is the stable
+// English id used as the React key.
 const IDEAS = [
   {
-    label: 'Street food & dim sum',
+    key: 'Street food & dim sum',
     img: '/gallery/night-market-skewers-stall.webp',
   },
   {
-    label: 'Electronics & maker markets',
+    key: 'Electronics & maker markets',
     img: '/gallery/maker-desk-dev-boards.webp',
   },
   {
-    label: 'Skyline & city views',
+    key: 'Skyline & city views',
     img: '/gallery/skyline-blue-towers-night.webp',
   },
   // Was 'Parks & easy hikes'. Relabelled to match the photo library — there is
@@ -151,7 +158,7 @@ const IDEAS = [
   // else is the stock-photo problem in miniature. Change it back the day a
   // real park photo lands.
   {
-    label: 'Bakeries & coffee stops',
+    key: 'Bakeries & coffee stops',
     img: '/gallery/bakery-bread-counter.webp',
   },
 ]
@@ -160,7 +167,19 @@ export default async function GuidePage({ searchParams }: Props) {
   if (!isSingleGuideMode()) redirect('/browse')
 
   const sp = await searchParams
-  const { locale, t: i18n } = await getI18n()
+  const { locale, meta, t: i18n } = await getI18n()
+  const b = i18n.booking
+  // English keeps formatDay's exact output; other locales get the same
+  // fields in their own order and script ("2026年6月10日(水)").
+  const localDay = (d: string) =>
+    locale === 'en'
+      ? formatDay(d)
+      : new Date(`${d}T00:00:00`).toLocaleDateString(meta.intlLocale, {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })
   // An unknown ?package= is ignored rather than 404ing: the booking page still
   // works perfectly without one, and a stale link from an old campaign should
   // land on a usable form, not an error.
@@ -212,9 +231,9 @@ export default async function GuidePage({ searchParams }: Props) {
   if (!guide || guideHidden) {
     return (
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center px-4 py-24 text-center">
-        <h1 className="text-2xl font-semibold">Our guide is almost ready</h1>
+        <h1 className="text-2xl font-semibold">{b.notReadyTitle}</h1>
         <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
-          We&apos;re setting things up — please check back soon.
+          {b.notReadyBody}
         </p>
       </main>
     )
@@ -396,7 +415,7 @@ export default async function GuidePage({ searchParams }: Props) {
           src={
             avatarPublicUrl(guide.cover_path, guide.updated_at) ?? DEFAULT_COVER
           }
-          alt={`${guide.display_name}'s cover`}
+          alt={fill(b.coverAlt, { name: guide.display_name })}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/55 to-black/85" />
@@ -414,7 +433,7 @@ export default async function GuidePage({ searchParams }: Props) {
                 href="/profile"
                 className="rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-sm text-white backdrop-blur transition hover:bg-white/20"
               >
-                Your profile
+                {i18n.common.yourProfile}
               </Link>
             )}
           </div>
@@ -428,26 +447,32 @@ export default async function GuidePage({ searchParams }: Props) {
             />
             <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-wider backdrop-blur">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-              Your local guide
+              {b.localGuide}
             </span>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight drop-shadow-lg sm:text-4xl">
               {guide.display_name}
             </h1>
             <p className="mt-1 text-sm text-white/85">
-              📍 {guide.city} · with Shenzhen Buddies
+              📍 {fill(b.withBrand, { city: guide.city })}
             </p>
 
             {reviewCount > 0 ? (
               <div className="mt-3 flex items-center gap-2 text-sm">
-                <StarRating value={avgStars} size={16} />
+                <StarRating
+                  value={avgStars}
+                  size={16}
+                  label={fill(i18n.stars.outOf, { value: avgStars.toFixed(1) })}
+                />
                 <span className="text-white/90">
-                  {avgStars.toFixed(1)} · {reviewCount}{' '}
-                  {reviewCount === 1 ? 'review' : 'reviews'}
+                  {avgStars.toFixed(1)} ·{' '}
+                  {fill(reviewCount === 1 ? b.reviewOne : b.reviewMany, {
+                    n: reviewCount,
+                  })}
                 </span>
               </div>
             ) : (
               <span className="mt-3 rounded-full bg-white/15 px-3 py-0.5 text-xs font-medium backdrop-blur">
-                ✨ New guide — be among the first to explore with {firstName}
+                ✨ {fill(b.newGuide, { name: firstName })}
               </span>
             )}
 
@@ -468,7 +493,7 @@ export default async function GuidePage({ searchParams }: Props) {
               href={`/u/${guide.id}`}
               className="mt-4 text-sm text-white/90 underline underline-offset-2 transition hover:text-white"
             >
-              Full profile &amp; reviews
+              {b.fullProfile}
             </Link>
           </div>
         </div>
@@ -480,25 +505,28 @@ export default async function GuidePage({ searchParams }: Props) {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Highlight
               icon="🗺️"
-              title="A real local"
-              body={`Spend the day with ${firstName}, not a tour script.`}
+              title={b.highlights.localTitle}
+              body={fill(b.highlights.localBody, { name: firstName })}
             />
             <Highlight
               icon="💬"
               title={
                 guide.languages.length > 0
-                  ? `Speaks ${guide.languages.length} ${guide.languages.length === 1 ? 'language' : 'languages'}`
-                  : 'Easy to talk to'
+                  ? fill(
+                      guide.languages.length === 1
+                        ? b.highlights.speaksOne
+                        : b.highlights.speaksMany,
+                      { n: guide.languages.length },
+                    )
+                  : b.highlights.easyTalk
               }
-              body="Match the day to how you like to explore."
+              body={b.highlights.talkBody}
             />
             <Highlight
               icon="🛟"
-              title={FREE_TOURS ? 'Free right now' : 'Risk-free'}
+              title={FREE_TOURS ? b.highlights.freeTitle : b.highlights.riskFreeTitle}
               body={
-                FREE_TOURS
-                  ? 'Tours cost nothing during our pilot. Really.'
-                  : 'Full refund if we can’t confirm your day.'
+                FREE_TOURS ? b.highlights.freeBody : b.highlights.riskFreeBody
               }
             />
           </div>
@@ -507,15 +535,12 @@ export default async function GuidePage({ searchParams }: Props) {
         {/* Banners */}
         {(sp.requested || sp.paid) && (
           <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-            {sp.paid
-              ? "Payment received! Your request is in — we'll confirm by email within 3 business days. If we can't confirm, you're fully refunded."
-              : "Request sent! We'll confirm by email within 3 business days."}
+            {sp.paid ? b.banners.paid : b.banners.requested}
           </p>
         )}
         {sp.payment_cancelled && (
           <p className="mt-6 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-            Payment cancelled — nothing was charged. You can pick a slot and try
-            again.
+            {b.banners.paymentCancelled}
           </p>
         )}
         {(sp.avail_saved || sp.avail_deleted) && (
@@ -532,12 +557,14 @@ export default async function GuidePage({ searchParams }: Props) {
         )}
         {sp.cancelled && (
           <p className="mt-6 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-            Booking cancelled.{' '}
+            {b.banners.cancelled}
             {Number(sp.refund_cents) > 0
-              ? `${formatMoney(Number(sp.refund_cents))} will be refunded within a few business days.`
+              ? fill(b.banners.refund, {
+                  amount: formatMoney(Number(sp.refund_cents)),
+                })
               : FREE_TOURS
-                ? 'The day is open again if you change your mind.'
-                : 'No refund applies under the cancellation policy.'}
+                ? b.banners.reopened
+                : b.banners.noRefund}
           </p>
         )}
         {sp.error && (
@@ -548,7 +575,9 @@ export default async function GuidePage({ searchParams }: Props) {
 
         {/* About the guide */}
         <section className="mt-6 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="text-lg font-semibold">About {firstName}</h2>
+          <h2 className="text-lg font-semibold">
+            {fill(b.about, { name: firstName })}
+          </h2>
           {guide.bio && (
             <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
               {guide.bio}
@@ -558,10 +587,10 @@ export default async function GuidePage({ searchParams }: Props) {
             guide.languages.length > 0 ||
             guide.personality_traits.length > 0) && (
             <div className="mt-6 grid gap-5 sm:grid-cols-3">
-              <InterestGroup label="Hobbies" items={guide.hobbies} tone="amber" />
-              <InterestGroup label="Languages" items={guide.languages} tone="sky" />
+              <InterestGroup label={b.hobbies} items={guide.hobbies} tone="amber" />
+              <InterestGroup label={b.languages} items={guide.languages} tone="sky" />
               <InterestGroup
-                label="Personality"
+                label={b.personality}
                 items={guide.personality_traits}
                 tone="rose"
               />
@@ -572,25 +601,25 @@ export default async function GuidePage({ searchParams }: Props) {
         {/* Ideas for your day */}
         {!isOfficialGuide && (
           <section className="mt-8">
-            <h2 className="text-xl font-semibold">Ideas for your day</h2>
+            <h2 className="text-xl font-semibold">{b.ideasTitle}</h2>
             <p className="mt-1 text-sm text-zinc-500">
-              {`A few ways ${firstName} can show you around — tell them what you're into, and they'll shape the day with you.`}
+              {fill(b.ideasBody, { name: firstName })}
             </p>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {IDEAS.map((idea) => (
+              {IDEAS.map((idea, i) => (
                 <div
-                  key={idea.label}
+                  key={idea.key}
                   className="group relative aspect-[3/4] overflow-hidden rounded-2xl border border-zinc-200 shadow-sm dark:border-zinc-800"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={idea.img}
-                    alt={idea.label}
+                    alt={b.ideas[i]}
                     className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                   <p className="absolute bottom-2 left-2 right-2 text-xs font-medium leading-tight text-white drop-shadow">
-                    {idea.label}
+                    {b.ideas[i]}
                   </p>
                 </div>
               ))}
@@ -618,7 +647,7 @@ export default async function GuidePage({ searchParams }: Props) {
                   <p className="mt-0.5 truncate text-base font-semibold">
                     {selectedPackage.title}{' '}
                     <span className="font-normal text-zinc-500">
-                      {selectedPackage.cn}
+                      {localizedCn(selectedPackage, locale)}
                     </span>
                   </p>
                   <p className="mt-1 text-xs text-zinc-500">
@@ -649,84 +678,77 @@ export default async function GuidePage({ searchParams }: Props) {
             </div>
           )}
 
-          <h2 className="text-xl font-semibold">Book a day together</h2>
+          <h2 className="text-xl font-semibold">{b.bookTitle}</h2>
           <p className="mt-1 text-sm text-zinc-500">
-            {FREE_TOURS ? (
-              <>
-                Tours are free during our pilot —{' '}
-                {selectedPackage?.hours
-                  ? `this one is a ${selectedPackage.hours} hour tour`
-                  : 'pick a 2 or 3 hour tour'}
-                , no payment, no card. One free tour per person at a time, so
-                everyone gets a turn. Request a day and we confirm by email.
-              </>
-            ) : (
-              <>
-                Tours run from {MIN_BOOKING_HOURS} to {MAX_BOOKING_HOURS} hours
-                at {formatMoney(HOURLY_RATE_CENTS)}/hour (
-                {formatMoney(amountCentsForHours(MIN_BOOKING_HOURS))}–
-                {formatMoney(amountCentsForHours(MAX_BOOKING_HOURS))}). You pay
-                when you book; if we can&apos;t confirm, you&apos;re fully
-                refunded.
-              </>
-            )}
+            {FREE_TOURS
+              ? selectedPackage?.hours
+                ? fill(b.introFreeFixed, { n: selectedPackage.hours })
+                : b.introFreeChoice
+              : fill(b.introPaid, {
+                  min: MIN_BOOKING_HOURS,
+                  max: MAX_BOOKING_HOURS,
+                  rate: formatMoney(HOURLY_RATE_CENTS),
+                  low: formatMoney(amountCentsForHours(MIN_BOOKING_HOURS)),
+                  high: formatMoney(amountCentsForHours(MAX_BOOKING_HOURS)),
+                })}
           </p>
 
           {user && !isTourist ? (
             <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 px-6 py-8 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-              Booking is open to tourists.{' '}
+              {b.touristsOnly}
               {!myProfile && (
                 <>
                   <Link href="/profile" className="underline underline-offset-2">
-                    Create your profile
-                  </Link>{' '}
-                  as a tourist to request a day.
+                    {b.createProfileLink}
+                  </Link>
+                  {b.createProfileSuffix}
                 </>
               )}
             </div>
           ) : myLiveBooking?.status === 'pending_payment' ? (
             <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-6 py-8 text-center text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
-              You have a checkout in progress for{' '}
+              {b.checkout.prefix}
               <span className="font-medium">
-                {formatDay(myLiveBooking.day)},{' '}
-                {formatHourRange(myLiveBooking.start_hour, myLiveBooking.end_hour)}
+                {fill(b.dateTime, {
+                  date: localDay(myLiveBooking.day),
+                  time: formatHourRange(myLiveBooking.start_hour, myLiveBooking.end_hour),
+                })}
               </span>
-              . It&apos;s one booking per person at a time, so{' '}
+              {b.checkout.middle}
               <Link
                 href={`/guide/pay/${myLiveBooking.id}`}
                 className="underline underline-offset-2"
               >
-                finish paying
-              </Link>{' '}
-              or{' '}
+                {b.checkout.finish}
+              </Link>
+              {b.checkout.or}
               <Link
                 href={`/guide/cancel?day=${myLiveBooking.day}`}
                 className="underline underline-offset-2"
               >
-                release it
-              </Link>{' '}
-              to pick a different time.
+                {b.checkout.release}
+              </Link>
+              {b.checkout.suffix}
             </div>
           ) : myLiveBooking ? (
             <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-6 py-8 text-center text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
-              You already have a tour booked for{' '}
+              {b.live.prefix}
               <span className="font-medium">
-                {formatDay(myLiveBooking.day)},{' '}
-                {formatHourRange(myLiveBooking.start_hour, myLiveBooking.end_hour)}
+                {fill(b.dateTime, {
+                  date: localDay(myLiveBooking.day),
+                  time: formatHourRange(myLiveBooking.start_hour, myLiveBooking.end_hour),
+                })}
               </span>
-              . Tours are free, so it&apos;s one booking per person at a time
-              and everyone gets a turn — once it&apos;s done you&apos;re welcome
-              to book another. Need a different day? Cancel it under
-              &ldquo;Your bookings&rdquo; below first.
+              {b.live.suffix}
             </div>
           ) : dayOptions.length === 0 ? (
             <div className="mt-4 rounded-2xl border border-dashed border-zinc-300 px-6 py-12 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-              No open dates right now — please check back soon.
+              {b.noDates}
             </div>
           ) : (
             <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
               {/* Day picker */}
-              <p className="text-sm font-medium">Available days</p>
+              <p className="text-sm font-medium">{b.availableDays}</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {dayOptions.map((d) => (
                   <Link
@@ -738,7 +760,7 @@ export default async function GuidePage({ searchParams }: Props) {
                         : 'rounded-full border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800'
                     }
                   >
-                    {formatDay(d.day)}
+                    {localDay(d.day)}
                   </Link>
                 ))}
               </div>
@@ -746,17 +768,21 @@ export default async function GuidePage({ searchParams }: Props) {
               {selectedDay && (
                 <>
                   <p className="mt-4 text-xs text-zinc-500">
-                    {guide.display_name}&apos;s hours on{' '}
-                    {formatDay(selectedDay.day)}:{' '}
-                    {selectedDay.segments
-                      .map((s) => formatHourRange(s.start, s.end))
-                      .join(' · ')}
+                    {fill(b.hoursOn, {
+                      name: guide.display_name,
+                      date: localDay(selectedDay.day),
+                      ranges: selectedDay.segments
+                        .map((s) => formatHourRange(s.start, s.end))
+                        .join(' · '),
+                    })}
                   </p>
 
                   {!user ? (
                     <AnonBookingCta
                       nextPath={bookingNext}
                       firstName={firstName}
+                      labels={b.anon}
+                      logIn={i18n.common.logIn}
                       guestHref={
                         GUEST_REQUESTS
                           ? `/book${selectedPackage ? `?package=${selectedPackage.slug}` : ''}`
@@ -769,6 +795,7 @@ export default async function GuidePage({ searchParams }: Props) {
                     {FREE_TOURS ? (
                       <FreeBookingFields
                         startOptions={startOptions}
+                        labels={b.fields}
                         lengths={
                           selectedPackage?.hours
                             ? [selectedPackage.hours]
@@ -780,14 +807,15 @@ export default async function GuidePage({ searchParams }: Props) {
                         startOptions={startOptions}
                         minHours={MIN_BOOKING_HOURS}
                         maxHours={MAX_BOOKING_HOURS}
+                        labels={b.fields}
                       />
                     )}
                     <label className="block">
                       <span className="text-sm font-medium">
-                        Anything {guide.display_name} should know?
+                        {fill(b.noteLabel, { name: guide.display_name })}
                       </span>
                       <span className="ml-1 text-xs text-zinc-500">
-                        (optional)
+                        {b.optional}
                       </span>
                       <textarea
                         name="note"
@@ -802,39 +830,37 @@ export default async function GuidePage({ searchParams }: Props) {
                             ? `${bookingNoteFor(selectedPackage)}\n`
                             : undefined
                         }
-                        placeholder="What you'd love to see, dietary needs, meeting point ideas…"
+                        placeholder={b.notePlaceholder}
                         className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950"
                       />
                     </label>
                     {/* Cancellation policy, visible before booking */}
                     <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
                       <p className="font-medium text-zinc-700 dark:text-zinc-300">
-                        Cancellation policy
+                        {b.policy.title}
                       </p>
                       {FREE_TOURS ? (
-                        <p className="mt-1">
-                          The tour is free, and so is cancelling — just do it
-                          before the tour starts so the time slot opens up
-                          for someone else.
-                        </p>
+                        <p className="mt-1">{b.policy.free}</p>
                       ) : (
                         <ul className="mt-1 space-y-0.5">
                           <li>
-                            • Before we confirm: <strong>full refund</strong>,
-                            anytime
+                            • {b.policy.beforeConfirm}
+                            <strong>{b.policy.fullRefund}</strong>
+                            {b.policy.anytime}
                           </li>
                           <li>
-                            • 72h+ before the tour: <strong>full refund</strong>
+                            • {b.policy.before72}
+                            <strong>{b.policy.fullRefund}</strong>
                           </li>
-                          <li>• 72–24h before: 90% refund (10% fee)</li>
-                          <li>• Under 24h before: 20% refund (80% fee)</li>
+                          <li>• {b.policy.within72}</li>
+                          <li>• {b.policy.within24}</li>
                         </ul>
                       )}
                       <Link
                         href="/cancellation"
                         className="mt-1 inline-block underline underline-offset-2 hover:text-zinc-800 dark:hover:text-zinc-200"
                       >
-                        Read the full policy
+                        {b.policy.readFull}
                       </Link>
                     </div>
 
@@ -847,33 +873,33 @@ export default async function GuidePage({ searchParams }: Props) {
 
                     <SubmitButton
                       pendingLabel={
-                        FREE_TOURS ? 'Sending request…' : 'Going to payment…'
+                        FREE_TOURS ? b.submit.pendingFree : b.submit.pendingPaid
                       }
                       className="w-full rounded-full bg-zinc-900 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
                     >
-                      {FREE_TOURS
-                        ? 'Request this day — it’s free'
-                        : 'Continue to payment'}
+                      {FREE_TOURS ? b.submit.free : b.submit.paid}
                     </SubmitButton>
                     <p className="text-center text-xs text-zinc-500">
                       {FREE_TOURS
-                        ? 'Nothing to pay — we confirm by email within 3 business days.'
-                        : `You pay ${formatMoney(HOURLY_RATE_CENTS)}/hour now to hold the day. We confirm within 3 business days — if we can’t, you’re fully refunded.`}{' '}
-                      By booking you agree to our{' '}
+                        ? b.submit.noteFree
+                        : fill(b.submit.notePaid, {
+                            rate: formatMoney(HOURLY_RATE_CENTS),
+                          })}
+                      {b.agree.prefix}
                       <Link
                         href="/terms"
                         className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
                       >
-                        Terms
-                      </Link>{' '}
-                      and{' '}
+                        {b.agree.terms}
+                      </Link>
+                      {b.agree.and}
                       <Link
                         href="/cancellation"
                         className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
                       >
-                        Cancellation Policy
+                        {b.agree.cancellation}
                       </Link>
-                      .
+                      {b.agree.suffix}
                     </p>
                   </form>
                   )}
@@ -889,15 +915,14 @@ export default async function GuidePage({ searchParams }: Props) {
         {FREE_TOURS && !isOfficialGuide && (
           <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-rose-50 px-5 py-4 dark:border-amber-900/40 dark:from-amber-950/20 dark:to-rose-950/20">
             <p className="text-sm text-zinc-700 dark:text-zinc-300">
-              <span className="font-semibold">The tours are free.</span> If you
-              like what we&apos;re building, you can chip in to keep the pilot
-              running.
+              <span className="font-semibold">{b.support.lead}</span>
+              {b.support.body}
             </p>
             <Link
               href="/donate"
               className="rounded-full border border-zinc-900/20 bg-white px-4 py-2 text-sm font-medium text-zinc-900 shadow-sm transition hover:bg-zinc-50 dark:border-white/20 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800"
             >
-              Support the pilot →
+              {b.support.cta}
             </Link>
           </div>
         )}
@@ -913,28 +938,23 @@ export default async function GuidePage({ searchParams }: Props) {
         {/* My bookings */}
         {(myBookings?.length ?? 0) > 0 && (
           <section className="mt-8">
-            <h2 className="text-xl font-semibold">Your requests</h2>
+            <h2 className="text-xl font-semibold">{b.mine.title}</h2>
             <p className="mt-1 text-xs text-zinc-500">
-              {FREE_TOURS ? (
-                <>Cancelling is free, any time before the tour starts. </>
-              ) : (
-                <>
-                  Cancellation: free up to 72h before · 10% fee within 72h ·
-                  80% fee within 24h. Before it&apos;s confirmed, you&apos;re
-                  always fully refunded.{' '}
-                </>
-              )}
+              {FREE_TOURS ? b.mine.cancelFree : b.mine.cancelPaid}
               <Link
                 href="/cancellation"
                 className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
               >
-                Full policy
+                {b.mine.fullPolicy}
               </Link>
-              .
+              {b.mine.fullPolicySuffix}
             </p>
             <ul className="mt-3 space-y-3">
               {myBookings!.map((b) => {
-                const status = STATUS_STYLES[b.status]
+                const status = {
+                  ...STATUS_STYLES[b.status],
+                  label: i18n.booking.status[b.status],
+                }
                 const hrs = hoursUntilTourStart(b.day, b.start_hour, nowMs)
                 const canCancel =
                   (b.status === 'pending' || b.status === 'approved') &&
@@ -953,14 +973,16 @@ export default async function GuidePage({ searchParams }: Props) {
                   >
                     <div>
                       <p className="text-sm font-medium">
-                        {formatDay(b.day)} ·{' '}
+                        {localDay(b.day)} ·{' '}
                         {formatHourRange(b.start_hour, b.end_hour)}
                         {b.amount_cents != null && (
                           <span className="ml-2 font-normal text-zinc-500">
                             {b.amount_cents === 0
-                              ? 'Free'
+                              ? i18n.common.free
                               : b.status === 'rejected'
-                                ? `${formatMoney(b.amount_cents, b.currency ?? undefined)} refunded`
+                                ? fill(i18n.booking.mine.refunded, {
+                                    amount: formatMoney(b.amount_cents, b.currency ?? undefined),
+                                  })
                                 : formatMoney(b.amount_cents, b.currency ?? undefined)}
                           </span>
                         )}
@@ -987,10 +1009,10 @@ export default async function GuidePage({ searchParams }: Props) {
                         <form action={startConversationWith}>
                           <input type="hidden" name="other_id" value={guideId} />
                           <SubmitButton
-                            pendingLabel="Opening…"
+                            pendingLabel={i18n.booking.mine.opening}
                             className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-medium text-white transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
                           >
-                            Message {firstName}
+                            {fill(i18n.booking.mine.message, { name: firstName })}
                           </SubmitButton>
                         </form>
                       )}
@@ -999,23 +1021,23 @@ export default async function GuidePage({ searchParams }: Props) {
                           href={`/guide/review/${b.id}`}
                           className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800 transition hover:bg-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:hover:bg-amber-900"
                         >
-                          How was it? 👍👎
+                          {i18n.booking.mine.howWasIt}
                         </Link>
                       )}
                       {canCancel && (
                         <form action={cancelOwnBooking}>
                           <input type="hidden" name="id" value={b.id} />
                           <SubmitButton
-                            pendingLabel="Cancelling…"
+                            pendingLabel={i18n.booking.mine.cancelling}
                             className="text-xs text-zinc-500 underline underline-offset-2 hover:text-red-600"
                           >
                             {wasFree
-                              ? 'Cancel'
+                              ? i18n.booking.mine.cancel
                               : pct === 100
-                                ? 'Cancel (full refund)'
+                                ? i18n.booking.mine.cancelFullRefund
                                 : pct > 0
-                                  ? `Cancel (${100 - pct}% fee)`
-                                  : 'Cancel (no refund)'}
+                                  ? fill(i18n.booking.mine.cancelFee, { pct: 100 - pct })
+                                  : i18n.booking.mine.cancelNoRefund}
                           </SubmitButton>
                         </form>
                       )}
@@ -1037,10 +1059,14 @@ export default async function GuidePage({ searchParams }: Props) {
 function AnonBookingCta({
   nextPath,
   firstName,
+  labels: l,
+  logIn,
   guestHref,
 }: {
   nextPath: string
   firstName: string
+  labels: Dictionary['booking']['anon']
+  logIn: string
   // While guest requests are on: the no-account form, offered first.
   guestHref: string | null
 }) {
@@ -1053,10 +1079,10 @@ function AnonBookingCta({
             href={guestHref}
             className="block w-full rounded-full bg-zinc-900 px-4 py-3 text-center text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
-            Request without an account
+            {l.guest}
           </Link>
           <p className="text-center text-xs text-zinc-500">
-            Leave your WhatsApp, WeChat or email and {firstName} will message you to set the time. Or, to pick an exact slot now:
+            {fill(l.guestNote, { name: firstName })}
           </p>
         </>
       )}
@@ -1068,20 +1094,19 @@ function AnonBookingCta({
             : 'block w-full rounded-full bg-zinc-900 px-4 py-3 text-center text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200'
         }
       >
-        Sign up to book this day
+        {l.signup}
       </Link>
       <p className="text-center text-xs text-zinc-500">
-        Takes under a minute. Already have an account?{' '}
+        {l.loginPrefix}
         <Link
           href={`/login?next=${next}`}
           className="underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
         >
-          Log in
+          {logIn}
         </Link>
-        . This day stays open while you do
         {FREE_TOURS
-          ? ' — and the tour itself is free during our pilot.'
-          : ` — and if ${firstName}'s day can't be confirmed, you're fully refunded.`}
+          ? l.loginSuffixFree
+          : fill(l.loginSuffixPaid, { name: firstName })}
       </p>
     </div>
   )

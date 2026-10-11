@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { thumbnailSrc, type PublicGalleryItem } from '@/content/gallery'
+import type { Dictionary } from '@/i18n'
 import { track } from '@/lib/analytics'
 import { Lightbox } from './Lightbox'
 
@@ -36,6 +37,8 @@ export function GalleryGrid({
   initialIndex,
   isAdmin,
   shareBaseUrl,
+  labels,
+  shareLabels,
 }: {
   items: PublicGalleryItem[]
   activeLocation: string
@@ -46,6 +49,8 @@ export function GalleryGrid({
   initialIndex: number | null
   isAdmin: boolean
   shareBaseUrl: string
+  labels: Dictionary['gallery']
+  shareLabels: Dictionary['share']
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(initialIndex)
   const triggers = useRef<(HTMLButtonElement | null)[]>([])
@@ -142,7 +147,7 @@ export function GalleryGrid({
                   triggers.current[i] = el
                 }}
                 onClick={() => open(i)}
-                aria-label={`Open ${item.title}`}
+                aria-label={labels.openPhoto.replace('{title}', item.title)}
                 className="group block w-full overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900"
               >
                 <span className="relative block aspect-[4/3] overflow-hidden">
@@ -174,7 +179,7 @@ export function GalleryGrid({
             </li>
             {(i + 1) % CTA_EVERY === 0 && (
               <li className="col-span-full">
-                <GridCta href={ctaHref} />
+                <GridCta href={ctaHref} label={labels.cta} />
               </li>
             )}
           </Fragment>
@@ -190,13 +195,15 @@ export function GalleryGrid({
           ctaHref={ctaHref}
           isAdmin={isAdmin}
           shareBaseUrl={shareBaseUrl}
+          labels={labels}
+          shareLabels={shareLabels}
         />
       )}
     </>
   )
 }
 
-function GridCta({ href }: { href: string }) {
+function GridCta({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
@@ -209,7 +216,7 @@ function GridCta({ href }: { href: string }) {
       }
       className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-300 px-6 py-5 text-sm font-medium text-zinc-700 transition hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-900"
     >
-      Have a local show you this
+      {label}
       <span aria-hidden>→</span>
     </Link>
   )

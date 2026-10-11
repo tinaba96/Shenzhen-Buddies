@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
+import { getI18n } from '@/i18n/server'
 import { avatarPublicUrl } from '@/lib/avatars'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { MessageList, type Message } from './MessageList'
@@ -34,6 +35,8 @@ export default async function ThreadPage({ params, searchParams }: Props) {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+
+  const { t, meta } = await getI18n()
 
   const { data: conversation } = await supabase
     .from('conversations')
@@ -71,7 +74,7 @@ export default async function ThreadPage({ params, searchParams }: Props) {
       <header className="flex items-center gap-3 border-b border-zinc-200 pb-4 dark:border-zinc-800">
         <Link
           href="/messages"
-          aria-label="Back to messages"
+          aria-label={t.messages.back}
           className="rounded-md p-1.5 text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
@@ -85,10 +88,12 @@ export default async function ThreadPage({ params, searchParams }: Props) {
         />
         <div className="min-w-0 flex-1">
           <p className="truncate font-semibold">
-            {other?.display_name ?? 'Unknown user'}
+            {other?.display_name ?? t.messages.unknownUser}
           </p>
           <p className="truncate text-xs text-zinc-500">
-            {other ? `${other.role === 'guide' ? 'Guide' : 'Tourist'} · ${other.city}` : ''}
+            {other
+              ? `${other.role === 'guide' ? t.buddy.roleGuide : t.buddy.roleTourist} · ${other.city}`
+              : ''}
           </p>
         </div>
       </header>
@@ -103,6 +108,13 @@ export default async function ThreadPage({ params, searchParams }: Props) {
         conversationId={id}
         currentUserId={user.id}
         initialMessages={messages ?? []}
+        intlLocale={meta.intlLocale}
+        labels={{
+          empty: t.messages.threadEmpty,
+          placeholder: t.messages.placeholder,
+          send: t.messages.send,
+          hint: t.messages.hint,
+        }}
       />
     </main>
   )

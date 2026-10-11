@@ -2,13 +2,17 @@
 
 import { useFormStatus } from 'react-dom'
 
-export function SearchSubmit() {
+export function SearchSubmit({
+  labels,
+}: {
+  labels: { search: string; searching: string }
+}) {
   const { pending } = useFormStatus()
   return (
     <button
       type="submit"
       disabled={pending}
-      aria-label={pending ? 'Searching…' : 'Search'}
+      aria-label={pending ? labels.searching : labels.search}
       className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-70 dark:hover:bg-zinc-800 dark:hover:text-white"
     >
       {pending ? (
