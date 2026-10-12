@@ -14,6 +14,7 @@ import {
   readingTimeMinutes,
   resolvePillarFilter,
 } from '@/content/posts'
+import { hasPostTranslation, localizePosts } from '@/content/posts-i18n'
 import { fill, type Dictionary } from '@/i18n'
 import { LOCALE_META, type Locale } from '@/i18n/config'
 import { getI18n } from '@/i18n/server'
@@ -73,8 +74,8 @@ export default async function BlogIndexPage({
   // locales use their own Intl locale. Server-only, so no hydration mismatch.
   const dateLocale = locale === 'en' ? 'en-GB' : meta.intlLocale
   const card = { t: t.blog, dateLocale, locale }
-  const all = publishedPosts()
-  const shown = postsForPillar(activePillar)
+  const all = localizePosts(publishedPosts(), locale)
+  const shown = localizePosts(postsForPillar(activePillar), locale)
   const [featured, ...rest] = shown
 
   // A chip row is only worth its space once there is more than one thing to
@@ -197,10 +198,10 @@ function FilterChip({
 
 type CardCopy = { t: Dictionary['blog']; dateLocale: string; locale: Locale }
 
-// Post titles and excerpts are English-only; say so to screen readers and
-// translation tools when the page around them is not.
-function postLang(locale: Locale): string | undefined {
-  return locale === 'en' ? undefined : 'en'
+// A post this locale has not translated yet shows its English title and
+// excerpt; say so to screen readers and translation tools.
+function postLang(post: Post, locale: Locale): string | undefined {
+  return hasPostTranslation(post, locale) ? undefined : 'en'
 }
 
 function pillarLabel(pillar: Pillar, t: Dictionary['blog']): string {
@@ -291,13 +292,13 @@ function FeaturedCard({ post, t, dateLocale, locale }: { post: Post } & CardCopy
         <div className="p-6 sm:p-8">
           <CardMeta post={post} t={t} dateLocale={dateLocale} locale={locale} />
           <h2
-            lang={postLang(locale)}
+            lang={postLang(post, locale)}
             className="mt-3 text-balance text-2xl font-semibold tracking-tight sm:text-3xl"
           >
             {post.title}
           </h2>
           <p
-            lang={postLang(locale)}
+            lang={postLang(post, locale)}
             className="mt-3 max-w-2xl text-pretty text-zinc-600 dark:text-zinc-400"
           >
             {post.excerpt}
@@ -321,11 +322,11 @@ function PostCard({ post, t, dateLocale, locale }: { post: Post } & CardCopy) {
         <CardImage post={post} t={t} locale={locale} />
         <div className="flex flex-1 flex-col p-5">
           <CardMeta post={post} t={t} dateLocale={dateLocale} locale={locale} />
-          <h3 lang={postLang(locale)} className="mt-2 text-lg font-semibold tracking-tight">
+          <h3 lang={postLang(post, locale)} className="mt-2 text-lg font-semibold tracking-tight">
             {post.title}
           </h3>
           <p
-            lang={postLang(locale)}
+            lang={postLang(post, locale)}
             className="mt-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400"
           >
             {post.excerpt}

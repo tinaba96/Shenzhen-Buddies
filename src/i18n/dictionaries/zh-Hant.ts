@@ -999,7 +999,6 @@ export const zhHant: Dictionary = {
     ctaBody: '按你真正感興趣的事配對，而不是走一條固定路線。',
     ctaButton: '找個夥伴',
     lastChecked: '最後核實：{date}。過關和簽證規定隨時會變——有時效性的資訊，出發前請再向官方渠道確認。',
-    englishOnly: '這篇文章暫時只有英文版。',
     pillars: {
       logistics: {
         label: '出行須知',

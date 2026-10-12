@@ -9,7 +9,7 @@ import type { TourPackage } from '@/content/packages'
 //   photo    — a file path
 //   accent   — a colour token
 //   featured — an editorial flag
-//   readMoreSlug — a blog slug; the post itself is English-only for now
+//   readMoreSlug — a blog slug; the post is translated in posts-i18n
 //
 // `alt` IS here. Alt text is read aloud by screen readers in the page's
 // language, so leaving it English inside a Japanese page is a real

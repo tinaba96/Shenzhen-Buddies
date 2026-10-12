@@ -1055,7 +1055,6 @@ export const en = {
     // Button on the inline call-out cards inside an article.
     ctaButton: 'Find a buddy',
     lastChecked: 'Last checked: {date}. Border and visa rules change — confirm anything time-sensitive with an official source before you travel.',
-    englishOnly: 'This article is in English for now.',
     // Keyed by Pillar in src/content/posts/types.ts.
     pillars: {
       logistics: {

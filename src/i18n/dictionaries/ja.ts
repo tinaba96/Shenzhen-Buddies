@@ -990,7 +990,6 @@ export const ja: Dictionary = {
     ctaBody: '決まったコースではなく、あなたが本当に好きなことでマッチングします。',
     ctaButton: 'バディを探す',
     lastChecked: '最終確認：{date}。出入国やビザのルールは変わることがあります。最新の情報は、出発前に必ず公式の情報源でご確認ください。',
-    englishOnly: 'この記事は現在、英語版のみです。',
     pillars: {
       logistics: {
         label: '移動・実用情報',

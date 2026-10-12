@@ -21,6 +21,7 @@ import {
   titleNamesPlace,
 } from '@/content/packages-i18n'
 import { getPublishedPost } from '@/content/posts'
+import { localizePost } from '@/content/posts-i18n'
 import { getI18n } from '@/i18n/server'
 import { FREE_TOURS, GUEST_REQUESTS } from '@/lib/booking'
 import { DEFAULT_OG_IMAGE, siteUrl } from '@/lib/config'
@@ -86,7 +87,8 @@ export default async function TourDetailPage({ params }: Props) {
   const price = FREE_TOURS ? t.common.free : packagePrice()
   const others = localizedPackages(locale).filter((p) => p.slug !== pkg.slug)
   const related = others.slice(0, 3)
-  const post = pkg.readMoreSlug ? getPublishedPost(pkg.readMoreSlug) : undefined
+  const basePost = pkg.readMoreSlug ? getPublishedPost(pkg.readMoreSlug) : undefined
+  const post = basePost ? localizePost(basePost, locale) : undefined
   const base = siteUrl()
   // The timeline for the advertised length is what the structured data
   // describes and what the toggle starts on; the others are a click away.

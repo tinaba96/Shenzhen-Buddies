@@ -59,30 +59,44 @@ export function parseInline(text: string): ReactNode {
 }
 
 // Heading ids are what the table of contents and any "#section" link would hang
-// off, and they cost nothing to emit now.
-function headingId(text: string): string {
-  return text
+// off, and they cost nothing to emit now. A Chinese or Japanese heading has no
+// ASCII letters to slug (a stray digit, as in 「6つの口岸」, is not a usable
+// id), so it falls back to its position — stable for a given post, and never an
+// empty or duplicate id.
+function headingId(text: string, index: number): string {
+  const slug = text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
+  return /[a-z]/.test(slug) ? slug : `section-${index}`
 }
 
 // `ctaHref` is resolved once by the page, on the server, because the config it
 // comes from reads a non-public env var. Threading it down is what lets the cta
-// block carry no href of its own.
+// block carry no href of its own. `ctaButton` is the translated button text, so
+// this client-rendered tree holds no English of its own.
 export function Prose({
   blocks,
   slug,
   ctaHref,
+  ctaButton,
 }: {
   blocks: Block[]
   slug: string
   ctaHref: string
+  ctaButton: string
 }) {
   return (
     <div className="mt-10 space-y-6">
       {blocks.map((block, i) => (
-        <BlockView key={i} block={block} slug={slug} ctaHref={ctaHref} />
+        <BlockView
+          key={i}
+          block={block}
+          index={i}
+          slug={slug}
+          ctaHref={ctaHref}
+          ctaButton={ctaButton}
+        />
       ))}
     </div>
   )
@@ -90,18 +104,22 @@ export function Prose({
 
 function BlockView({
   block,
+  index,
   slug,
   ctaHref,
+  ctaButton,
 }: {
   block: Block
+  index: number
   slug: string
   ctaHref: string
+  ctaButton: string
 }) {
   switch (block.k) {
     case 'h2':
       return (
         <h2
-          id={headingId(block.text)}
+          id={headingId(block.text, index)}
           className="scroll-mt-20 pt-6 text-2xl font-semibold tracking-tight sm:text-3xl"
         >
           {block.text}
@@ -111,7 +129,7 @@ function BlockView({
     case 'h3':
       return (
         <h3
-          id={headingId(block.text)}
+          id={headingId(block.text, index)}
           className="scroll-mt-20 pt-2 text-lg font-semibold tracking-tight sm:text-xl"
         >
           {block.text}
@@ -279,6 +297,7 @@ function BlockView({
           href={ctaHref}
           label={block.label}
           sub={block.sub}
+          button={{ label: ctaButton }}
         />
       )
   }

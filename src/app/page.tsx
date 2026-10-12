@@ -8,6 +8,7 @@ import {
   localizedOtherPackages,
 } from '@/content/packages-i18n'
 import { publishedPosts } from '@/content/posts'
+import { hasPostTranslation, localizePosts } from '@/content/posts-i18n'
 import type { Dictionary } from '@/i18n'
 import { getI18n } from '@/i18n/server'
 import { FREE_TOURS } from '@/lib/booking'
@@ -674,11 +675,8 @@ function Testimonials({ t }: { t: Dictionary }) {
 }
 
 function Journal({ locale, t }: { locale: Locale; t: Dictionary }) {
-  const posts = publishedPosts().slice(0, 3)
+  const posts = localizePosts(publishedPosts().slice(0, 3), locale)
   if (posts.length === 0) return null
-  // Post titles and excerpts are English-only. Marking them lets a screen
-  // reader switch voice instead of reading English with Japanese phonetics.
-  const postLang = locale === 'en' ? undefined : 'en'
 
   return (
     <section className="border-b border-zinc-200 dark:border-zinc-800">
@@ -706,6 +704,10 @@ function Journal({ locale, t }: { locale: Locale; t: Dictionary }) {
 
         <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => {
+            // A post not yet translated shows its English title; marking it
+            // lets a screen reader switch voice instead of reading English
+            // with Japanese phonetics.
+            const postLang = hasPostTranslation(post, locale) ? undefined : 'en'
             const hero = post.heroGalleryId
               ? localizeGalleryItem(
                   requireGalleryItem(post.heroGalleryId, 'home/journal'),

@@ -990,7 +990,6 @@ export const zhHans: Dictionary = {
     ctaBody: '按你真正感兴趣的来匹配，而不是走一条固定路线。',
     ctaButton: '找个伙伴',
     lastChecked: '最后核实：{date}。过关和签证规定随时可能变化——有时效性的信息，出发前请再向官方渠道确认一次。',
-    englishOnly: '这篇文章暂时只有英文版。',
     pillars: {
       logistics: {
         label: '出行实用',

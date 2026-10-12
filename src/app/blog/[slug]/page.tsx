@@ -20,6 +20,12 @@ import {
   readingTimeMinutes,
   relatedPosts,
 } from '@/content/posts'
+import {
+  hasPostTranslation,
+  localizeAuthor,
+  localizePost,
+  localizePosts,
+} from '@/content/posts-i18n'
 import { fill, type Dictionary } from '@/i18n'
 import { getI18n } from '@/i18n/server'
 import { isAdminViewer } from '@/lib/admin'
@@ -36,11 +42,10 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
-  const post = getPublishedPost((await params).slug)
-  if (!post) return {}
-  // The article is English, but og:locale describes the page it is shared
-  // from, which follows the reader's language like every other page.
-  const { meta } = await getI18n()
+  const base = getPublishedPost((await params).slug)
+  if (!base) return {}
+  const { locale, meta } = await getI18n()
+  const post = localizePost(base, locale)
 
   const title = post.seo?.title ?? post.title
   const description = post.seo?.description ?? post.excerpt
@@ -57,9 +62,11 @@ export async function generateMetadata({
     ? ogImageSrc(requireGalleryItem(post.heroGalleryId, `posts/${post.slug} hero`))
     : DEFAULT_OG_IMAGE
 
+  // Japanese titles join with a full-width bar, as elsewhere on the site.
+  const separator = locale === 'ja' ? '｜' : ' — '
+
   return {
-    // The article is English in every locale, so its <title> is too.
-    title: `${title} — Shenzhen Buddies`,
+    title: `${title}${separator}Shenzhen Buddies`,
     description,
     alternates: { canonical: url },
     robots: post.seo?.noindex ? { index: false, follow: true } : undefined,
@@ -88,21 +95,20 @@ export default async function BlogPostPage({
 }: {
   params: Promise<{ slug: string }>
 }) {
-  const post = getPublishedPost((await params).slug)
-  if (!post) notFound()
+  const base = getPublishedPost((await params).slug)
+  if (!base) notFound()
 
-  const author = AUTHORS[post.author]
-  const related = relatedPosts(post)
+  const { locale, meta, t } = await getI18n()
+  const post = localizePost(base, locale)
+  const author = localizeAuthor(post.author, locale)
+  const related = localizePosts(relatedPosts(base), locale)
   // Gates the admin-only share button and nothing else. This route is already
   // server-rendered on demand — the root layout reads the session to draw the
   // header — so the check costs no static generation that was not already gone.
   const isAdmin = await isAdminViewer()
-  // The page chrome follows the reader's locale; the article itself — title,
-  // body, FAQ, author box — is English-only content, and is marked lang="en"
-  // when the page around it is not, so screen readers and translation tools
-  // switch language with it.
-  const { locale, meta, t } = await getI18n()
-  const articleLang = locale === 'en' ? undefined : 'en'
+  // A post this locale has not translated yet renders in English and is marked
+  // lang="en", so screen readers and translation tools switch language with it.
+  const articleLang = hasPostTranslation(post, locale) ? undefined : 'en'
   // English keeps its long-standing en-GB day-month-year format, as on /blog.
   const dateLocale = locale === 'en' ? 'en-GB' : meta.intlLocale
   // /guide during the single-guide beta, otherwise bare /browse. Never a login
@@ -167,9 +173,6 @@ export default async function BlogPostPage({
         >
           {post.title}
         </h1>
-        {articleLang && (
-          <p className="mt-3 text-sm text-zinc-500">{t.blog.englishOnly}</p>
-        )}
 
         <div className="mt-6 flex flex-wrap items-center gap-3 border-b border-zinc-200 pb-6 dark:border-zinc-800">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -221,6 +224,7 @@ export default async function BlogPostPage({
             blocks={post.body}
             slug={post.slug}
             ctaHref={ctaHref}
+            ctaButton={t.blog.ctaButton}
           />
         </div>
 

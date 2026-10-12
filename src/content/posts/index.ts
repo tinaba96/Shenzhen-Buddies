@@ -24,6 +24,10 @@ export const posts: Post[] = [
 // Average adult reading speed for web prose. Reading time is computed rather
 // than stored so it cannot drift out of sync with an edited body.
 const WORDS_PER_MINUTE = 220
+// Chinese and Japanese do not space their words, so a translated body is
+// counted in characters instead. Both languages read at roughly this rate.
+const CJK_CHARS_PER_MINUTE = 400
+const CJK = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/gu
 
 const TITLE_MAX = 60
 const EXCERPT_MAX = 155
@@ -67,12 +71,20 @@ function blockText(post: Post): string[] {
   return out
 }
 
+// Works on the English post and on a localized one alike: CJK characters are
+// counted at their own rate, and whatever is left (Latin names, numbers,
+// station codes) is counted as words.
 export function readingTimeMinutes(post: Post): number {
-  const words = blockText(post)
-    .join(' ')
+  const text = blockText(post).join(' ')
+  const cjk = text.match(CJK)?.length ?? 0
+  const words = text
+    .replace(CJK, ' ')
     .split(/\s+/)
-    .filter(Boolean).length
-  return Math.max(1, Math.round(words / WORDS_PER_MINUTE))
+    .filter((w) => /[\p{L}\p{N}]/u.test(w)).length
+  return Math.max(
+    1,
+    Math.round(words / WORDS_PER_MINUTE + cjk / CJK_CHARS_PER_MINUTE),
+  )
 }
 
 export function assertPostsValid(all: readonly Post[] = posts): void {
