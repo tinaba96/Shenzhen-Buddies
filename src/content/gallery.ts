@@ -485,6 +485,47 @@ export const galleryItems: GalleryItem[] = [
     people: 'none',
     capturedAt: '2026-07',
   },
+  {
+    id: 'futian-caitian-towers-night',
+    kind: 'image',
+    src: '/gallery/futian-caitian-towers-night.webp',
+    width: 1200,
+    height: 1600,
+    alt: 'Three skyscrapers at night seen from the pavement, their facades striped with blue light and one tower glowing red through the trees, with a street sign for Caitian Road and Shennan Boulevard in the corner.',
+    title: 'Shennan Boulevard, looking up',
+    caption: 'The Caitian Road junction after dark. The towers run their lights whether or not anyone is looking.',
+    // Placed by the road sign in the frame — 彩田路 / 福中路 / 深南大道(东) —
+    // which is the Futian CBD. The towers themselves are deliberately not
+    // named: they could not be verified from the photo.
+    location: 'futian',
+    themes: ['nightlife', 'street'],
+    relatedPostSlug: 'futian-new-downtown',
+    // Portrait, towers from pavement to sky. A centred crop keeps the lit
+    // facades; the trees and the sign are at the bottom and can go.
+    focus: '50% 40%',
+    // Street scene shot upward. Nobody in frame.
+    people: 'none',
+    capturedAt: '2026-02',
+  },
+  {
+    id: 'hotpot-split-broth-table',
+    kind: 'image',
+    src: '/gallery/hotpot-split-broth-table.webp',
+    width: 1371,
+    height: 963,
+    alt: 'A hot pot table: a split pot with clear broth on one side and red chilli broth on the other, two pairs of red chopsticks, a bowl of dipping sauce and three white trays with the last slices of raw beef.',
+    title: 'The half-and-half pot',
+    caption: 'Clear broth on one side for the sensible, the red one on the other. The beef trays were full ten minutes earlier.',
+    // Founder's own table, Futian, Lunar New Year 2026. Cropped to the table
+    // from a wider frame that showed the two people eating; this crop keeps
+    // the pot and the trays and nothing identifiable — see CONSENT.md,
+    // "shoot places, not faces".
+    location: 'futian',
+    themes: ['food'],
+    relatedPostSlug: 'futian-new-downtown',
+    people: 'none',
+    capturedAt: '2026-02',
+  },
 ]
 
 function fail(id: string, problem: string): never {

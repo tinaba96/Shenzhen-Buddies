@@ -504,6 +504,7 @@ export const packages: TourPackage[] = [
     ],
     insiderTip:
       'Futian is at its best after sunset. The buildings, plazas and public spaces light up, and it looks far better than it does in the daytime.',
+    readMoreSlug: 'futian-new-downtown',
     accent: 'violet',
   },
   {
