@@ -13,6 +13,18 @@ export function isSingleGuideMode(): boolean {
   return officialGuideId() !== null
 }
 
+// The secret code on the open review link (/review?k=…), so the page cannot
+// be found by guessing the URL. Unset means the link is off.
+export function reviewLinkKey(): string | null {
+  return process.env.REVIEW_LINK_KEY?.trim() || null
+}
+
+// True when `k` (from the link or the form) matches REVIEW_LINK_KEY.
+export function isValidReviewLinkKey(k: string | null | undefined): boolean {
+  const key = reviewLinkKey()
+  return key !== null && k === key
+}
+
 export function adminEmails(): string[] {
   return (process.env.ADMIN_EMAILS ?? '')
     .split(',')

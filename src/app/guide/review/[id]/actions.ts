@@ -6,6 +6,7 @@ import { fill } from '@/i18n'
 import { getI18n } from '@/i18n/server'
 import { formatDay } from '@/lib/booking'
 import { officialGuideId } from '@/lib/config'
+import { reviewLengthProblem } from '@/lib/review-length'
 import {
   createSupportCheckout,
   parseSupportAmountCents,
@@ -18,33 +19,6 @@ import { checkTipEligibility, officialGuideDisplayName } from '@/lib/tips'
 // the guide's profile, the average on /guide and the old star-based form all
 // keep working, and RLS (0016_review_after_tour.sql) stays the enforcement
 // that only a tourist whose tour has finished can write one.
-
-const MIN_REVIEW_WORDS = 5
-const MAX_REVIEW_WORDS = 50
-// Chinese and Japanese are written without spaces, so splitting on whitespace
-// counts a whole sentence as one word and rejects every review. Text in those
-// scripts is measured in characters instead, with limits sized to say about
-// as much as 5–50 English words. The page's hint (t.review.wordsHint) quotes
-// these numbers.
-const MIN_REVIEW_CHARS = 10
-const MAX_REVIEW_CHARS = 100
-// ー (the katakana long-vowel mark) is script Common, so it is named outright.
-const CJK = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー]/u
-const CJK_ALL = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー]/gu
-
-// Each CJK character counts once; any run of other text between spaces counts
-// as one word, so a Latin brand name inside a Chinese sentence is one unit.
-function reviewLength(text: string): { unit: 'words' | 'chars'; n: number } {
-  if (!CJK.test(text)) {
-    return { unit: 'words', n: text.split(/\s+/).filter(Boolean).length }
-  }
-  const chars = text.match(CJK_ALL)?.length ?? 0
-  const rest = text
-    .replace(CJK_ALL, ' ')
-    .split(/\s+/)
-    .filter((w) => /[\p{L}\p{N}]/u.test(w)).length
-  return { unit: 'chars', n: chars + rest }
-}
 
 function reviewFail(bookingId: string, message: string): never {
   redirect(`/guide/review/${bookingId}?error=${encodeURIComponent(message)}`)
@@ -94,12 +68,9 @@ export async function submitTourReview(formData: FormData) {
   const text = String(formData.get('body') ?? '').trim()
   let body: string | null = null
   if (text) {
-    const { unit, n } = reviewLength(text)
-    const [min, max] =
-      unit === 'words'
-        ? [MIN_REVIEW_WORDS, MAX_REVIEW_WORDS]
-        : [MIN_REVIEW_CHARS, MAX_REVIEW_CHARS]
-    if (n < min || n > max) {
+    const problem = reviewLengthProblem(text)
+    if (problem) {
+      const { unit, min, max, n } = problem
       reviewFail(
         bookingId,
         fill(unit === 'words' ? e.words : e.chars, { min, max, n }),

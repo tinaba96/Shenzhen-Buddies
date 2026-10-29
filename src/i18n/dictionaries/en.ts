@@ -74,6 +74,9 @@ export const en = {
     review: {
       title: 'How was your tour? — Shenzhen Buddies',
     },
+    openReview: {
+      title: 'Leave a review — Shenzhen Buddies',
+    },
     localHelp: {
       title: 'Get local help in Shenzhen — Shenzhen Buddies',
       description: 'Get help in Shenzhen from someone who lives there. Book a local for 2 or 3 hours to set up Alipay and WeChat Pay, read menus and find your way on the metro. Free during our pilot.',
@@ -955,7 +958,7 @@ export const en = {
     saving: 'Saving…',
     words: 'A few words',
     // The limits are MIN/MAX_REVIEW_WORDS (and _CHARS for Chinese and
-    // Japanese, which are counted by character) in ./guide/review/[id]/actions.
+    // Japanese, which are counted by character) in src/lib/review-length.
     wordsHint: '(optional, 5–50 words)',
     placeholder: 'What stood out — good or bad?',
     note: "Tapping a thumb saves your review. Honest reviews — good or bad — are published on {name}'s profile.",
@@ -973,6 +976,50 @@ export const en = {
       generic: 'Could not save your review — please try again.',
       tipAmount: 'Pick a tip between CA$1 and CA$500 (whole dollars).',
       tipCheckout: 'Could not start the tip payment — please try again.',
+    },
+  },
+
+  // /review — the open review link the guide shares with tourists whose tour
+  // was arranged outside the website. Posting also creates their account.
+  openReview: {
+    kicker: 'Shenzhen Buddies',
+    title: 'How was your time with {name}?',
+    sub: 'Leave a review and create your account in one go. It takes about a minute.',
+    subSignedIn: "You're signed in, so just pick your stars and add a few words.",
+    haveAccount: 'Already have an account?',
+    rating: 'Your rating for {name}',
+    words: 'A few words',
+    placeholder: 'What stood out — good or bad?',
+    name: 'Your name',
+    nameHint: 'Shown next to your review.',
+    photo: 'Profile photo',
+    optional: '(optional)',
+    accountHint: 'This creates your Shenzhen Buddies account, so you can book your next outing with it.',
+    pending: 'Posting…',
+    submit: 'Post review & create account',
+    submitSignedIn: 'Post review',
+    consent: "Your review, name and photo are published on your guide's profile. By posting, you agree to our Terms and Privacy Policy.",
+    thanks: 'Thank you — your review is posted!',
+    live: "It's now on {name}'s profile.",
+    checkEmail: "Your review is live. We've emailed you a link to confirm your address — open it to finish setting up your account.",
+    seeProfile: "See {name}'s profile",
+    invalidLink: "This review link isn't valid. Please ask your guide for the latest link.",
+    errors: {
+      invalidLink: "This review link isn't valid. Please ask your guide for the latest link.",
+      noGuide: 'Reviews are not open right now.',
+      stars: 'Pick from 1 to 5 stars.',
+      name: 'Enter your name (up to 60 characters).',
+      words: 'A written review is {min}–{max} words (yours is {n}). Or leave it empty — the stars are enough.',
+      chars: 'A written review is {min}–{max} characters (yours is {n}). Or leave it empty — the stars are enough.',
+      photoSize: 'That photo is too large — please pick one under 3 MB.',
+      photoType: 'Please use a JPEG, PNG, WebP or GIF photo.',
+      self: "You can't review yourself.",
+      email: 'Enter your email address.',
+      password: 'Your password needs at least 8 characters.',
+      exists: 'That email already has an account. Log in first, then come back to this page.',
+      rateLimit: 'Too many sign-ups just now — please try again in a few minutes.',
+      signup: 'Could not create your account — check your email address and try again.',
+      generic: 'Could not save your review — please try again.',
     },
   },
 
