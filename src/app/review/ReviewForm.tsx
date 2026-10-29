@@ -11,7 +11,6 @@ type Labels = Omit<Dictionary['openReview'], 'errors' | 'thankYouEmail'> & {
   email: string
   password: string
   minLength: string
-  wordsHint: string
   stars: { one: string; other: string }
 }
 
@@ -23,12 +22,15 @@ export function ReviewForm({
   signedIn,
   defaultName,
   linkKey,
+  hasPhoto,
 }: {
   // Filled by the server page (the guide's name is already in `rating`).
   labels: Labels
   signedIn: boolean
   defaultName: string
   linkKey: string
+  // A signed-in reviewer who already has a profile photo keeps it.
+  hasPhoto: boolean
 }) {
   const initial: OpenReviewState = {
     error: null,
@@ -70,6 +72,7 @@ export function ReviewForm({
         <span className="ml-1 text-xs text-zinc-500">{l.wordsHint}</span>
         <textarea
           name="body"
+          required
           rows={4}
           maxLength={600}
           defaultValue={v.body}
@@ -95,9 +98,12 @@ export function ReviewForm({
 
       <label className="block">
         <span className="text-sm font-medium">{l.photo}</span>
-        <span className="ml-1 text-xs text-zinc-500">{l.optional}</span>
+        {hasPhoto && (
+          <span className="ml-1 text-xs text-zinc-500">{l.photoKeep}</span>
+        )}
         <ImageUpload
           name="photo"
+          required={!hasPhoto}
           className="mt-1 block w-full text-sm text-zinc-600 file:mr-3 file:rounded-full file:border-0 file:bg-zinc-100 file:px-4 file:py-2 file:text-sm file:font-medium hover:file:bg-zinc-200 dark:text-zinc-400 dark:file:bg-zinc-800 dark:hover:file:bg-zinc-700"
         />
       </label>

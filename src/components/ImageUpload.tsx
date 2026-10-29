@@ -38,9 +38,11 @@ async function compress(
 export function ImageUpload({
   name,
   className,
+  required,
 }: {
   name: string
   className?: string
+  required?: boolean
 }) {
   const ref = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
@@ -66,6 +68,7 @@ export function ImageUpload({
         type="file"
         name={name}
         accept="image/*"
+        required={required}
         onChange={onChange}
         className={className}
       />

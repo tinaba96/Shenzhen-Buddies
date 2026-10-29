@@ -63,9 +63,9 @@ export default async function OpenReviewPage({ searchParams }: Props) {
     user
       ? admin
           .from('profiles')
-          .select('display_name')
+          .select('display_name, avatar_path')
           .eq('id', user.id)
-          .maybeSingle<{ display_name: string }>()
+          .maybeSingle<{ display_name: string; avatar_path: string | null }>()
       : Promise.resolve({ data: null }),
   ])
   // First name only, as on the post-tour page; the fallback is a phrase.
@@ -117,13 +117,13 @@ export default async function OpenReviewPage({ searchParams }: Props) {
             signedIn={!!user}
             defaultName={me?.display_name ?? ''}
             linkKey={sp.k ?? ''}
+            hasPhoto={!!me?.avatar_path}
             labels={{
               ...formLabels,
               rating: fill(o.rating, { name: guideName }, locale),
               email: t.auth.email,
               password: t.auth.password,
               minLength: t.auth.minLength,
-              wordsHint: t.review.wordsHint,
               stars: { one: t.stars.starOne, other: t.stars.starOther },
             }}
           />
