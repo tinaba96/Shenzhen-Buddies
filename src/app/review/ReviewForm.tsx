@@ -7,7 +7,7 @@ import { SubmitButton } from '@/components/SubmitButton'
 import type { Dictionary } from '@/i18n'
 import { submitOpenReview, type OpenReviewState } from './actions'
 
-type Labels = Omit<Dictionary['openReview'], 'errors'> & {
+type Labels = Omit<Dictionary['openReview'], 'errors' | 'thankYouEmail'> & {
   email: string
   password: string
   minLength: string
@@ -128,6 +128,17 @@ export function ReviewForm({
             <span className="mt-1 block text-xs text-zinc-500">
               {l.minLength} {l.accountHint}
             </span>
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium">{l.passwordConfirm}</span>
+            <input
+              type="password"
+              name="password_confirm"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              className={INPUT}
+            />
           </label>
         </>
       )}

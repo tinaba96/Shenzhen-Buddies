@@ -994,6 +994,7 @@ export const en = {
     nameHint: 'Shown next to your review.',
     photo: 'Profile photo',
     optional: '(optional)',
+    passwordConfirm: 'Confirm password',
     accountHint: 'This creates your Shenzhen Buddies account, so you can book your next outing with it.',
     pending: 'Posting…',
     submit: 'Post review & create account',
@@ -1004,6 +1005,20 @@ export const en = {
     checkEmail: "Your review is live. We've emailed you a link to confirm your address — open it to finish setting up your account.",
     seeProfile: "See {name}'s profile",
     invalidLink: "This review link isn't valid. Please ask your guide for the latest link.",
+    // The thank-you email sent after posting (plain text). {name} is the
+    // reviewer's first name, {guide} the guide's.
+    thankYouEmail: {
+      subject: 'Thank you for your review, {name}!',
+      greeting: 'Hi {name},',
+      thanks: "Thank you for taking the time to review your outing with {guide}. It really means a lot — reviews like yours help other travelers find a local they'll click with.",
+      yourReview: 'Your review:',
+      profile: "It's now live on {guide}'s profile:",
+      confirm: "One last step: we've sent you a separate email to confirm your address. Open the link in it to finish setting up your account.",
+      login: 'Your account is all set — log in anytime with this email and the password you chose.',
+      comeBack: 'Whenever you fancy another outing in Shenzhen, our experiences are here:',
+      signoff: 'Hope to see you again soon!',
+      team: 'The Shenzhen Buddies team',
+    },
     errors: {
       invalidLink: "This review link isn't valid. Please ask your guide for the latest link.",
       noGuide: 'Reviews are not open right now.',

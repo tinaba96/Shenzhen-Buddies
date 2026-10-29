@@ -29,10 +29,10 @@ type Props = {
 export default async function OpenReviewPage({ searchParams }: Props) {
   const [sp, { locale, t }] = await Promise.all([searchParams, getI18n()])
   const o = t.openReview
-  // The error strings are used by the action only; keep them out of the
-  // client bundle.
+  // The error and email strings are used by the action only; keep them out
+  // of the client bundle.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { errors, ...formLabels } = o
+  const { errors, thankYouEmail, ...formLabels } = o
   const guideId = officialGuideId()
 
   // The thank-you view is reached by the action's redirect, without the code.

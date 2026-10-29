@@ -53,7 +53,7 @@ export async function submitOpenReview(
   prev: OpenReviewState,
   formData: FormData,
 ): Promise<OpenReviewState> {
-  const { t } = await getI18n()
+  const { t, locale } = await getI18n()
   const e = t.openReview.errors
 
   const values = {
@@ -120,6 +120,10 @@ export async function submitOpenReview(
     const password = String(formData.get('password') ?? '')
     if (!values.email) return fail(e.email)
     if (password.length < 8) return fail(e.password)
+    // A typo here would lock them out of the account they are making.
+    if (password !== String(formData.get('password_confirm') ?? '')) {
+      return fail(t.auth.errors.mismatch)
+    }
     const { data, error } = await supabase.auth.signUp({
       email: values.email,
       password,
@@ -193,6 +197,41 @@ export async function submitOpenReview(
     return fail(e.generic)
   }
 
+  // A thank-you in the reviewer's language. Best-effort, like every email
+  // here: the review is already saved.
+  if (email) {
+    const m = t.openReview.thankYouEmail
+    const vars = {
+      name: values.name.split(' ')[0],
+      guide: await officialGuideFirstName(admin, guideId, t.review.yourGuide),
+    }
+    const f = (s: string) => fill(s, vars, locale)
+    await sendEmail({
+      to: email,
+      subject: f(m.subject),
+      text: [
+        f(m.greeting),
+        '',
+        f(m.thanks),
+        '',
+        m.yourReview,
+        '★'.repeat(values.stars) + '☆'.repeat(5 - values.stars),
+        ...(values.body ? [values.body] : []),
+        '',
+        f(m.profile),
+        `${siteUrl()}/u/${guideId}`,
+        '',
+        needsConfirmation ? m.confirm : m.login,
+        '',
+        m.comeBack,
+        `${siteUrl()}/tours`,
+        '',
+        m.signoff,
+        m.team,
+      ].join('\n'),
+    })
+  }
+
   // Best-effort, like every other admin email: the review is already saved.
   const h = await headers()
   await sendEmail({
@@ -211,4 +250,19 @@ export async function submitOpenReview(
   revalidatePath('/guide')
   revalidatePath(`/u/${guideId}`)
   redirect(needsConfirmation ? '/review?sent=1&check_email=1' : '/review?sent=1')
+}
+
+// The guide's first name for the thank-you email; the fallback is a phrase
+// ("your guide"), as on the page.
+async function officialGuideFirstName(
+  admin: ReturnType<typeof createSupabaseAdminClient>,
+  guideId: string,
+  fallback: string,
+): Promise<string> {
+  const { data } = await admin
+    .from('profiles')
+    .select('display_name')
+    .eq('id', guideId)
+    .maybeSingle<{ display_name: string }>()
+  return data?.display_name ? data.display_name.split(' ')[0] : fallback
 }
