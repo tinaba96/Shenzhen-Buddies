@@ -22,6 +22,8 @@ const ROUTES: Array<{
   { path: '/tours', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/guide', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/explore', priority: 0.8, changeFrequency: 'weekly' },
+  // The landing page for "local help in Shenzhen" searches.
+  { path: '/local-help', priority: 0.8, changeFrequency: 'monthly' },
   // Only the bare path. `?loc=` variants canonicalise back to /gallery, so
   // listing them would submit duplicates of a page we already point at.
   { path: '/gallery', priority: 0.6, changeFrequency: 'weekly' },

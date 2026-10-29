@@ -24,9 +24,11 @@ export const en = {
   // indexable documents. Switching to /zh path prefixes is what would change
   // that, and it would bring hreflang with it.
   seo: {
-    siteTitle: 'Shenzhen Buddies',
+    // Carries the "local help in Shenzhen" search phrasing. /local-help is the
+    // page written for that query; the homepage title backs it up.
+    siteTitle: 'Shenzhen Buddies — Local help and private outings in Shenzhen',
     siteDescription:
-      'Match with a Shenzhen local who shares your interests, for a private outing of 2 or 3 hours. Bring a friend if you like. Free during our pilot.',
+      'Get local help in Shenzhen from someone who shares your interests. Spend 2 or 3 hours together while they help you set up phone payments, order food and ride the metro. Free during our pilot.',
     toursTitle: 'Free local experiences in Shenzhen — Shenzhen Buddies',
     toursDescription:
       'Six private experiences in Shenzhen, free during our pilot: the Huaqiangbei electronics market, Dongmen street food, Futian after dark, Talent Park, the Shekou waterfront and a bike ride along Shenzhen Bay.',
@@ -71,6 +73,10 @@ export const en = {
     },
     review: {
       title: 'How was your tour? — Shenzhen Buddies',
+    },
+    localHelp: {
+      title: 'Get local help in Shenzhen — Shenzhen Buddies',
+      description: 'Get help in Shenzhen from someone who lives there. Book a local for 2 or 3 hours to set up Alipay and WeChat Pay, read menus and find your way on the metro. Free during our pilot.',
     },
   },
 
@@ -177,6 +183,7 @@ export const en = {
       kicker: 'What a buddy actually does',
       title: 'The friction, handled.',
       body: 'Not a licence, not a coach, not a flag on a stick. A person who lives here and takes the awkward parts off your plate.',
+      helpLink: 'How to get local help in Shenzhen',
       items: [
         {
           title: 'Translation, live',
@@ -312,6 +319,7 @@ export const en = {
     account: 'Account',
     company: 'Company',
     discount: 'Free tours (pilot)',
+    localHelp: 'Local help in Shenzhen',
     donate: 'Support us',
     about: 'About',
     contact: 'Contact',
@@ -1073,6 +1081,107 @@ export const en = {
         label: 'Buddies',
         blurb: 'The locals showing people around, in their own words.',
       },
+    },
+  },
+
+  // /local-help — the page written for "get local help in Shenzhen" searches.
+  // Only claims what a buddy already does on the homepage's promise list; the
+  // emergency numbers are the national mainland ones.
+  localHelp: {
+    heroAlt: 'Crayfish noodles lifted from the bowl at a Shenzhen restaurant',
+    kicker: 'Visiting Shenzhen',
+    title: 'Get local help in Shenzhen from someone who lives here.',
+    body: 'Shenzhen runs on phone payments, and many of the apps you use at home do not work here. Book a local for 2 or 3 hours and sort it out together.',
+    primaryCta: 'Book a local, free',
+    secondaryCta: 'Ask us a question',
+    helpWith: {
+      kicker: 'What a local can help with',
+      title: 'The things visitors get stuck on.',
+      items: [
+        {
+          title: 'Paying for things',
+          body: 'Many places do not take foreign cards. Your buddy helps you set up Alipay and WeChat Pay on your phone and you test them together, so you are not stuck at the till later.',
+        },
+        {
+          title: 'Ordering food',
+          body: 'Menus are in Chinese, and many restaurants take orders through a QR code at the table. Your buddy talks you through the dishes and places the order with you.',
+        },
+        {
+          title: 'Getting around',
+          body: 'Your buddy shows you how the metro QR code works and which exit to take. When it is time to head back, they call a ride and tell the driver where you are going.',
+        },
+        {
+          title: 'Talking to people',
+          body: 'Your buddy does the talking at market stalls, at shop counters and in taxis, so you do not have to rely on a translation app.',
+        },
+        {
+          title: 'Fair prices',
+          body: 'In markets like Huaqiangbei, your buddy asks the local price for you. Nothing you buy passes through us, and we take no cut.',
+        },
+        {
+          title: 'Knowing where to go',
+          body: 'Your buddy can tell you which district suits what you are into and where people who live here go to eat.',
+        },
+      ],
+    },
+    how: {
+      kicker: 'How to get help',
+      title: 'Three small steps.',
+      steps: [
+        {
+          title: 'Say what you need',
+          body: 'Pick an experience, or just tell us what you want help with — payments, food, a district to explore.',
+        },
+        {
+          title: 'Pick a day',
+          body: 'Open days are listed live. Request 2 or 3 hours for free, and we reply by email within three business days.',
+        },
+        {
+          title: 'Meet your local',
+          body: 'Message each other beforehand, meet where you agreed, and work through your list together.',
+        },
+      ],
+    },
+    limits: {
+      kicker: 'Good to know',
+      title: 'What we are not.',
+      body: 'A buddy is a local who spends a few hours with you. We are not an emergency service, a visa agent or a 24-hour helpline. In an emergency anywhere in mainland China, call 110 for the police, 120 for an ambulance or 119 for the fire service.',
+    },
+    reading: {
+      kicker: 'Before you arrive',
+      title: 'Read up first.',
+    },
+    faq: {
+      kicker: 'Questions',
+      title: 'Common questions about getting help in Shenzhen.',
+      items: [
+        {
+          q: 'How can a foreigner get local help in Shenzhen?',
+          a: 'Book a local buddy on Shenzhen Buddies. Pick a day and request 2 or 3 hours. Once we confirm, someone who lives in Shenzhen meets you and helps with payments, food and getting around. It is free during our pilot.',
+        },
+        {
+          q: 'Do I need to speak Chinese?',
+          a: 'No. Your buddy handles the conversations in Chinese, so you do not need to.',
+        },
+        {
+          q: 'Can someone help me set up Alipay or WeChat Pay?',
+          a: 'Yes. Your buddy can set both up on your phone with you and check they work before you need them.',
+        },
+        {
+          q: 'Is this a tour guide service?',
+          a: 'Not in the usual sense. There is no coach and no fixed script, just one local with you (and a friend, if you like), and the plan can change as you go.',
+        },
+        {
+          q: 'How much does it cost?',
+          a: 'Nothing during the pilot — no card, no deposit. If we cannot confirm your day, we tell you straight away.',
+        },
+      ],
+    },
+    final: {
+      title: 'Need a hand in Shenzhen?',
+      body: 'Pick a day and meet a local who knows the city. Free while we pilot.',
+      primaryCta: 'See open days',
+      secondaryCta: 'Contact us',
     },
   },
 

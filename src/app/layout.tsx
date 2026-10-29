@@ -415,6 +415,8 @@ async function SiteFooter() {
           links={[
             { href: "/tours", label: t.nav.tours },
             { href: "/welcome", label: t.footer.discount },
+            // Site-wide internal link to the "local help" search landing page.
+            { href: "/local-help", label: t.footer.localHelp },
             { href: "/explore", label: t.nav.explore },
             { href: "/gallery", label: t.nav.gallery },
             { href: "/blog", label: t.nav.blog },

@@ -369,6 +369,13 @@ function Promise_({ t }: { t: Dictionary }) {
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
             {t.home.promise.body}
           </p>
+          <Link
+            href="/local-help"
+            className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-zinc-900 underline-offset-4 hover:underline dark:text-white"
+          >
+            {t.home.promise.helpLink}
+            <span aria-hidden>→</span>
+          </Link>
         </div>
 
         <ul className="mt-12 grid gap-px overflow-hidden rounded-3xl border border-zinc-200 bg-zinc-200 sm:grid-cols-2 lg:grid-cols-3 dark:border-zinc-800 dark:bg-zinc-800">
