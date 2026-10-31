@@ -3,6 +3,7 @@ import type { PostTranslations } from '../types'
 import { dongmenOldDowntown } from './dongmen-old-downtown'
 import { futianNewDowntown } from './futian-new-downtown'
 import { shenzhenAfterDark } from './shenzhen-after-dark'
+import { shenzhenBayWaterfront } from './shenzhen-bay-waterfront'
 import { shenzhenFromHongKongDayTrip } from './shenzhen-from-hong-kong-day-trip'
 import { whatShenzhenActuallyEats } from './what-shenzhen-actually-eats'
 
@@ -11,6 +12,7 @@ export const postsJa: PostTranslations = {
     'dongmen-old-downtown': dongmenOldDowntown,
     'futian-new-downtown': futianNewDowntown,
     'shenzhen-after-dark': shenzhenAfterDark,
+    'shenzhen-bay-waterfront': shenzhenBayWaterfront,
     'shenzhen-from-hong-kong-day-trip': shenzhenFromHongKongDayTrip,
     'what-shenzhen-actually-eats': whatShenzhenActuallyEats,
   },

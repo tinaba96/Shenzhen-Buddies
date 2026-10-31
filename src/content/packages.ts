@@ -587,6 +587,7 @@ export const packages: TourPackage[] = [
     ],
     insiderTip:
       'Come around sunset if you can. Talent Park is nice in the daytime, but it is better when the skyline lights up, the towers reflect in the lake, and day turns into night.',
+    readMoreSlug: 'shenzhen-bay-waterfront',
     accent: 'jade',
   },
   {
@@ -665,6 +666,7 @@ export const packages: TourPackage[] = [
     ],
     insiderTip:
       'Go after sunset. Sea World is a different place once the lights come on along the water.',
+    readMoreSlug: 'shenzhen-bay-waterfront',
     accent: 'coral',
   },
   {
@@ -783,6 +785,7 @@ export const packages: TourPackage[] = [
     ],
     insiderTip:
       "Shenzhen Bay is a lot longer than most visitors expect, so don't try to cover all of it. Ride slowly, stop for photos, and enjoy the breeze and the changing views. It's mostly flat and easy for beginners, so it's fine even if you don't cycle much.",
+    readMoreSlug: 'shenzhen-bay-waterfront',
     accent: 'sky',
   },
 

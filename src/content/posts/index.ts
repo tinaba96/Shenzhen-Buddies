@@ -8,6 +8,7 @@ import { AUTHORS, PILLARS, type Pillar, type Post } from './types'
 import { dongmenOldDowntown } from './dongmen-old-downtown'
 import { futianNewDowntown } from './futian-new-downtown'
 import { shenzhenAfterDark } from './shenzhen-after-dark'
+import { shenzhenBayWaterfront } from './shenzhen-bay-waterfront'
 import { shenzhenFromHongKongDayTrip } from './shenzhen-from-hong-kong-day-trip'
 import { whatShenzhenActuallyEats } from './what-shenzhen-actually-eats'
 
@@ -19,6 +20,7 @@ export const posts: Post[] = [
   dongmenOldDowntown,
   futianNewDowntown,
   shenzhenAfterDark,
+  shenzhenBayWaterfront,
   shenzhenFromHongKongDayTrip,
   whatShenzhenActuallyEats,
 ]

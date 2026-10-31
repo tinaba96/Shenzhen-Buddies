@@ -526,6 +526,100 @@ export const galleryItems: GalleryItem[] = [
     people: 'none',
     capturedAt: '2026-02',
   },
+  {
+    id: 'shenzhen-bay-houhai-dusk',
+    kind: 'image',
+    src: '/gallery/shenzhen-bay-houhai-dusk.webp',
+    width: 1200,
+    height: 1600,
+    alt: 'The Houhai skyline at dusk across Shenzhen Bay: a tapered tower with a spire, a white mesh arena at the waterline, and the towers reflected in the wet mudflat, with rocks in the foreground.',
+    title: 'Houhai from the mud',
+    caption: 'The Houhai towers from the Shenzhen Bay shore at low tide. The tapered one is the Spring Bamboo; the white dome is the Spring Cocoon.',
+    // Founder's own frame, August 2026, from the rocks at Shenzhen Bay Park.
+    // The two named buildings are the China Resources headquarters and the
+    // Shenzhen Bay Sports Center, both unmistakable in the frame.
+    location: 'other',
+    themes: ['nightlife', 'nature'],
+    relatedPostSlug: 'shenzhen-bay-waterfront',
+    // Portrait: sky above, the skyline across the middle, mud and rocks
+    // below. Hold it just below centre so the card keeps towers and water.
+    focus: '50% 55%',
+    people: 'none',
+    capturedAt: '2026-08',
+    featured: true,
+  },
+  {
+    id: 'shenzhen-bay-bridge-hongkong',
+    kind: 'image',
+    src: '/gallery/shenzhen-bay-bridge-hongkong.webp',
+    width: 1600,
+    height: 740,
+    alt: 'Shenzhen Bay at low tide under a pale evening sky: wet mudflat in the foreground, a long cable-stayed bridge crossing the water to hills on the far side, and a line of towers on the right.',
+    title: 'The bridge to Hong Kong',
+    caption: 'The Shenzhen Bay Bridge at low tide. The hills on the far side are the New Territories.',
+    // Cropped from a wider founder frame (August 2026) that showed families
+    // on the rocks below; the crop keeps sky, hills, bridge and water and
+    // nothing identifiable — "shoot places, not faces".
+    location: 'other',
+    themes: ['nature'],
+    relatedPostSlug: 'shenzhen-bay-waterfront',
+    focus: '50% 70%',
+    people: 'none',
+    capturedAt: '2026-08',
+  },
+  {
+    id: 'sea-world-minghua-ship-day',
+    kind: 'image',
+    src: '/gallery/sea-world-minghua-ship-day.webp',
+    width: 1600,
+    height: 1200,
+    alt: 'The white Minghua liner moored in a pond at Sea World, Shekou, in daylight, with a red bow on her side, apartment towers behind her and the whole scene reflected in the water.',
+    title: 'The Minghua by day',
+    caption: 'The ship has not moved since 1983. The sea has.',
+    // Founder's own frame, Lunar New Year 2026 (the red bow is a holiday
+    // decoration). Figures on the far bridge are specks at 1600x1200.
+    location: 'shekou',
+    themes: ['street'],
+    relatedPostSlug: 'shenzhen-bay-waterfront',
+    focus: '50% 50%',
+    people: 'none',
+    capturedAt: '2026-02',
+  },
+  {
+    id: 'sea-world-beer-tower',
+    kind: 'image',
+    src: '/gallery/sea-world-beer-tower.webp',
+    width: 1600,
+    height: 1085,
+    alt: 'A round self-service beer kiosk on the Sea World plaza with a wide saucer-shaped roof and a curved LED price board, apartment towers and palm trees behind it under a blue sky.',
+    title: 'The beer tower',
+    caption: 'Scan a code, pour your own, and the tap works out the bill. Open all night.',
+    // Cropped from a wider founder frame (February 2026) that showed people
+    // at the taps; the crop stops above them and keeps the roof and the
+    // price board.
+    location: 'shekou',
+    themes: ['street', 'food'],
+    relatedPostSlug: 'shenzhen-bay-waterfront',
+    focus: '50% 50%',
+    people: 'none',
+    capturedAt: '2026-02',
+  },
+  {
+    id: 'shekou-grilled-eggplant',
+    kind: 'image',
+    src: '/gallery/shekou-grilled-eggplant.webp',
+    width: 1200,
+    height: 1600,
+    alt: 'A whole grilled eggplant split open on a cast-iron tray, covered in minced garlic, chilli and spring onion, with a pan of grilled dishes behind it.',
+    title: 'The eggplant',
+    caption: 'Split, grilled until it collapses, buried in garlic. The standard order at any grill in Shekou.',
+    // Founder's own table, Shekou, February 2026. No people in frame.
+    location: 'shekou',
+    themes: ['food'],
+    relatedPostSlug: 'shenzhen-bay-waterfront',
+    people: 'none',
+    capturedAt: '2026-02',
+  },
 ]
 
 function fail(id: string, problem: string): never {
