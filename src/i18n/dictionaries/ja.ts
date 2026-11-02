@@ -930,7 +930,7 @@ export const ja: Dictionary = {
     haveAccount: 'すでにアカウントをお持ちの方は',
     rating: '{name}さんへの評価',
     words: 'ひとこと',
-    placeholder: '印象に残ったことは？良かった点も、そうでない点も。',
+    placeholder: '{name}さんと一緒に体験して良かったことは？{name}さんは頼りになりましたか？',
     name: 'お名前',
     nameHint: 'レビューと一緒に表示されます。',
     photo: 'プロフィール写真',

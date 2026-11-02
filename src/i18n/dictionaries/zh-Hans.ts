@@ -930,7 +930,7 @@ export const zhHans: Dictionary = {
     haveAccount: '已经有账号了？',
     rating: '给{name}打个分',
     words: '说几句',
-    placeholder: '有什么让你印象深刻？好的坏的都可以。',
+    placeholder: '和{name}一起尝试的事情里，哪一件让你最开心？{name}帮上忙了吗？',
     name: '你的名字',
     nameHint: '会显示在你的评价旁边。',
     photo: '头像',

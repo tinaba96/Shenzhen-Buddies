@@ -121,6 +121,7 @@ export default async function OpenReviewPage({ searchParams }: Props) {
             labels={{
               ...formLabels,
               rating: fill(o.rating, { name: guideName }, locale),
+              placeholder: fill(o.placeholder, { name: guideName }, locale),
               email: t.auth.email,
               password: t.auth.password,
               minLength: t.auth.minLength,

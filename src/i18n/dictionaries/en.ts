@@ -989,7 +989,7 @@ export const en = {
     haveAccount: 'Already have an account?',
     rating: 'Your rating for {name}',
     words: 'A few words',
-    placeholder: 'What stood out — good or bad?',
+    placeholder: "What's one thing you're glad you tried with {name}? Was {name} helpful?",
     name: 'Your name',
     nameHint: 'Shown next to your review.',
     photo: 'Profile photo',

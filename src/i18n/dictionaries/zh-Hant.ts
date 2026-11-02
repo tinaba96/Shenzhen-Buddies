@@ -939,7 +939,7 @@ export const zhHant: Dictionary = {
     haveAccount: '已經有帳號？',
     rating: '你給{name}的評分',
     words: '寫幾句',
-    placeholder: '有甚麼令你印象深刻？好或不好都可以。',
+    placeholder: '和{name}一起嘗試的事情之中，哪一件最令你開心？{name}幫得上忙嗎？',
     name: '你的名字',
     nameHint: '會顯示在你的評價旁邊。',
     photo: '個人相片',
