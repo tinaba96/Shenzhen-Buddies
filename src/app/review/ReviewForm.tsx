@@ -163,7 +163,7 @@ export function ReviewForm({
         pendingLabel={l.pending}
         className="w-full rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
       >
-        {signedIn ? l.submitSignedIn : l.submit}
+        {l.submit}
       </SubmitButton>
       <p className="text-xs text-zinc-500">{l.consent}</p>
     </form>
