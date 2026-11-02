@@ -5,7 +5,7 @@ import { Avatar } from '@/components/Avatar'
 import { BookingFields } from '@/components/BookingFields'
 import { FreeBookingFields } from '@/components/FreeBookingFields'
 import { ReviewPledge } from '@/components/GuestRequestForm'
-import { StarRating } from '@/components/StarRating'
+import { ReviewSummary } from '@/components/ReviewSummary'
 import { SubmitButton } from '@/components/SubmitButton'
 import { avatarPublicUrl } from '@/lib/avatars'
 import {
@@ -38,6 +38,7 @@ import type { Locale } from '@/i18n/config'
 import { getI18n } from '@/i18n/server'
 import { tagLabel } from '@/i18n/tags'
 import { DEFAULT_OG_IMAGE, isSingleGuideMode, officialGuideId } from '@/lib/config'
+import { summarizeReviews, type ReviewRating } from '@/lib/review-summary'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { startConversationWith } from '@/app/messages/actions'
@@ -294,16 +295,13 @@ export default async function GuidePage({ searchParams }: Props) {
         : Promise.resolve({ data: null as BookingRow[] | null }),
       admin
         .from('reviews')
-        .select('stars')
+        .select('stars, thumb')
         .eq('reviewee_id', guideId)
-        .returns<{ stars: number }[]>(),
+        .returns<ReviewRating[]>(),
     ])
 
-  const reviewCount = guideReviews?.length ?? 0
-  const avgStars =
-    reviewCount > 0
-      ? guideReviews!.reduce((s, r) => s + r.stars, 0) / reviewCount
-      : 0
+  const reviewSummary = summarizeReviews(guideReviews ?? [])
+  const reviewCount = reviewSummary.count
   const firstName = guide.display_name.split(' ')[0]
 
   // Hours taken by a confirmed/awaiting booking or a *fresh* hold, per day.
@@ -463,19 +461,17 @@ export default async function GuidePage({ searchParams }: Props) {
             </p>
 
             {reviewCount > 0 ? (
-              <div className="mt-3 flex items-center gap-2 text-sm">
-                <StarRating
-                  value={avgStars}
-                  size={16}
-                  label={fill(i18n.stars.outOf, { value: avgStars.toFixed(1) }, locale)}
-                />
-                <span className="text-white/90">
-                  {avgStars.toFixed(1)}
-                  {meta.sep}
-                  {fill(reviewCount === 1 ? b.reviewOne : b.reviewMany, {
+              <div className="mt-3 text-sm text-white/90">
+                <ReviewSummary
+                  summary={reviewSummary}
+                  starsLabel={fill(i18n.stars.outOf, { value: reviewSummary.avgStars.toFixed(1) }, locale)}
+                  thumbsLabel={fill(reviewSummary.thumbsUp === 1 ? i18n.stars.thumbsUpOne : i18n.stars.thumbsUpOther, { n: reviewSummary.thumbsUp }, locale)}
+                  countLabel={fill(reviewCount === 1 ? b.reviewOne : b.reviewMany, {
                     n: reviewCount,
                   }, locale)}
-                </span>
+                  sep={meta.sep}
+                  className="justify-center"
+                />
               </div>
             ) : (
               <span className="mt-3 rounded-full bg-white/15 px-3 py-0.5 text-xs font-medium backdrop-blur">

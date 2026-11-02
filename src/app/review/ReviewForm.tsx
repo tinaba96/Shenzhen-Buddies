@@ -34,7 +34,7 @@ export function ReviewForm({
 }) {
   const initial: OpenReviewState = {
     error: null,
-    values: { name: defaultName, email: '', stars: 0, body: '' },
+    values: { name: defaultName, email: '', thumb: '', stars: 0, body: '' },
     attempt: 0,
   }
   const [state, action] = useActionState(submitOpenReview, initial)
@@ -55,8 +55,41 @@ export function ReviewForm({
         </p>
       )}
 
+      <fieldset>
+        <legend className="text-sm font-medium">{l.thumb}</legend>
+        <div className="mt-2 grid grid-cols-2 gap-3">
+          {(['up', 'down'] as const).map((value) => (
+            <label key={value} className="relative cursor-pointer">
+              {/* Kept in the layout (not display:none) so the browser's
+                  "please select" bubble has somewhere to point. */}
+              <input
+                type="radio"
+                name="thumb"
+                value={value}
+                required
+                defaultChecked={v.thumb === value}
+                aria-label={value === 'up' ? l.thumbUp : l.thumbDown}
+                className="peer absolute inset-0 opacity-0"
+              />
+              <span
+                className={`block rounded-xl border border-zinc-300 px-4 py-4 text-center text-2xl transition dark:border-zinc-700 ${
+                  value === 'up'
+                    ? 'hover:border-emerald-400 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-950'
+                    : 'hover:border-red-300 peer-checked:border-red-400 peer-checked:bg-red-50 dark:peer-checked:bg-red-950'
+                } peer-focus-visible:ring-2 peer-focus-visible:ring-amber-400`}
+              >
+                {value === 'up' ? '👍' : '👎'}
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
       <div>
-        <p className="text-sm font-medium">{l.rating}</p>
+        <p className="text-sm font-medium">
+          {l.rating}
+          <span className="ml-1 text-xs font-normal text-zinc-500">{l.starsOptional}</span>
+        </p>
         <div className="mt-2">
           <StarRatingInput
             name="stars"

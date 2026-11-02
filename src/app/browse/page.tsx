@@ -230,9 +230,11 @@ export default async function BrowsePage({ searchParams }: Props) {
         'reviewee_id',
         profiles.map((p) => p.id),
       )
-      .returns<{ reviewee_id: string; stars: number }[]>()
+      .returns<{ reviewee_id: string; stars: number | null }[]>()
     const agg = new Map<string, { sum: number; count: number }>()
     for (const r of reviewRows ?? []) {
+      // Thumb-only reviews (migration 0021) carry no stars to average.
+      if (r.stars == null) continue
       const cur = agg.get(r.reviewee_id) ?? { sum: 0, count: 0 }
       cur.sum += r.stars
       cur.count += 1

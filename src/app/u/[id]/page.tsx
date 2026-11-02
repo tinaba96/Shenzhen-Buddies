@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { Avatar } from '@/components/Avatar'
+import { ReviewSummary } from '@/components/ReviewSummary'
 import { StarRating, StarRatingInput } from '@/components/StarRating'
 import { SubmitButton } from '@/components/SubmitButton'
 import { fill, type Dictionary } from '@/i18n'
@@ -12,6 +13,7 @@ import {
   type MatchScore,
   type ProfileForMatching,
 } from '@/lib/matching'
+import { summarizeReviews } from '@/lib/review-summary'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { startConversationWith } from '@/app/messages/actions'
@@ -44,7 +46,8 @@ type ReviewRow = {
   id: string
   reviewer_id: string
   reviewee_id: string
-  stars: number
+  stars: number | null
+  thumb: 'up' | 'down' | null
   body: string | null
   created_at: string
   updated_at: string
@@ -109,17 +112,24 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
 
   const { data: reviews } = await reader
     .from('reviews')
-    .select('id, reviewer_id, reviewee_id, stars, body, created_at, updated_at')
+    .select('id, reviewer_id, reviewee_id, stars, thumb, body, created_at, updated_at')
     .eq('reviewee_id', id)
     .order('created_at', { ascending: false })
     .returns<ReviewRow[]>()
 
   const reviewList = reviews ?? []
-  const reviewCount = reviewList.length
-  const avgStars =
-    reviewCount === 0
-      ? 0
-      : reviewList.reduce((sum, r) => sum + r.stars, 0) / reviewCount
+  const reviewSummary = summarizeReviews(reviewList)
+  const reviewCount = reviewSummary.count
+  const summaryLabels = {
+    starsLabel: fill(t.stars.outOf, { value: reviewSummary.avgStars.toFixed(1) }, locale),
+    thumbsLabel: fill(
+      reviewSummary.thumbsUp === 1 ? t.stars.thumbsUpOne : t.stars.thumbsUpOther,
+      { n: reviewSummary.thumbsUp },
+      locale,
+    ),
+    countLabel: reviewCountLabel(reviewCount),
+    sep: meta.sep,
+  }
   const canSeeReviews = isSelf || reviewCount >= REVIEW_VISIBILITY_THRESHOLD
 
   const myReview =
@@ -220,17 +230,8 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
             </div>
             <p className="mt-1 text-sm text-zinc-500">{tagLabel(t.browse.cityNames, profile.city)}</p>
             {reviewCount > 0 && (
-              <div className="mt-2 flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-                <StarRating
-                  value={avgStars}
-                  size={16}
-                  label={fill(t.stars.outOf, { value: avgStars.toFixed(1) }, locale)}
-                />
-                <span>
-                  {avgStars.toFixed(1)}
-                  {meta.sep}
-                  {reviewCountLabel(reviewCount)}
-                </span>
+              <div className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                <ReviewSummary summary={reviewSummary} {...summaryLabels} />
               </div>
             )}
           </div>
@@ -311,17 +312,8 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
         <div className="mb-3 flex items-baseline justify-between">
           <h2 className="text-xl font-semibold">{c.reviews}</h2>
           {reviewCount > 0 && (
-            <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-              <StarRating
-                value={avgStars}
-                size={14}
-                label={fill(t.stars.outOf, { value: avgStars.toFixed(1) }, locale)}
-              />
-              <span>
-                {avgStars.toFixed(1)}
-                  {meta.sep}
-                  {reviewCountLabel(reviewCount)}
-              </span>
+            <div className="text-sm text-zinc-600 dark:text-zinc-400">
+              <ReviewSummary summary={reviewSummary} size={14} {...summaryLabels} />
             </div>
           )}
         </div>
@@ -417,12 +409,23 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
                           {new Date(r.created_at).toLocaleDateString(meta.intlLocale)}
                         </span>
                       </div>
-                      <StarRating
-                        value={r.stars}
-                        size={14}
-                        className="mt-1"
-                        label={fill(t.stars.outOf, { value: r.stars.toFixed(1) }, locale)}
-                      />
+                      <div className="mt-1 flex items-center gap-2">
+                        {r.thumb && (
+                          <span
+                            role="img"
+                            aria-label={r.thumb === 'up' ? t.stars.thumbUp : t.stars.thumbDown}
+                          >
+                            {r.thumb === 'up' ? '👍' : '👎'}
+                          </span>
+                        )}
+                        {r.stars != null && (
+                          <StarRating
+                            value={r.stars}
+                            size={14}
+                            label={fill(t.stars.outOf, { value: r.stars.toFixed(1) }, locale)}
+                          />
+                        )}
+                      </div>
                       {r.body && (
                         <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
                           {r.body}

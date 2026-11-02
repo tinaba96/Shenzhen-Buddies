@@ -80,10 +80,10 @@ export default async function ReviewPage({ params, searchParams }: Props) {
       .maybeSingle<{ display_name: string }>(),
     supabase
       .from('reviews')
-      .select('stars, body')
+      .select('thumb, body')
       .eq('reviewer_id', user.id)
       .eq('reviewee_id', guideId)
-      .maybeSingle<{ stars: number; body: string | null }>(),
+      .maybeSingle<{ thumb: 'up' | 'down' | null; body: string | null }>(),
   ])
   const guideName = guide?.display_name ?? r.yourGuide
   // The fallback is a phrase, not a name — splitting it would leave "your".
@@ -112,11 +112,7 @@ export default async function ReviewPage({ params, searchParams }: Props) {
   const currentThumb =
     sp.thanks === 'up' || sp.thanks === 'down'
       ? sp.thanks
-      : existingReview
-        ? existingReview.stars >= 4
-          ? 'up'
-          : 'down'
-        : null
+      : (existingReview?.thumb ?? null)
 
   return (
     <main className="mx-auto w-full max-w-xl flex-1 px-4 py-12">

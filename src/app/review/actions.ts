@@ -42,6 +42,8 @@ export type OpenReviewState = {
   values: {
     name: string
     email: string
+    thumb: string
+    // 0 when no stars were picked: they are optional.
     stars: number
     body: string
   }
@@ -59,7 +61,8 @@ export async function submitOpenReview(
   const values = {
     name: String(formData.get('name') ?? '').trim(),
     email: String(formData.get('email') ?? '').trim(),
-    stars: Number(formData.get('stars') ?? 0),
+    thumb: String(formData.get('thumb') ?? ''),
+    stars: Number(formData.get('stars') || 0),
     body: String(formData.get('body') ?? '').trim(),
   }
   const fail = (error: string): OpenReviewState => ({
@@ -80,7 +83,8 @@ export async function submitOpenReview(
   const guideId = officialGuideId()
   if (!guideId) return fail(e.noGuide)
 
-  if (!Number.isInteger(values.stars) || values.stars < 1 || values.stars > 5) {
+  if (values.thumb !== 'up' && values.thumb !== 'down') return fail(e.thumb)
+  if (!Number.isInteger(values.stars) || values.stars < 0 || values.stars > 5) {
     return fail(e.stars)
   }
   if (!values.body) return fail(e.body)
@@ -190,7 +194,8 @@ export async function submitOpenReview(
     {
       reviewer_id: userId,
       reviewee_id: guideId,
-      stars: values.stars,
+      thumb: values.thumb,
+      stars: values.stars || null,
       body: values.body ? values.body.slice(0, 5000) : null,
     },
     { onConflict: 'reviewer_id,reviewee_id' },
@@ -199,6 +204,13 @@ export async function submitOpenReview(
     console.error('Open review upsert failed:', reviewError)
     return fail(e.generic)
   }
+
+  // 👍 or 👎, then the stars if they gave any — for both emails.
+  const rating =
+    (values.thumb === 'up' ? '👍' : '👎') +
+    (values.stars
+      ? ` ${'★'.repeat(values.stars)}${'☆'.repeat(5 - values.stars)}`
+      : '')
 
   // A thank-you in the reviewer's language. Best-effort, like every email
   // here: the review is already saved.
@@ -218,7 +230,7 @@ export async function submitOpenReview(
         f(m.thanks),
         '',
         m.yourReview,
-        '★'.repeat(values.stars) + '☆'.repeat(5 - values.stars),
+        rating,
         ...(values.body ? [values.body] : []),
         '',
         f(m.profile),
@@ -239,9 +251,9 @@ export async function submitOpenReview(
   const h = await headers()
   await sendEmail({
     to: adminEmails(),
-    subject: `New review — ${values.stars}★ from ${values.name}`,
+    subject: `New review — ${rating} from ${values.name}`,
     text: [
-      `${values.name} <${email}> left a ${values.stars}-star review on /review.`,
+      `${values.name} <${email}> left a review on /review: ${rating}`,
       '',
       values.body || '(no written review)',
       '',

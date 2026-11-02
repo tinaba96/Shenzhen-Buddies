@@ -14,11 +14,11 @@ import {
 } from '@/lib/support'
 import { checkTipEligibility, officialGuideDisplayName } from '@/lib/tips'
 
-// Post-tour review: a thumb up/down plus an optional short written review.
-// Stored in the existing reviews table — up maps to 5 stars, down to 1 — so
-// the guide's profile, the average on /guide and the old star-based form all
-// keep working, and RLS (0016_review_after_tour.sql) stays the enforcement
-// that only a tourist whose tour has finished can write one.
+// Post-tour review: a thumb up/down plus an optional short written review,
+// stored in the reviews table's `thumb` column (migration 0021). Stars are
+// left alone, so a star rating given elsewhere survives a thumb change. RLS
+// (0016_review_after_tour.sql) stays the enforcement that only a tourist
+// whose tour has finished can write one.
 
 function reviewFail(bookingId: string, message: string): never {
   redirect(`/guide/review/${bookingId}?error=${encodeURIComponent(message)}`)
@@ -83,7 +83,7 @@ export async function submitTourReview(formData: FormData) {
     {
       reviewer_id: user.id,
       reviewee_id: guideId,
-      stars: thumb === 'up' ? 5 : 1,
+      thumb,
       body,
     },
     { onConflict: 'reviewer_id,reviewee_id' },
