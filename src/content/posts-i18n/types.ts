@@ -31,6 +31,8 @@ export type LocalizedBlock =
   // tone stays on the base block.
   | { k: 'callout'; title: string; text: string }
   | { k: 'cta'; label: string; sub?: string }
+  // The channels themselves come from config; only the words are translated.
+  | { k: 'contact'; title: string; text: string }
 
 export type LocalizedPost = {
   title: string

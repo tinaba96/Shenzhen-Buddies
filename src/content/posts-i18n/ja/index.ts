@@ -1,5 +1,6 @@
 import type { PostTranslations } from '../types'
 
+import { apec2026Shenzhen } from './apec-2026-shenzhen'
 import { dongmenOldDowntown } from './dongmen-old-downtown'
 import { futianNewDowntown } from './futian-new-downtown'
 import { shenzhenAfterDark } from './shenzhen-after-dark'
@@ -9,6 +10,7 @@ import { whatShenzhenActuallyEats } from './what-shenzhen-actually-eats'
 
 export const postsJa: PostTranslations = {
   posts: {
+    'apec-2026-shenzhen': apec2026Shenzhen,
     'dongmen-old-downtown': dongmenOldDowntown,
     'futian-new-downtown': futianNewDowntown,
     'shenzhen-after-dark': shenzhenAfterDark,

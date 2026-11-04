@@ -71,6 +71,17 @@ function headingId(text: string, index: number): string {
   return /[a-z]/.test(slug) ? slug : `section-${index}`
 }
 
+// The channels a `contact` block lists, resolved by the page on the server.
+// `whatsapp` is the display form of the number (null when WHATSAPP_NUMBER is
+// unset, in which case the row is simply omitted); the link itself goes through
+// /whatsapp like every other WhatsApp button on the site.
+export type ContactChannels = {
+  whatsapp: string | null
+  wechat: string
+  email: string
+  labels: { whatsapp: string; wechat: string; email: string }
+}
+
 // `ctaHref` is resolved once by the page, on the server, because the config it
 // comes from reads a non-public env var. Threading it down is what lets the cta
 // block carry no href of its own. `ctaButton` is the translated button text, so
@@ -80,11 +91,13 @@ export function Prose({
   slug,
   ctaHref,
   ctaButton,
+  contact,
 }: {
   blocks: Block[]
   slug: string
   ctaHref: string
   ctaButton: string
+  contact: ContactChannels
 }) {
   return (
     <div className="mt-10 space-y-6">
@@ -96,6 +109,7 @@ export function Prose({
           slug={slug}
           ctaHref={ctaHref}
           ctaButton={ctaButton}
+          contact={contact}
         />
       ))}
     </div>
@@ -108,12 +122,14 @@ function BlockView({
   slug,
   ctaHref,
   ctaButton,
+  contact,
 }: {
   block: Block
   index: number
   slug: string
   ctaHref: string
   ctaButton: string
+  contact: ContactChannels
 }) {
   switch (block.k) {
     case 'h2':
@@ -300,5 +316,50 @@ function BlockView({
           button={{ label: ctaButton }}
         />
       )
+
+    case 'contact': {
+      const rowClass =
+        'flex flex-wrap items-baseline gap-x-4 gap-y-1 py-2.5 text-[15px]'
+      const labelClass =
+        'w-24 shrink-0 text-xs font-semibold uppercase tracking-wider text-zinc-500'
+      const valueClass =
+        'font-medium text-zinc-900 underline decoration-zinc-300 underline-offset-2 transition hover:decoration-zinc-900 dark:text-zinc-100 dark:decoration-zinc-600 dark:hover:decoration-white'
+      return (
+        <aside className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            {block.title}
+          </p>
+          <p className="mt-1.5 text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
+            {parseInline(block.text)}
+          </p>
+          <dl className="mt-4 divide-y divide-zinc-200 border-t border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
+            {contact.whatsapp && (
+              <div className={rowClass}>
+                <dt className={labelClass}>{contact.labels.whatsapp}</dt>
+                <dd>
+                  <a href="/whatsapp" className={valueClass}>
+                    {contact.whatsapp}
+                  </a>
+                </dd>
+              </div>
+            )}
+            <div className={rowClass}>
+              <dt className={labelClass}>{contact.labels.wechat}</dt>
+              <dd className="font-medium text-zinc-900 dark:text-zinc-100">
+                {contact.wechat}
+              </dd>
+            </div>
+            <div className={rowClass}>
+              <dt className={labelClass}>{contact.labels.email}</dt>
+              <dd>
+                <a href={`mailto:${contact.email}`} className={valueClass}>
+                  {contact.email}
+                </a>
+              </dd>
+            </div>
+          </dl>
+        </aside>
+      )
+    }
   }
 }

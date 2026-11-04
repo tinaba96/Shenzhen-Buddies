@@ -62,6 +62,11 @@ export type Block =
   // which /browse does not accept and silently drops. Making the destination
   // uneditable is what keeps that guarantee true without a review step.
   | { k: 'cta'; label: string; sub?: string }
+  // The ways to reach us, rendered from config at request time: the WhatsApp
+  // number comes from a server-only env var (this repo is public, so it is
+  // never written into content), the WeChat ID and email from lib/config.
+  // The block carries only its heading and a line of prose.
+  | { k: 'contact'; title: string; text: string }
 
 export type AuthorId = 'bryan' | 'taka'
 

@@ -1135,6 +1135,8 @@ export const en = {
     ctaBody: 'Matched on what you are actually into, not on a fixed itinerary.',
     // Button on the inline call-out cards inside an article.
     ctaButton: 'Find a buddy',
+    // Row labels on the contact card at the end of an article.
+    contactLabels: { whatsapp: 'WhatsApp', wechat: 'WeChat ID', email: 'Email' },
     lastChecked: 'Last checked: {date}. Border and visa rules change — confirm anything time-sensitive with an official source before you travel.',
     // Keyed by Pillar in src/content/posts/types.ts.
     pillars: {

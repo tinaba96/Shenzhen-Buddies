@@ -1073,6 +1073,7 @@ export const zhHant: Dictionary = {
     ctaLabel: '找個本地人帶你遊',
     ctaBody: '按你真正感興趣的事配對，而不是走一條固定路線。',
     ctaButton: '找個夥伴',
+    contactLabels: { whatsapp: 'WhatsApp', wechat: '微信號', email: '電郵' },
     lastChecked: '最後核實：{date}。過關和簽證規定隨時會變——有時效性的資訊，出發前請再向官方渠道確認。',
     pillars: {
       logistics: {

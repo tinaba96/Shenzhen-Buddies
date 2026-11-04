@@ -29,7 +29,25 @@ import {
 import { fill, type Dictionary } from '@/i18n'
 import { getI18n } from '@/i18n/server'
 import { isAdminViewer } from '@/lib/admin'
-import { DEFAULT_OG_IMAGE, isSingleGuideMode, siteUrl } from '@/lib/config'
+import {
+  CONTACT_EMAIL,
+  DEFAULT_OG_IMAGE,
+  WECHAT_ID,
+  isSingleGuideMode,
+  siteUrl,
+  whatsappNumber,
+} from '@/lib/config'
+
+// "+86 132 6589 5405" for a mainland mobile, "+<digits>" for anything else.
+// Display only: the link goes through /whatsapp, which reads the same env var.
+function whatsappDisplay(): string | null {
+  const digits = whatsappNumber()
+  if (!digits) return null
+  if (digits.startsWith('86') && digits.length === 13) {
+    return `+86 ${digits.slice(2, 5)} ${digits.slice(5, 9)} ${digits.slice(9)}`
+  }
+  return `+${digits}`
+}
 
 // Draft posts are excluded here as well as from the listing, so a draft is not
 // quietly reachable by typing its URL.
@@ -225,6 +243,12 @@ export default async function BlogPostPage({
             slug={post.slug}
             ctaHref={ctaHref}
             ctaButton={t.blog.ctaButton}
+            contact={{
+              whatsapp: whatsappDisplay(),
+              wechat: WECHAT_ID,
+              email: CONTACT_EMAIL,
+              labels: t.blog.contactLabels,
+            }}
           />
         </div>
 
