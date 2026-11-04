@@ -8,8 +8,12 @@ How to post it:
 
 1. Paste `shenzhen-bay-waterfront.md` into the platform's editor (Medium: Import a story
    does not accept local files, so paste; Substack and note accept Markdown paste).
-2. Upload the six images from `images/` where the `![...]` lines are. The alt text
-   is in the brackets; the italic line under each image is the caption.
+2. Upload the seven images from `images/` where the `![...]` lines are. The alt text
+   is in the brackets; the italic line under each image is the caption. The seventh,
+   `07-shenzhen-buddies-banner.jpg` (1600×640), is the advertising banner at the very
+   end of the post; the text block under it carries the links, since platform images
+   are usually not clickable. It says tours are free during the pilot, so retire that
+   line (and re-render the banner) when `FREE_TOURS` is switched off.
 3. **Set the canonical URL** to `https://www.shenzhen-buddies.com/blog/shenzhen-bay-waterfront`
    so search engines credit the site, not the platform. Medium: story settings →
    "Advanced settings" → canonical link. Substack and note have no canonical field,

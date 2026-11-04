@@ -90,3 +90,20 @@ Take the metro to Sea World station on Line 2 or Line 12 and leave by Exit A, a 
 
 **When is the best time to visit Shenzhen Bay?**
 Late afternoon into evening, so you reach Talent Park an hour before sunset and Sea World after dark. For the migratory birds, including the black-faced spoonbill, come between November and March and go to the mangrove end of the park.
+
+---
+
+![Shenzhen Buddies. Walk Shenzhen with someone who lives here. Local buddies for an afternoon or an evening, free during our pilot. shenzhen-buddies.com](images/07-shenzhen-buddies-banner.jpg)
+
+## Walk Shenzhen with someone who lives here
+
+**Shenzhen Buddies** is a small company run by people who live in Shenzhen. We pair visitors with a local buddy for an afternoon or an evening: the waterfront at dusk, the electronics markets, the old town, dinner at a place with no English on the menu. Your buddy handles the apps, the ordering and the timing, and you get the city the way it is lived in, not the way it is toured.
+
+Tours are **free while we are in our pilot**. Pick a walk, choose a day, and we take care of the rest.
+
+- **Browse the walks:** [shenzhen-buddies.com/tours](https://www.shenzhen-buddies.com/tours?utm_source=syndication&utm_medium=blog&utm_campaign=shenzhen-bay-waterfront&utm_content=banner)
+- **Start here if it is your first time in Shenzhen:** [shenzhen-buddies.com/welcome](https://www.shenzhen-buddies.com/welcome?utm_source=syndication&utm_medium=blog&utm_campaign=shenzhen-bay-waterfront&utm_content=banner)
+- **More from the Journal:** [shenzhen-buddies.com/blog](https://www.shenzhen-buddies.com/blog?utm_source=syndication&utm_medium=blog&utm_campaign=shenzhen-bay-waterfront&utm_content=banner)
+- **Follow along:** [Instagram](https://www.instagram.com/shenzhenbuddies/) · [TikTok](https://www.tiktok.com/@shenzhenbuddies) · [Threads](https://www.threads.com/@shenzhenbuddies) · [X](https://x.com/shenzhenbuddies)
+
+Live in Shenzhen and want to show people around? [Write to us](https://www.shenzhen-buddies.com/contact?utm_source=syndication&utm_medium=blog&utm_campaign=shenzhen-bay-waterfront&utm_content=banner). We are looking for buddies too.
