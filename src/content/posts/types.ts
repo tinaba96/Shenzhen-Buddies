@@ -55,6 +55,10 @@ export type Block =
   | { k: 'table'; head: string[]; rows: string[][] }
   | { k: 'quote'; text: string; attribution?: string }
   | { k: 'img'; galleryId: string; caption?: string }
+  // Someone else's photo, resolved against src/content/licensed-photos.ts.
+  // Rendered with its credit and licence underneath, always. The caption is
+  // required because a borrowed photo needs a line saying why it is here.
+  | { k: 'photo'; photoId: string; caption: string }
   | { k: 'callout'; tone: 'tip' | 'warn'; title: string; text: string }
   // Deliberately carries no href. The destination is resolved at render time
   // from isSingleGuideMode() — /guide in beta, bare /browse otherwise — so an
@@ -111,6 +115,9 @@ export type Post = {
   // already requires. Optional: a post that is all text should not have to
   // borrow an unrelated photo to satisfy the type.
   heroGalleryId?: string
+  // The same, for a licensed photo from src/content/licensed-photos.ts. A post
+  // sets at most one of the two; the validator in ./index.ts enforces it.
+  heroPhotoId?: string
   // 'YYYY-MM-DD'
   publishedAt: string
   updatedAt?: string

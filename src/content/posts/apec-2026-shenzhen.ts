@@ -63,6 +63,14 @@ import type { Post } from './types'
 //     the airport and ports by 23 Oct 2026 (21jingji).
 //   - Metro bag checks tightened ahead of the meeting (Sing Tao, Nov 2026).
 //
+//   - Photos (2026-11-06): the venue (Lhzss8, CC BY-SA 4.0, taken 2 Aug
+//     2026) and the 2014 Beijing leaders' photo (Kremlin.ru, CC BY 4.0), both
+//     from Wikimedia Commons and credited in src/content/licensed-photos.ts.
+//     The White House's public-domain 2014 photos were left out: their notice
+//     bars commercial use. The two gallery photos are ours and used nowhere
+//     else, replacing the Futian pair this post used to share with the Futian
+//     post.
+//
 // Deliberately absent: hotel names and prices, the list of attending leaders
 // (unconfirmed until they land), anything about which roads will physically
 // close on the two meeting days (not published at the time of writing), and
@@ -78,7 +86,7 @@ export const apec2026Shenzhen: Post = {
   publishedAt: '2026-11-04',
   lastChecked: '2026-11',
   author: 'bryan',
-  heroGalleryId: 'futian-caitian-towers-night',
+  heroPhotoId: 'shenzhen-international-exchange-center-2026',
   relatedSlugs: ['shenzhen-from-hong-kong-day-trip', 'futian-new-downtown'],
   seo: {
     title: 'APEC 2026 Shenzhen: dates, venue, traffic rules and visiting the city',
@@ -99,14 +107,18 @@ export const apec2026Shenzhen: Post = {
       text: 'APEC is the Asia-Pacific Economic Cooperation forum. Twenty-one economies around the Pacific belong to it, from Chile to Thailand, and their leaders have met once a year since 1993. They are called economies rather than countries, which is how Hong Kong and Chinese Taipei each have a seat of their own. It is a forum rather than a treaty body. The leaders’ meeting is simply the two days a year when they are all in one place. China has given its year the slogan ‘Building an Asia-Pacific Community to Prosper Together’. The three priorities under it are openness, innovation and cooperation.',
     },
     {
+      k: 'photo',
+      photoId: 'apec-2014-beijing-leaders-photo',
+      caption: 'Beijing, 10 November 2014: the leaders and their spouses in jackets the host had made for the occasion. Every APEC host stages a group photo like this.',
+    },
+    {
       k: 'p',
       text: 'The 33rd leaders’ meeting is on 18 and 19 November 2026. The CEO Summit runs on 17 and 18 November, and the last senior officials’ meeting on 14 and 15 November. The main venue is the Shenzhen International Exchange Center at Xiangmi Lake in Futian. It is a new building with a long cantilevered roof and a hotel on either side, one of which opens in December. The architects were He Jingtang’s team, who did the China pavilion at the Shanghai Expo. The APEC forestry ministers’ meeting in July was its first big event. None of it is open to the public.',
     },
     {
-      k: 'img',
-      galleryId: 'futian-cbd-street-night',
-      caption:
-        'Futian after dark. The meeting is a few kilometres west of this, at Xiangmi Lake.',
+      k: 'photo',
+      photoId: 'shenzhen-international-exchange-center-2026',
+      caption: 'The exchange centre in August 2026, three months before the meeting.',
     },
 
     { k: 'h2', text: 'The week: 16 to 20 November' },
@@ -169,6 +181,11 @@ export const apec2026Shenzhen: Post = {
       k: 'p',
       text: 'Our own plan is to stay out of central Futian on the two meeting days. The western waterfront in Nanshan is on the metro and well away from the venue. It runs from [Shenzhen Bay Park, past Talent Park, to Sea World](/blog/shenzhen-bay-waterfront) at Shekou, the old port at the far western end. Sea World is a plaza of bars and restaurants, not an aquarium. [Dongmen](/blog/dongmen-old-downtown) is in Luohu, the next district east. Dafen, the painting village, and Overseas Chinese Town, the theme-park and arts district, are outside Futian too. We would skip [our Futian skyline walk](/blog/futian-new-downtown) on the two meeting nights. Nobody knows yet how far the cordon will reach.',
     },
+    {
+      k: 'img',
+      galleryId: 'shenzhen-bay-railing-day',
+      caption: 'Shenzhen Bay on a clear day. The hills across the water are Hong Kong.',
+    },
 
     { k: 'h2', text: 'Getting in' },
     {
@@ -199,6 +216,11 @@ export const apec2026Shenzhen: Post = {
         'Press and delegation staff who need something specific, such as a place to film the skyline or a menu read over the phone, can write to us and we will say whether we can do it.',
         'An ordinary visitor gets an afternoon planned around the road rules: metro rather than taxis, and nothing near Xiangmi Lake on the meeting days.',
       ],
+    },
+    {
+      k: 'img',
+      galleryId: 'sea-world-minghua-ship-night',
+      caption: 'The Minghua at Sea World after dark, where the evening walk ends.',
     },
     {
       k: 'cta',

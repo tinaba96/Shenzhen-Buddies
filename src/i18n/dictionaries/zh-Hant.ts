@@ -1074,6 +1074,7 @@ export const zhHant: Dictionary = {
     ctaBody: '按你真正感興趣的事配對，而不是走一條固定路線。',
     ctaButton: '找個夥伴',
     contactLabels: { whatsapp: 'WhatsApp', wechat: '微信號', email: '電郵' },
+    photoCredit: { photo: '圖片：', viaCommons: '來自 Wikimedia Commons', resized: '已調整尺寸' },
     lastChecked: '最後核實：{date}。過關和簽證規定隨時會變——有時效性的資訊，出發前請再向官方渠道確認。',
     pillars: {
       logistics: {

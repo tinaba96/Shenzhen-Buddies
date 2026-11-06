@@ -2,7 +2,9 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { requireGalleryItem } from '@/content/gallery'
+import { requireLicensedPhoto } from '@/content/licensed-photos'
 import type { Block } from '@/content/posts/types'
+import type { Locale } from '@/i18n/config'
 
 import { BlogCta } from './BlogTracking'
 
@@ -75,6 +77,9 @@ function headingId(text: string, index: number): string {
 // `whatsapp` is the display form of the number (null when WHATSAPP_NUMBER is
 // unset, in which case the row is simply omitted); the link itself goes through
 // /whatsapp like every other WhatsApp button on the site.
+// Words around a licensed photo's credit line, from the page's dictionary.
+export type PhotoCreditLabels = { photo: string; viaCommons: string; resized: string }
+
 export type ContactChannels = {
   whatsapp: string | null
   wechat: string
@@ -92,12 +97,16 @@ export function Prose({
   ctaHref,
   ctaButton,
   contact,
+  locale,
+  photoCredit,
 }: {
   blocks: Block[]
   slug: string
   ctaHref: string
   ctaButton: string
   contact: ContactChannels
+  locale: Locale
+  photoCredit: PhotoCreditLabels
 }) {
   return (
     <div className="mt-10 space-y-6">
@@ -110,6 +119,8 @@ export function Prose({
           ctaHref={ctaHref}
           ctaButton={ctaButton}
           contact={contact}
+          locale={locale}
+          photoCredit={photoCredit}
         />
       ))}
     </div>
@@ -123,6 +134,8 @@ function BlockView({
   ctaHref,
   ctaButton,
   contact,
+  locale,
+  photoCredit,
 }: {
   block: Block
   index: number
@@ -130,6 +143,8 @@ function BlockView({
   ctaHref: string
   ctaButton: string
   contact: ContactChannels
+  locale: Locale
+  photoCredit: PhotoCreditLabels
 }) {
   switch (block.k) {
     case 'h2':
@@ -271,6 +286,47 @@ function BlockView({
               {block.caption ?? item.caption}
             </figcaption>
           )}
+        </figure>
+      )
+    }
+
+    case 'photo': {
+      // Someone else's photo: the credit line is part of the licence, so it
+      // renders every time, not only when there is room.
+      const photo = requireLicensedPhoto(block.photoId, `posts/${slug} body`)
+      const linkClass = 'underline decoration-zinc-300 underline-offset-2 hover:text-zinc-700 dark:decoration-zinc-600 dark:hover:text-zinc-300'
+      const viaCommons = photo.sourceUrl.includes('commons.wikimedia.org')
+      return (
+        <figure className="-mx-4 sm:mx-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={photo.src}
+            alt={photo.alt[locale]}
+            width={photo.width}
+            height={photo.height}
+            loading="lazy"
+            className="w-full rounded-none sm:rounded-2xl"
+          />
+          <figcaption className="mt-2 px-4 text-sm text-zinc-500 sm:px-0">
+            {block.caption}
+            <span className="mt-1 block text-xs text-zinc-400">
+              {photoCredit.photo}
+              <a href={photo.sourceUrl} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                {photo.author}
+              </a>
+              {' · '}
+              {photo.licenseUrl ? (
+                <a href={photo.licenseUrl} target="_blank" rel="noopener noreferrer license" className={linkClass}>
+                  {photo.license}
+                </a>
+              ) : (
+                photo.license
+              )}
+              {viaCommons && <>{' · '}{photoCredit.viaCommons}</>}
+              {' · '}
+              {photoCredit.resized}
+            </span>
+          </figcaption>
         </figure>
       )
     }

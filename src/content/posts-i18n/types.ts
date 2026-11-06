@@ -28,6 +28,8 @@ export type LocalizedBlock =
   // galleryId stays on the base block. A caption is present exactly when the
   // English block has one.
   | { k: 'img'; caption?: string }
+  // photoId stays on the base block; credit and alt text live with the photo.
+  | { k: 'photo'; caption: string }
   // tone stays on the base block.
   | { k: 'callout'; title: string; text: string }
   | { k: 'cta'; label: string; sub?: string }

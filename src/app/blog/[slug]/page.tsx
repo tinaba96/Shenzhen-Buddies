@@ -10,7 +10,7 @@ import {
 } from '@/components/blog/BlogTracking'
 import { Prose } from '@/components/blog/Prose'
 import { ShareLinks } from '@/components/ShareLinks'
-import { ogImageSrc, requireGalleryItem } from '@/content/gallery'
+import { postHero } from '@/content/post-hero'
 import {
   AUTHORS,
   PILLARS,
@@ -76,9 +76,7 @@ export async function generateMetadata({
   // twitter needs its own title and description — inherited from the root
   // layout it would carry the site-wide pair while og: names the post — but
   // not its own image: Next fills twitter:image from og:image.
-  const image = post.heroGalleryId
-    ? ogImageSrc(requireGalleryItem(post.heroGalleryId, `posts/${post.slug} hero`))
-    : DEFAULT_OG_IMAGE
+  const image = postHero(post, locale)?.ogSrc ?? DEFAULT_OG_IMAGE
 
   // Japanese titles join with a full-width bar, as elsewhere on the site.
   const separator = locale === 'ja' ? '｜' : ' — '
@@ -134,6 +132,7 @@ export default async function BlogPostPage({
   // public previews.
   const ctaHref = isSingleGuideMode() ? '/guide' : '/browse'
 
+  const heroImage = postHero(post, locale)
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -148,11 +147,7 @@ export default async function BlogPostPage({
       url: siteUrl(),
     },
     mainEntityOfPage: `${siteUrl()}/blog/${post.slug}`,
-    ...(post.heroGalleryId
-      ? {
-          image: `${siteUrl()}${ogImageSrc(requireGalleryItem(post.heroGalleryId, `posts/${post.slug} hero`))}`,
-        }
-      : {}),
+    ...(heroImage ? { image: `${siteUrl()}${heroImage.ogSrc}` } : {}),
   }
 
   const faqJsonLd = post.faq?.length
@@ -243,6 +238,8 @@ export default async function BlogPostPage({
             slug={post.slug}
             ctaHref={ctaHref}
             ctaButton={t.blog.ctaButton}
+            locale={locale}
+            photoCredit={t.blog.photoCredit}
             contact={{
               whatsapp: whatsappDisplay(),
               wechat: WECHAT_ID,

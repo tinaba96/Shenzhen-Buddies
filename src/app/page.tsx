@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { PackageCard } from '@/components/PackageCard'
-import { galleryItems, requireGalleryItem } from '@/content/gallery'
+import { galleryItems } from '@/content/gallery'
 import { localizeGalleryItem } from '@/content/gallery-i18n'
+import { postHero } from '@/content/post-hero'
 import { packagePrice } from '@/content/packages'
 import {
   localizedFeaturedPackage,
@@ -715,12 +716,7 @@ function Journal({ locale, t }: { locale: Locale; t: Dictionary }) {
             // lets a screen reader switch voice instead of reading English
             // with Japanese phonetics.
             const postLang = hasPostTranslation(post, locale) ? undefined : 'en'
-            const hero = post.heroGalleryId
-              ? localizeGalleryItem(
-                  requireGalleryItem(post.heroGalleryId, 'home/journal'),
-                  locale,
-                )
-              : null
+            const hero = postHero(post, locale)
             return (
               <li key={post.slug}>
                 <Link

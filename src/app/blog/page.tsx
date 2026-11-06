@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { TrackOnMount } from '@/components/blog/BlogTracking'
-import { requireGalleryItem } from '@/content/gallery'
-import { localizeGalleryItem } from '@/content/gallery-i18n'
+import { postHero } from '@/content/post-hero'
 import {
   AUTHORS,
   PILLARS,
@@ -254,7 +253,8 @@ function CardImage({
 }) {
   const ratio = tall ? 'aspect-[16/9]' : 'aspect-[3/2]'
 
-  if (!post.heroGalleryId) {
+  const hero = postHero(post, locale)
+  if (!hero) {
     return (
       <div
         className={`${ratio} flex items-end bg-gradient-to-br from-amber-100 via-rose-50 to-rose-100 p-5 dark:from-amber-950/40 dark:via-zinc-900 dark:to-rose-950/40`}
@@ -266,10 +266,6 @@ function CardImage({
     )
   }
 
-  const hero = localizeGalleryItem(
-    requireGalleryItem(post.heroGalleryId, `posts/${post.slug} hero`),
-    locale,
-  )
   return (
     <div className={`${ratio} overflow-hidden`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}

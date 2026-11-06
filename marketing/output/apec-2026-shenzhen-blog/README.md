@@ -33,3 +33,14 @@ How to post it:
 
 Translations (Japanese, Simplified and Traditional Chinese) live on the site at
 `/ja/blog/…`, `/zh-Hans/blog/…` and `/zh-Hant/blog/…`.
+
+## Photo credits
+
+Two photos are not ours and are used under their Creative Commons licences. Keep
+the italic "Photo:" line under each one when pasting; the credit, the licence
+link and the "resized" note are what the licence asks for.
+
+- `01-shenzhen-international-exchange-center.jpg`: Lhzss8, CC BY-SA 4.0, via
+  Wikimedia Commons (file page linked in the Markdown).
+- `02-apec-2014-beijing-leaders.jpg`: Kremlin.ru, CC BY 4.0, via Wikimedia Commons.
+- `03` and `04` are the founders' own photos. Neither appears in any other post.

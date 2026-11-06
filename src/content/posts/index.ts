@@ -3,6 +3,7 @@
 // load (bottom of this file), so `npm run build` is the gate.
 
 import { requireGalleryItem } from '@/content/gallery'
+import { requireLicensedPhoto } from '@/content/licensed-photos'
 
 import { AUTHORS, PILLARS, type Pillar, type Post } from './types'
 import { dongmenOldDowntown } from './dongmen-old-downtown'
@@ -71,6 +72,9 @@ function blockText(post: Post): string[] {
         break
       case 'img':
         out.push(b.caption ?? '')
+        break
+      case 'photo':
+        out.push(b.caption)
         break
     }
   }
@@ -145,9 +149,17 @@ export function assertPostsValid(all: readonly Post[] = posts): void {
     if (post.heroGalleryId) {
       requireGalleryItem(post.heroGalleryId, `posts/${slug} hero`)
     }
+    if (post.heroPhotoId) {
+      if (post.heroGalleryId) fail(slug, 'sets both heroGalleryId and heroPhotoId; pick one')
+      requireLicensedPhoto(post.heroPhotoId, `posts/${slug} hero`)
+    }
     for (const block of post.body) {
       if (block.k === 'img') {
         requireGalleryItem(block.galleryId, `posts/${slug} body`)
+      }
+      if (block.k === 'photo') {
+        requireLicensedPhoto(block.photoId, `posts/${slug} body`)
+        if (!block.caption.trim()) fail(slug, `photo "${block.photoId}" needs a caption`)
       }
       if (block.k === 'table') {
         for (const row of block.rows) {

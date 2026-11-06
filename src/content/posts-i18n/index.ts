@@ -92,6 +92,10 @@ function mergeBlock(base: Post['body'][number], tr: LocalizedBlock | undefined):
       const t = tr as { caption?: string }
       return base.caption === undefined ? base : { ...base, caption: t.caption ?? base.caption }
     }
+    case 'photo': {
+      const t = tr as { caption: string }
+      return { ...base, caption: t.caption }
+    }
     case 'callout':
     case 'contact': {
       const t = tr as { title: string; text: string }

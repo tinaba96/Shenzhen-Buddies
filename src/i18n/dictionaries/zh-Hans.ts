@@ -1065,6 +1065,7 @@ export const zhHans: Dictionary = {
     ctaBody: '按你真正感兴趣的来匹配，而不是走一条固定路线。',
     ctaButton: '找个伙伴',
     contactLabels: { whatsapp: 'WhatsApp', wechat: '微信号', email: '邮箱' },
+    photoCredit: { photo: '图片：', viaCommons: '来自 Wikimedia Commons', resized: '已调整尺寸' },
     lastChecked: '最后核实：{date}。过关和签证规定随时可能变化——有时效性的信息，出发前请再向官方渠道确认一次。',
     pillars: {
       logistics: {

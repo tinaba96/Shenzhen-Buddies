@@ -4,7 +4,10 @@
 
 By Bryan Wang, co-founder of Shenzhen Buddies. Lives in Shenzhen. Last checked: 3 November 2026.
 
-![Three skyscrapers at night seen from the pavement, their facades striped with blue light and one tower glowing red through the trees, with a street sign for Caitian Road and Shennan Boulevard in the corner.](images/01-futian-caitian-towers-night.jpg)
+![The Shenzhen International Exchange Center at Xiangmi Lake on an overcast day in August 2026: a pale stone building under a wide, sharply overhanging roof, with pine trees and an engraved boulder at the entrance.](images/01-shenzhen-international-exchange-center.jpg)
+
+*The exchange centre in August 2026, three months before the meeting.*
+*Photo: [Lhzss8](https://commons.wikimedia.org/wiki/File:%E6%B7%B1%E5%9C%B3%E5%9B%BD%E9%99%85%E4%BA%A4%E6%B5%81%E4%B8%AD%E5%BF%83.jpg) · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) · via Wikimedia Commons · resized*
 
 In the middle of November, Shenzhen hosts the APEC leaders’ meeting. Leaders from twenty-one economies come to Futian, the central district, for two days, and the streets around the venue are expected to be shut while they are there. China has done this twice before, in Shanghai in 2001 and in Beijing in 2014. It is the first time for Shenzhen, and the city has been getting ready for a year.
 
@@ -14,11 +17,13 @@ We live here and have watched the preparations. The venue at Xiangmi Lake was fi
 
 APEC is the Asia-Pacific Economic Cooperation forum. Twenty-one economies around the Pacific belong to it, from Chile to Thailand, and their leaders have met once a year since 1993. They are called economies rather than countries, which is how Hong Kong and Chinese Taipei each have a seat of their own. It is a forum rather than a treaty body. The leaders’ meeting is simply the two days a year when they are all in one place. China has given its year the slogan ‘Building an Asia-Pacific Community to Prosper Together’. The three priorities under it are openness, innovation and cooperation.
 
+![The leaders and their spouses at the 22nd APEC Economic Leaders’ Meeting in Beijing on 10 November 2014, standing in two rows on a stage in matching dark red, green and blue jackets, under a sign with the meeting’s name and dates.](images/02-apec-2014-beijing-leaders.jpg)
+
+*Beijing, 10 November 2014: the leaders and their spouses in jackets the host had made for the occasion. Every APEC host stages a group photo like this.*
+*Photo: [Kremlin.ru](https://commons.wikimedia.org/wiki/File:APEC_Summit_China_2014.jpg) · [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) · via Wikimedia Commons · resized*
+
 The 33rd leaders’ meeting is on 18 and 19 November 2026. The CEO Summit runs on 17 and 18 November, and the last senior officials’ meeting on 14 and 15 November. The main venue is the Shenzhen International Exchange Center at Xiangmi Lake in Futian. It is a new building with a long cantilevered roof and a hotel on either side, one of which opens in December. The architects were He Jingtang’s team, who did the China pavilion at the Shanghai Expo. The APEC forestry ministers’ meeting in July was its first big event. None of it is open to the public.
 
-![A street in Futian’s business district at night: towers lit red and blue, a faceted glass skybridge between two buildings, a facade of coloured light panels, and a taxi on the wet road below.](images/02-futian-cbd-street-night.jpg)
-
-*Futian after dark. The meeting is a few kilometres west of this, at Xiangmi Lake.*
 
 ## The week: 16 to 20 November
 
@@ -42,6 +47,10 @@ If you are here for the meeting the question does not arise, and the useful part
 
 Our own plan is to stay out of central Futian on the two meeting days. The western waterfront in Nanshan is on the metro and well away from the venue. It runs from [Shenzhen Bay Park, past Talent Park, to Sea World](https://www.shenzhen-buddies.com/blog/shenzhen-bay-waterfront?utm_source=syndication&utm_medium=blog&utm_campaign=apec-2026-shenzhen) at Shekou, the old port at the far western end. Sea World is a plaza of bars and restaurants, not an aquarium. [Dongmen](https://www.shenzhen-buddies.com/blog/dongmen-old-downtown?utm_source=syndication&utm_medium=blog&utm_campaign=apec-2026-shenzhen) is in Luohu, the next district east. Dafen, the painting village, and Overseas Chinese Town, the theme-park and arts district, are outside Futian too. We would skip [our Futian skyline walk](https://www.shenzhen-buddies.com/blog/futian-new-downtown?utm_source=syndication&utm_medium=blog&utm_campaign=apec-2026-shenzhen) on the two meeting nights. Nobody knows yet how far the cordon will reach.
 
+![The Shenzhen Bay waterfront promenade on a clear day: a wooden-topped railing runs along green water, with hills across the bay under a blue sky.](images/03-shenzhen-bay-railing.jpg)
+
+*Shenzhen Bay on a clear day. The hills across the water are Hong Kong.*
+
 ## Getting in
 
 Many visitors no longer need a visa. China’s unilateral visa-free entry covers ordinary passports from fifty countries, including Japan, Australia, most of Europe and, since 17 February 2026, the United Kingdom and Canada, for stays of up to thirty days. The policy currently runs to 31 December 2026. The United States is not on the list. Travellers from fifty-seven countries, Americans among them, can use the 240-hour visa-free transit instead if they are moving on to a third country or region. Since 1 November, holders of an APEC Business Travel Card can stay ninety days rather than sixty.
@@ -60,6 +69,10 @@ Shenzhen Buddies pairs visitors with a local for two or three hours, free during
 - A partner who is not attending gets an afternoon with a buddy at the waterfront, in Dafen or in the Huaqiangbei electronics markets, which are at the east end of Futian and well clear of the lake, and dinner somewhere we would eat ourselves.
 - Press and delegation staff who need something specific, such as a place to film the skyline or a menu read over the phone, can write to us and we will say whether we can do it.
 - An ordinary visitor gets an afternoon planned around the road rules: metro rather than taxis, and nothing near Xiangmi Lake on the meeting days.
+
+![The white Minghua ship lit up at night above the Sea World plaza in Shekou, with palm trees, restaurant signs and people strolling across the square.](images/04-minghua-ship-night.jpg)
+
+*The Minghua at Sea World after dark, where the evening walk ends.*
 
 **Book a buddy for APEC week.** Tell us your dates and what you need: [shenzhen-buddies.com/guide](https://www.shenzhen-buddies.com/guide?utm_source=syndication&utm_medium=blog&utm_campaign=apec-2026-shenzhen).
 
@@ -97,7 +110,7 @@ Yes. No attractions have been announced as closed, visa-free entry for fifty cou
 
 ---
 
-![Shenzhen Buddies. Walk Shenzhen with someone who lives here. Local buddies for an afternoon or an evening, free during our pilot. shenzhen-buddies.com](images/03-shenzhen-buddies-banner.jpg)
+![Shenzhen Buddies. Walk Shenzhen with someone who lives here. Local buddies for an afternoon or an evening, free during our pilot. shenzhen-buddies.com](images/05-shenzhen-buddies-banner.jpg)
 
 ## Walk Shenzhen with someone who lives here
 

@@ -1065,6 +1065,7 @@ export const ja: Dictionary = {
     ctaBody: '決まったコースではなく、あなたが本当に好きなことでマッチングします。',
     ctaButton: 'バディを探す',
     contactLabels: { whatsapp: 'WhatsApp', wechat: 'WeChat ID', email: 'メール' },
+    photoCredit: { photo: '写真：', viaCommons: 'Wikimedia Commons より', resized: 'サイズ変更' },
     lastChecked: '最終確認：{date}。出入国やビザのルールは変わることがあります。最新の情報は、出発前に必ず公式の情報源でご確認ください。',
     pillars: {
       logistics: {

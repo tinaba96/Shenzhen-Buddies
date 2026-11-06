@@ -1137,6 +1137,7 @@ export const en = {
     ctaButton: 'Find a buddy',
     // Row labels on the contact card at the end of an article.
     contactLabels: { whatsapp: 'WhatsApp', wechat: 'WeChat ID', email: 'Email' },
+    photoCredit: { photo: 'Photo: ', viaCommons: 'via Wikimedia Commons', resized: 'resized' },
     lastChecked: 'Last checked: {date}. Border and visa rules change — confirm anything time-sensitive with an official source before you travel.',
     // Keyed by Pillar in src/content/posts/types.ts.
     pillars: {
