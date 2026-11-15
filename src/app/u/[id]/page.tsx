@@ -83,7 +83,9 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
   // Guide profiles are the public landing page for cold traffic, and RLS
   // doesn't expose profiles without a session — so anonymous reads go through
   // the service-role client and are narrowed to public guides right below.
-  const reader = user ? supabase : createSupabaseAdminClient()
+  // Admins read through it too, so a private profile's reviews can still be
+  // moderated.
+  const reader = user && !isAdmin ? supabase : createSupabaseAdminClient()
 
   const { data: profile } = await reader
     .from('profiles')
@@ -94,7 +96,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
     .maybeSingle<ProfileRow>()
 
   if (!profile) notFound()
-  if (profile.visibility === 'private' && !isSelf) notFound()
+  if (profile.visibility === 'private' && !isSelf && !isAdmin) notFound()
   // Only public *guide* profiles are part of the anonymous preview. Tourist
   // profiles stay behind login exactly as before.
   if (!user && profile.role !== 'guide') {
@@ -298,7 +300,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
             >
               {c.editProfile}
             </Link>
-          ) : myProfile?.role && myProfile.role === profile.role ? (
+          ) : profile.visibility === 'private' ? null : myProfile?.role && myProfile.role === profile.role ? (
             <div className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
               {profile.role === 'guide' ? c.sameRoleGuides : c.sameRoleTourists}
             </div>
@@ -326,7 +328,8 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
           )}
         </div>
 
-        {!isSelf && myProfile?.role && myProfile.role !== profile.role && (
+        {/* A private profile only renders here for an admin moderating it. */}
+        {!isSelf && profile.visibility !== 'private' && myProfile?.role && myProfile.role !== profile.role && (
           <form
             action={submitReview}
             className="mb-6 space-y-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"

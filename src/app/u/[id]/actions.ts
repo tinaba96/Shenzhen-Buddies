@@ -92,7 +92,7 @@ export async function deleteReview(formData: FormData) {
     .delete()
     .eq('id', reviewId)
     .eq('reviewee_id', revieweeId)
-    .select('id')
+    .select('id, reviewer_id, thumb, stars')
   if (error) {
     console.error('Review delete failed:', error)
     redirect(`/u/${revieweeId}?error=${encodeURIComponent('Could not delete the review. Check the Vercel logs.')}`)
@@ -101,6 +101,9 @@ export async function deleteReview(formData: FormData) {
   if (!deleted?.length) {
     redirect(`/u/${revieweeId}?error=${encodeURIComponent('That review was already deleted.')}`)
   }
+  // Who removed which review, in the Vercel logs (kept only briefly). The
+  // text itself is not copied there.
+  console.info('Admin deleted review', { by: user.email, revieweeId, review: deleted[0] })
 
   revalidatePath('/guide')
   revalidatePath(`/u/${revieweeId}`)
