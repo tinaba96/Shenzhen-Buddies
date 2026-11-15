@@ -8,6 +8,7 @@ import { fill, type Dictionary } from '@/i18n'
 import { getI18n } from '@/i18n/server'
 import { tagLabel } from '@/i18n/tags'
 import { avatarPublicUrl } from '@/lib/avatars'
+import { isAdminEmail } from '@/lib/config'
 import {
   scoreMatch,
   type MatchScore,
@@ -18,10 +19,11 @@ import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { startConversationWith } from '@/app/messages/actions'
 import { submitReview } from './actions'
+import { DeleteReviewButton } from './DeleteReviewButton'
 
 type Props = {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ reviewed?: string; error?: string }>
+  searchParams: Promise<{ reviewed?: string; error?: string; review_deleted?: string }>
 }
 
 type ProfileRow = {
@@ -64,7 +66,7 @@ const REVIEW_VISIBILITY_THRESHOLD = 1
 
 export default async function ProfileDetailPage({ params, searchParams }: Props) {
   const { id } = await params
-  const { reviewed, error: queryError } = await searchParams
+  const { reviewed, error: queryError, review_deleted: reviewDeleted } = await searchParams
   const { locale, t, meta } = await getI18n()
   const c = t.buddy
   const reviewCountLabel = (n: number) =>
@@ -76,6 +78,7 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
   } = await supabase.auth.getUser()
 
   const isSelf = user?.id === id
+  const isAdmin = isAdminEmail(user?.email)
 
   // Guide profiles are the public landing page for cold traffic, and RLS
   // doesn't expose profiles without a session — so anonymous reads go through
@@ -242,6 +245,11 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
             {c.reviewed}
           </p>
         )}
+        {isAdmin && reviewDeleted && (
+          <p className="mt-6 rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+            Review deleted.
+          </p>
+        )}
         {queryError && (
           <p className="mt-6 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
             {queryError}
@@ -405,9 +413,12 @@ export default async function ProfileDetailPage({ params, searchParams }: Props)
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <p className="truncate font-medium">{reviewerName}</p>
-                        <span className="text-xs text-zinc-500">
+                        <div className="flex items-center gap-2 text-xs text-zinc-500">
                           {new Date(r.created_at).toLocaleDateString(meta.intlLocale)}
-                        </span>
+                          {isAdmin && (
+                            <DeleteReviewButton reviewId={r.id} revieweeId={profile.id} />
+                          )}
+                        </div>
                       </div>
                       <div className="mt-1 flex items-center gap-2">
                         {r.thumb && (

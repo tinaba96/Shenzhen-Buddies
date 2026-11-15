@@ -257,7 +257,7 @@ export async function submitOpenReview(
       '',
       values.body || '(no written review)',
       '',
-      `It is live on ${siteUrl()}/u/${guideId}. To remove it, delete the row in the Supabase reviews table.`,
+      `It is live on ${siteUrl()}/u/${guideId}. To remove it, open that page signed in as an admin and press Delete on the review.`,
       `Sent from ${h.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown IP'}`,
     ].join('\n'),
   })

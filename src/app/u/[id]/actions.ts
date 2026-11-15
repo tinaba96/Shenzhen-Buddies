@@ -1,8 +1,10 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { getI18n } from '@/i18n/server'
+import { isAdminEmail } from '@/lib/config'
+import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export async function submitReview(formData: FormData) {
@@ -64,4 +66,43 @@ export async function submitReview(formData: FormData) {
 
   revalidatePath(`/u/${revieweeId}`)
   redirect(`/u/${revieweeId}?reviewed=1`)
+}
+
+// Admin-only "Delete" on a review. Reviews go live without approval (post-tour
+// page, the open /review link, this page), so this is how an inappropriate
+// one comes down. The reviewer's account is left alone.
+export async function deleteReview(formData: FormData) {
+  const reviewId = String(formData.get('review_id') ?? '').trim()
+  const revieweeId = String(formData.get('reviewee_id') ?? '').trim()
+
+  if (!reviewId || !revieweeId) notFound()
+
+  const supabase = await createSupabaseServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) redirect(`/login?next=${encodeURIComponent(`/u/${revieweeId}`)}`)
+  if (!isAdminEmail(user.email)) notFound()
+
+  // Service role: RLS only lets reviewers touch their own rows. Matching on
+  // reviewee too keeps a stale form from deleting a review on another page.
+  const admin = createSupabaseAdminClient()
+  const { data: deleted, error } = await admin
+    .from('reviews')
+    .delete()
+    .eq('id', reviewId)
+    .eq('reviewee_id', revieweeId)
+    .select('id')
+  if (error) {
+    console.error('Review delete failed:', error)
+    redirect(`/u/${revieweeId}?error=${encodeURIComponent('Could not delete the review. Check the Vercel logs.')}`)
+  }
+  // Already gone (deleted in another tab, or the page was stale).
+  if (!deleted?.length) {
+    redirect(`/u/${revieweeId}?error=${encodeURIComponent('That review was already deleted.')}`)
+  }
+
+  revalidatePath('/guide')
+  revalidatePath(`/u/${revieweeId}`)
+  redirect(`/u/${revieweeId}?review_deleted=1`)
 }
